@@ -346,20 +346,24 @@ const Shell = (() => {
       }
     });
     
-    // Close on outside click
+    // Close on outside click (backdrop or the overlay element itself)
     palette.addEventListener('click', e => {
-      if (e.target.classList.contains('palette-backdrop')) closePalette();
+      if (e.target === palette || e.target.classList.contains('palette-backdrop')) closePalette();
     });
+    // Wire the close kbd button directly
+    const closeKbd = palette.querySelector('[data-action="palette:close"]');
+    if (closeKbd) closeKbd.addEventListener('click', e => { e.stopPropagation(); closePalette(); });
   }
   
   function openPalette() {
     palette.hidden = false;
+    palette.style.display = ''; // clear any inline display:none from boot-time guard
     const input = document.getElementById('palette-input');
-    setTimeout(() => input.focus(), 50);
     OPS.state.paletteQuery = '';
     OPS.state.selectedPaletteIndex = 0;
     input.value = '';
     renderPaletteResults();
+    setTimeout(() => input.focus(), 10);
   }
   
   function closePalette() {
@@ -442,9 +446,15 @@ const Shell = (() => {
   
   // ── Shortcuts panel ─────────────────────────────────────────────────
   function initShortcutsPanel() {
+    // Backdrop click closes
     shortcutsPanel.addEventListener('click', e => {
-      if (e.target.classList.contains('palette-backdrop')) closeShortcuts();
+      if (e.target === shortcutsPanel || e.target.classList.contains('palette-backdrop')) {
+        closeShortcuts();
+      }
     });
+    // X button closes (wired directly so delegated-action race conditions can't block it)
+    const closeBtn = shortcutsPanel.querySelector('[data-action="shortcuts:close"]');
+    if (closeBtn) closeBtn.addEventListener('click', e => { e.stopPropagation(); closeShortcuts(); });
     // Ensure both overlays start hidden (defensive against any state issues)
     shortcutsPanel.hidden = true;
     palette.hidden = true;
@@ -452,6 +462,7 @@ const Shell = (() => {
   
   function openShortcuts() {
     shortcutsPanel.hidden = false;
+    shortcutsPanel.style.display = ''; // clear inline display:none from boot-time guard
     const grid = document.getElementById('shortcuts-grid');
     const shortcuts = [
       { keys: ['⌘K'], desc: 'Command palette' },
@@ -476,6 +487,9 @@ const Shell = (() => {
         <span class="shortcut-keys">${s.keys.map(k => `<kbd class="kbd">${k}</kbd>`).join('')}</span>
       </div>
     `).join('');
+    // Focus panel so Esc works immediately
+    shortcutsPanel.setAttribute('tabindex', '-1');
+    shortcutsPanel.focus();
   }
   
   function closeShortcuts() { shortcutsPanel.hidden = true; }

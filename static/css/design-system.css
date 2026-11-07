@@ -13,6 +13,11 @@ img, svg { display: block; max-width: 100%; }
 ul, ol { list-style: none; }
 table { border-collapse: collapse; width: 100%; }
 
+/* CRITICAL: [hidden] must truly hide elements. Without !important,
+   author CSS that sets display (e.g. .palette-overlay { display:flex })
+   will override the UA's [hidden]{display:none} and make overlays visible on page load. */
+[hidden] { display: none !important; }
+
 /* ── Design Tokens (defaults — workspace overrides via data-workspace) ── */
 :root {
   /* Type */

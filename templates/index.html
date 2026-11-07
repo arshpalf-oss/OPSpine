@@ -154,15 +154,16 @@
 </script>
 
 <script>
-// Immediately hide overlays to prevent flash/stuck state before JS loads
-document.addEventListener('DOMContentLoaded', function() {
+// Immediately force-hide overlays BEFORE first paint to prevent stuck state.
+// Runs synchronously while parser is here (elements above already exist in DOM).
+(function(){
   var p = document.getElementById('palette');
   var s = document.getElementById('shortcuts-panel');
   var ds = document.getElementById('drawer-scrim');
-  if (p) p.hidden = true;
-  if (s) s.hidden = true;
-  if (ds) { ds.hidden = true; ds.classList.remove('visible'); }
-});
+  if (p) { p.hidden = true; p.style.display = 'none'; }
+  if (s) { s.hidden = true; s.style.display = 'none'; }
+  if (ds) { ds.hidden = true; ds.style.display = 'none'; ds.classList.remove('visible'); }
+})();
 </script>
 <script src="/static/js/api.js"></script>
 <script src="/static/js/motion.js"></script>
