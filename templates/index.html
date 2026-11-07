@@ -153,7 +153,17 @@
 }
 </script>
 
-<script src="/static/js/state.js"></script>
+<script>
+// Immediately hide overlays to prevent flash/stuck state before JS loads
+document.addEventListener('DOMContentLoaded', function() {
+  var p = document.getElementById('palette');
+  var s = document.getElementById('shortcuts-panel');
+  var ds = document.getElementById('drawer-scrim');
+  if (p) p.hidden = true;
+  if (s) s.hidden = true;
+  if (ds) { ds.hidden = true; ds.classList.remove('visible'); }
+});
+</script>
 <script src="/static/js/api.js"></script>
 <script src="/static/js/motion.js"></script>
 <script src="/static/js/shell.js"></script>

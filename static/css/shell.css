@@ -351,15 +351,41 @@
 }
 
 /* ── Shortcuts panel ─────────────────────────────────────────────────── */
-.shortcuts-panel { padding: 0; max-width: 520px; }
+.shortcuts-panel {
+  padding: 0;
+  width: 90%;
+  max-width: 520px;
+  max-height: 70vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
 .shortcuts-header {
   display: flex; align-items: center; justify-content: space-between;
   padding: var(--sp-4) var(--sp-5); border-bottom: 1px solid var(--ws-line);
+  flex-shrink: 0;
 }
 .shortcuts-header h2 { font-size: var(--fs-lg); font-weight: 600; }
 .shortcuts-grid {
-  padding: var(--sp-4); display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp-2);
-  max-height: 50vh; overflow-y: auto;
+  padding: var(--sp-4);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--sp-2);
+  overflow-y: auto;
+  flex: 1;
+  min-height: 0;
+}
+.shortcuts-panel .shortcut-row {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: var(--sp-2) var(--sp-3); border-radius: var(--r-md);
+  gap: var(--sp-2);
+  font-size: var(--fs-sm);
+}
+.shortcuts-panel .shortcut-row span:first-child { flex: 1; min-width: 0; }
+.shortcuts-panel .kbd {
+  font-size: 10px; padding: 2px 5px;
+  background: rgba(0,0,0,.2); border: 1px solid var(--ws-line);
+  border-radius: 4px; font-family: var(--mono); white-space: nowrap;
 }
 .shortcut-row {
   display: flex; align-items: center; justify-content: space-between;

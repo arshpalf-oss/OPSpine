@@ -445,6 +445,9 @@ const Shell = (() => {
     shortcutsPanel.addEventListener('click', e => {
       if (e.target.classList.contains('palette-backdrop')) closeShortcuts();
     });
+    // Ensure both overlays start hidden (defensive against any state issues)
+    shortcutsPanel.hidden = true;
+    palette.hidden = true;
   }
   
   function openShortcuts() {

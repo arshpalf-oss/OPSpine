@@ -17,18 +17,26 @@ const Commands = (() => {
     
     // Escape closes overlays
     if (e.key === 'Escape') {
-      const palette = document.getElementById('palette');
-      const shortcuts = document.getElementById('shortcuts-panel');
-      if (!palette.hidden) { Shell.closePalette(); e.preventDefault(); return; }
-      if (!shortcuts.hidden) { Shell.closeShortcuts(); e.preventDefault(); return; }
+      const paletteEl = document.getElementById('palette');
+      const shortcutsEl = document.getElementById('shortcuts-panel');
+      if (paletteEl && !paletteEl.hidden) { Shell.closePalette(); e.preventDefault(); return; }
+      if (shortcutsEl && !shortcutsEl.hidden) { Shell.closeShortcuts(); e.preventDefault(); return; }
       return;
     }
     
-    // ? opens shortcuts (when not typing)
-    if (key === '?' && !typing && !mod) {
-      e.preventDefault();
-      Shell.openShortcuts();
+    // ? opens shortcuts (when not typing, and only when Shift is held — ? is Shift+/)
+    if (key === '?' && !typing && !mod && e.shiftKey) {
+      // Check that shortcuts isn't already open to avoid toggle-loop
+      const sp = document.getElementById('shortcuts-panel');
+      if (sp && sp.hidden) {
+        e.preventDefault();
+        Shell.openShortcuts();
+      }
       return;
+    }
+    // Toggle shortcuts with /? when palette is open
+    if (key === '?' && !typing && !mod && !e.shiftKey) {
+      // plain "/" when not typing - do nothing (avoids accidental triggers on non-US keyboards)
     }
     
     // Modifier combos
