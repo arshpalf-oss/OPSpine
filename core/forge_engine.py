@@ -246,7 +246,7 @@ def create_pdf(prompt: str, opts: Dict = None) -> Tuple[str, str, int]:
         "Real PDF generation via ReportLab",
         "Markdown export",
         "ZIP packaging of multiple files",
-        "PNG placeholder generation via Pillow",
+        "PNG generation (with Pillow or built-in fallback)",
     ]
     for item in items:
         story.append(Paragraph(f"• {item}", body))
@@ -311,12 +311,19 @@ that can be opened in any text editor or rendered by any Markdown viewer.
 
 
 def create_png(prompt: str, opts: Dict = None) -> Tuple[str, str, int]:
-    """Create a PNG placeholder image."""
-    from PIL import Image, ImageDraw, ImageFont
-    import io
-    
+    """Create a PNG placeholder image. Uses Pillow if available; otherwise writes a valid minimal PNG manually."""
     opts = opts or {}
-    w, h = opts.get("width", 1200), opts.get("height", 675)
+    w, h = opts.get("width", 800), opts.get("height", 450)
+    
+    try:
+        from PIL import Image, ImageDraw, ImageFont
+        return _create_png_pil(prompt, w, h)
+    except ImportError:
+        return _create_png_manual(prompt, w, h)
+
+
+def _create_png_pil(prompt: str, w: int, h: int) -> Tuple[str, str, int]:
+    from PIL import Image, ImageDraw, ImageFont
     
     img = Image.new("RGB", (w, h), color=(15, 15, 30))
     draw = ImageDraw.Draw(img)
@@ -329,31 +336,65 @@ def create_png(prompt: str, opts: Dict = None) -> Tuple[str, str, int]:
         draw.line([(0, y), (w, y)], fill=(r, g, b))
     
     # Accent shapes
-    draw.ellipse([w//2-100, h//2-100, w//2+100, h//2+100], outline=(100, 180, 255, 128), width=2)
-    draw.ellipse([w//2-60, h//2-60, w//2+60, h//2+60], outline=(255, 100, 150, 80), width=1)
+    draw.ellipse([w//2-100, h//2-100, w//2+100, h//2+100], outline=(100, 180, 255), width=2)
+    draw.ellipse([w//2-60, h//2-60, w//2+60, h//2+60], outline=(255, 100, 150), width=1)
     
-    # Text
+    # Text (use default font to avoid missing-font issues across platforms)
+    font_large = ImageFont.load_default()
+    font_small = ImageFont.load_default()
     try:
-        font_large = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 36)
-        font_small = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 16)
-    except:
-        font_large = ImageFont.load_default()
-        font_small = ImageFont.load_default()
+        for fp in [
+            "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
+            "/System/Library/Fonts/Helvetica.ttc",
+            "C:/Windows/Fonts/arial.ttf",
+        ]:
+            if os.path.exists(fp):
+                font_large = ImageFont.truetype(fp, 28)
+                font_small = ImageFont.truetype(fp, 14)
+                break
+    except Exception:
+        pass
     
     title = prompt[:60] if len(prompt) < 60 else prompt[:57] + "..."
-    bbox = draw.textbbox((0,0), title, font=font_large)
-    tw = bbox[2] - bbox[0]
-    draw.text(((w - tw) // 2, h//2 - 30), title, fill=(255, 255, 255), font=font_large)
-    
+    draw.text((w//2, h//2 - 20), title, fill=(255, 255, 255), font=font_large, anchor="mm")
     sub = "OPSpine Forge · Local Image Generator"
-    bbox2 = draw.textbbox((0,0), sub, font=font_small)
-    sw = bbox2[2] - bbox2[0]
-    draw.text(((w - sw) // 2, h//2 + 30), sub, fill=(180, 200, 220), font=font_small)
+    draw.text((w//2, h//2 + 20), sub, fill=(180, 200, 220), font=font_small, anchor="mm")
     
     ts = int(time.time())
     fname = f"image_{ts}.png"
     fpath = DOCS_DIR / fname
     img.save(str(fpath), "PNG")
+    size = fpath.stat().st_size
+    return str(fpath), fname, size
+
+
+def _create_png_manual(prompt: str, w: int, h: int) -> Tuple[str, str, int]:
+    """Write a minimal valid PNG (solid dark blue-gray with no dependencies on Pillow).
+    Uses zlib + struct from stdlib. Works on Python 3.14 Windows without Pillow."""
+    import struct
+    import zlib
+    
+    # Build raw pixel data (solid dark color)
+    r, g, b = 20, 25, 45
+    raw = b""
+    for _ in range(h):
+        raw += b"\x00"  # filter byte per scanline
+        raw += bytes([r, g, b]) * w
+    
+    compressed = zlib.compress(raw, 9)
+    
+    def chunk(ctype, data):
+        c = ctype + data
+        return struct.pack(">I", len(data)) + c + struct.pack(">I", zlib.crc32(c) & 0xffffffff)
+    
+    sig = b"\x89PNG\r\n\x1a\n"
+    ihdr = struct.pack(">IIBBBBB", w, h, 8, 2, 0, 0, 0)  # 8-bit RGB
+    png = sig + chunk(b"IHDR", ihdr) + chunk(b"IDAT", compressed) + chunk(b"IEND", b"")
+    
+    ts = int(time.time())
+    fname = f"image_{ts}.png"
+    fpath = DOCS_DIR / fname
+    fpath.write_bytes(png)
     size = fpath.stat().st_size
     return str(fpath), fname, size
 
