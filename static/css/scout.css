@@ -1,72 +1,163 @@
-/* SCOUT — Sky / serif / frosted newsletter */
-.scout-panel { max-width: 800px; margin: 0 auto; }
+/* ═══════════════════════════════════════════════════════════════════════════
+   SCOUT — Synecdoche newsletter aesthetic (sky, asteroids, glass capsule)
+   ═══════════════════════════════════════════════════════════════════════════ */
 
+.scout-panel {
+  position: relative;
+  min-height: calc(100vh - 100px);
+  border-radius: 32px;
+  overflow: hidden;
+  background: linear-gradient(180deg, #4a89d1 0%, #6aa3e0 35%, #d8a46a 72%, #c67a44 100%);
+  padding: 0;
+}
+
+/* Sky gradient layers (animated) */
+.scout-panel::before {
+  content: ''; position: absolute; inset: 0;
+  background:
+    radial-gradient(ellipse 60% 40% at 50% 20%, rgba(255,255,255,.9) 0%, rgba(255,255,255,0) 60%),  /* sun glow */
+    radial-gradient(ellipse 100% 30% at 50% 95%, rgba(198,122,68,.5) 0%, transparent 70%);  /* horizon */
+  pointer-events: none;
+}
+
+/* Distant clouds */
+.scout-panel::after {
+  content: ''; position: absolute; inset: 0;
+  background-image:
+    radial-gradient(ellipse 200px 60px at 15% 40%, rgba(255,255,255,.6) 0%, transparent 70%),
+    radial-gradient(ellipse 250px 70px at 75% 30%, rgba(255,255,255,.5) 0%, transparent 70%),
+    radial-gradient(ellipse 180px 50px at 40% 55%, rgba(255,255,255,.45) 0%, transparent 70%),
+    radial-gradient(ellipse 220px 65px at 85% 50%, rgba(255,255,255,.5) 0%, transparent 70%);
+  opacity: .85;
+  animation: scout-clouds 60s ease-in-out infinite alternate;
+  pointer-events: none;
+}
+@keyframes scout-clouds {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(30px); }
+}
+
+/* Floating asteroid rocks (decorative) */
+.scout-asteroid {
+  position: absolute; border-radius: 40% 55% 50% 45% / 50% 45% 55% 45%;
+  background: linear-gradient(135deg, #7a5a3d, #4a3525);
+  box-shadow: inset -4px -6px 12px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.25);
+  pointer-events: none;
+}
+.scout-asteroid::before {
+  content: ''; position: absolute; inset: 0; border-radius: inherit;
+  background: radial-gradient(ellipse at 30% 30%, rgba(255,200,150,.3), transparent 60%);
+}
+
+/* Hero layout */
 .scout-hero {
-  position: relative; text-align: center;
-  padding: var(--sp-8) var(--sp-4) var(--sp-8);
-  display: flex; flex-direction: column; align-items: center; gap: var(--sp-3);
+  position: relative; z-index: 2;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  min-height: 55vh; padding: 80px 40px 40px; text-align: center;
 }
-.scout-floating-rock {
-  position: absolute; width: 120px; height: 60px; top: -20px; right: 10%;
-  background: linear-gradient(135deg, rgba(255,255,255,.6), rgba(180,210,240,.3));
-  border-radius: 50% 40% 60% 30% / 60% 50% 50% 40%;
-  filter: blur(1px); opacity: .4;
-  animation: rock-float 8s ease-in-out infinite;
-}
-@keyframes rock-float { 0%,100%{transform:translateY(0) rotate(0)} 50%{transform:translateY(-10px) rotate(3deg)} }
 
 .scout-wordmark {
-  font-family: var(--serif); font-weight: 400; font-style: italic;
-  font-size: clamp(48px, 8vw, 80px);
-  color: #1a2740;
-  letter-spacing: -0.02em;
+  font-family: 'Playfair Display', Georgia, 'Times New Roman', serif;
+  font-size: clamp(64px, 9vw, 120px);
+  font-weight: 400; font-style: italic;
+  color: #fff; line-height: 1; letter-spacing: -0.02em;
+  margin-bottom: var(--sp-6); text-shadow: 0 4px 30px rgba(0,0,0,.2);
 }
-.scout-hero-sub { font-family: var(--mono); font-size: var(--fs-sm); text-transform: uppercase; letter-spacing: .15em; color: #3b5998; opacity: .6; }
-
-.scout-input-wrap {
-  width: 100%; max-width: 560px; padding: var(--sp-3);
-  display: flex; flex-direction: column; gap: var(--sp-3);
-  background: rgba(255,255,255,.55);
-  border-color: rgba(255,255,255,.6);
+.scout-wordmark sup {
+  font-size: .45em; font-style: normal; font-family: var(--sans);
+  font-weight: 300; vertical-align: super; margin-left: 4px;
+  border: 2px solid rgba(255,255,255,.8);
+  border-radius: 50%; width: .7em; height: .7em;
+  display: inline-flex; align-items: center; justify-content: center;
+  line-height: 1; padding: .15em;
 }
-.scout-input {
-  width: 100%; padding: var(--sp-3) var(--sp-2);
-  background: none; border: none; outline: none;
-  font-family: var(--serif); font-size: var(--fs-lg); color: #1a2740;
+
+/* Glass capsule search — Synecdoche-style */
+.scout-capsule {
+  display: flex; align-items: center; gap: 12px;
+  width: 100%; max-width: 620px;
+  padding: 4px 4px 4px 22px;
+  background: rgba(255,255,255,.25);
+  backdrop-filter: blur(20px) saturate(1.5);
+  -webkit-backdrop-filter: blur(20px) saturate(1.5);
+  border: 1.5px solid rgba(255,255,255,.4);
+  border-radius: 999px;
+  box-shadow: 0 8px 32px rgba(0,0,0,.15), inset 0 1px 0 rgba(255,255,255,.5);
+  margin: 0 auto;
 }
-.scout-input::placeholder { color: rgba(26,39,64,.4); font-style: italic; }
-.scout-mode-row { display: flex; align-items: center; justify-content: space-between; }
-.scout-go { background: #3b5998; color: #fff; border-color: transparent; }
-.scout-go:hover { background: #2d4373; }
-
-.scout-results { margin-top: var(--sp-6); }
-.scout-loading { display: flex; flex-direction: column; align-items: center; gap: var(--sp-4); padding: var(--sp-12); }
-
-.brief-result { padding: var(--sp-6); background: rgba(255,255,255,.7); }
-.brief-header { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: var(--sp-2); margin-bottom: var(--sp-4); }
-.brief-verdict {
-  display: inline-flex; align-items: center; gap: var(--sp-2);
-  padding: 6px 14px; border-radius: var(--r-pill);
-  font-weight: 600; font-size: var(--fs-sm); border: 1px solid;
+.scout-capsule input {
+  flex: 1; min-width: 0; background: none; border: none; outline: none;
+  font-size: 17px; color: #fff; padding: 14px 0;
 }
-.verdict-badge { width: 8px; height: 8px; border-radius: 50%; background: currentColor; }
-.brief-query { font-family: var(--serif); font-size: var(--fs-xl); margin-bottom: var(--sp-4); font-weight: 600; }
-.brief-summary { font-size: var(--fs-base); line-height: 1.7; margin-bottom: var(--sp-4); }
-.brief-reasoning, .brief-disclaimer {
-  padding: var(--sp-3) var(--sp-4); border-radius: var(--r-md);
-  background: rgba(59,89,152,.08); font-size: var(--fs-sm); margin-bottom: var(--sp-3); line-height: 1.5;
+.scout-capsule input::placeholder { color: rgba(255,255,255,.7); }
+.scout-capsule .capsule-icon {
+  width: 18px; height: 18px; opacity: .7; flex-shrink: 0;
 }
-.brief-disclaimer { background: rgba(245,158,11,.08); font-style: italic; }
-.brief-sources { margin-top: var(--sp-4); }
-.brief-sources h4 { font-family: var(--mono); font-size: var(--fs-xs); text-transform: uppercase; letter-spacing: .08em; opacity: .5; margin-bottom: var(--sp-2); }
-.source-item { padding: var(--sp-3) 0; border-top: 1px solid rgba(26,39,64,.1); }
-.source-title { font-weight: 600; margin-bottom: 4px; }
-.source-snippet { line-height: 1.5; opacity: .7; }
-.source-meta { color: #3b5998; font-family: var(--mono); }
+.scout-capsule .capsule-send {
+  width: 44px; height: 44px; border-radius: 50%;
+  background: #fff; border: none; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  color: #3d74b8; flex-shrink: 0;
+  transition: transform .15s, background .15s;
+  box-shadow: 0 2px 8px rgba(0,0,0,.15);
+}
+.scout-capsule .capsule-send:hover { transform: scale(1.08); background: #fff; }
+.scout-capsule .capsule-send svg { width: 18px; height: 18px; stroke-width: 2.5; }
 
-.scout-briefs-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px,1fr)); gap: var(--sp-3); }
-.brief-card { padding: var(--sp-4); cursor: pointer; }
-.brief-card-title { font-weight: 500; margin: var(--sp-2) 0 4px; font-size: var(--fs-sm); }
+.scout-tagline {
+  max-width: 620px; margin: 24px auto 0;
+  color: rgba(255,255,255,.92); font-size: 17px; line-height: 1.5; font-weight: 400;
+  text-shadow: 0 1px 6px rgba(0,0,0,.2);
+}
 
-.scout-examples { display: flex; gap: var(--sp-2); flex-wrap: wrap; justify-content: center; margin-top: var(--sp-3)); }
-.scout-examples .chip { cursor: pointer; background: rgba(255,255,255,.5); }
+.scout-cta {
+  margin-top: 28px;
+  padding: 12px 28px;
+  background: rgba(255,255,255,.2); border: 1.5px solid rgba(255,255,255,.4);
+  backdrop-filter: blur(10px); border-radius: 999px;
+  color: #fff; font-weight: 600; font-size: 14px; cursor: pointer;
+  transition: background .2s, transform .15s;
+}
+.scout-cta:hover { background: rgba(255,255,255,.35); transform: translateY(-1px); }
+
+/* Results section below hero */
+.scout-results {
+  position: relative; z-index: 2;
+  padding: 20px 40px 40px;
+  max-width: 900px; margin: 0 auto;
+}
+.scout-mode-row {
+  display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; margin-bottom: 24px;
+}
+.scout-chip {
+  padding: 8px 18px; border-radius: 999px; font-size: 13px; font-weight: 500;
+  background: rgba(255,255,255,.18); border: 1px solid rgba(255,255,255,.3);
+  color: #fff; cursor: pointer; transition: all .15s; backdrop-filter: blur(8px);
+}
+.scout-chip:hover { background: rgba(255,255,255,.3); }
+.scout-chip.active { background: #fff; color: #3d74b8; border-color: #fff; }
+
+.scout-brief {
+  background: rgba(255,255,255,.85); backdrop-filter: blur(20px);
+  border-radius: 20px; padding: 24px; color: #1a2740; margin-bottom: 16px;
+  border: 1px solid rgba(255,255,255,.5);
+  box-shadow: 0 8px 32px rgba(0,0,0,.15);
+}
+.scout-brief h3 { color: #1a2740; font-size: 20px; margin-bottom: 12px; }
+.scout-brief p { color: #3a4a60; line-height: 1.6; font-size: 14px; }
+
+/* Quick example chips */
+.scout-examples { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; margin-top: 16px; }
+.scout-ex {
+  padding: 6px 14px; border-radius: 999px; font-size: 12px;
+  background: rgba(255,255,255,.15); border: 1px solid rgba(255,255,255,.25);
+  color: rgba(255,255,255,.9); cursor: pointer; backdrop-filter: blur(6px);
+  transition: background .15s;
+}
+.scout-ex:hover { background: rgba(255,255,255,.25); }
+
+/* Tiny figure standing at bottom */
+.scout-figure {
+  position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%);
+  width: 30px; height: 60px; z-index: 3; pointer-events: none;
+}

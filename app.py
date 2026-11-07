@@ -56,40 +56,40 @@ WORKSPACE_PALETTES = {
         "accent": "#8faeff", "glass": "rgba(14,20,40,.78)", "glass2": "rgba(143,174,255,.06)",
         "ambient": "hologram", "ink_soft": "rgba(223,230,255,.70)", "ink_mute": "rgba(223,230,255,.42)"
     },
-    "verify": {  # Scout (dark slate, research feel)
-        "bg": "#0d1220", "ink": "#e4e8f2", "line": "rgba(120,160,220,.12)",
-        "accent": "#60a5fa", "glass": "rgba(18,26,44,.78)", "glass2": "rgba(96,165,250,.06)",
-        "ambient": "sky", "ink_soft": "rgba(228,232,242,.70)", "ink_mute": "rgba(228,232,242,.42)"
+    "verify": {  # Scout — Synecdoche sky-glass newsletter aesthetic
+        "bg": "#3d74b8", "ink": "#ffffff", "line": "rgba(255,255,255,.22)",
+        "accent": "#ffd166", "glass": "rgba(255,255,255,.16)", "glass2": "rgba(255,255,255,.08)",
+        "ambient": "scout-sky", "ink_soft": "rgba(255,255,255,.85)", "ink_mute": "rgba(255,255,255,.6)"
     },
-    "studio": {  # Forge (near-black with hot pink)
-        "bg": "#0a0a0f", "ink": "#eaeaf0", "line": "rgba(255,61,113,.14)",
-        "accent": "#ff3d71", "glass": "rgba(22,18,28,.82)", "glass2": "rgba(255,61,113,.05)",
-        "ambient": "dotgrid", "ink_soft": "rgba(234,234,240,.70)", "ink_mute": "rgba(234,234,240,.40)"
+    "studio": {  # Forge — Spinlab RGB builder (pure black, hot pink glow, pixel grid)
+        "bg": "#05060a", "ink": "#f5f5fa", "line": "rgba(255,255,255,.08)",
+        "accent": "#ff2d6f", "glass": "rgba(18,20,28,.72)", "glass2": "rgba(255,45,111,.06)",
+        "ambient": "forge-grid", "ink_soft": "rgba(245,245,250,.72)", "ink_mute": "rgba(245,245,250,.40)"
     },
-    "draft": {  # Quill (soft ink on cream-dark)
-        "bg": "#f5f0e6", "ink": "#1a1a24", "line": "rgba(30,30,50,.14)",
-        "accent": "#1e40af", "glass": "rgba(255,252,244,.85)", "glass2": "rgba(30,64,175,.05)",
-        "ambient": "paper-light", "ink_soft": "rgba(26,26,36,.70)", "ink_mute": "rgba(26,26,36,.45)"
+    "draft": {  # Quill — YourSaaS landing (white/light blue, bold sans, blue CTA)
+        "bg": "#f7f9ff", "ink": "#0a0e1a", "line": "rgba(10,30,80,.10)",
+        "accent": "#2563eb", "glass": "rgba(255,255,255,.7)", "glass2": "rgba(37,99,235,.05)",
+        "ambient": "quill-grid", "ink_soft": "rgba(10,14,26,.7)", "ink_mute": "rgba(10,14,26,.45)"
     },
-    "cadence": {  # Kronos (warm paper, neobrutalist accents)
-        "bg": "#faf3df", "ink": "#1a1a1a", "line": "rgba(0,0,0,.22)",
-        "accent": "#e11d48", "glass": "rgba(255,250,232,.88)", "glass2": "rgba(0,0,0,.04)",
-        "ambient": "paper", "ink_soft": "rgba(26,26,26,.72)", "ink_mute": "rgba(26,26,26,.48)"
+    "cadence": {  # Kronos — Postcraft neobrutalist (white/lavender, thick black borders, chunky shadows)
+        "bg": "#f4f0ff", "ink": "#0a0a0a", "line": "#000",
+        "accent": "#0a0a0a", "glass": "#ffffff", "glass2": "rgba(0,0,0,.04)",
+        "ambient": "brut", "ink_soft": "rgba(10,10,10,.7)", "ink_mute": "rgba(10,10,10,.5)"
     },
-    "whiteboard": {
-        "bg": "#060608", "ink": "#f0f0f5", "line": "rgba(255,255,255,.10)",
-        "accent": "#a78bfa", "glass": "rgba(18,18,26,.85)", "glass2": "rgba(167,139,250,.06)",
-        "ambient": "black", "ink_soft": "rgba(240,240,245,.70)", "ink_mute": "rgba(240,240,245,.40)"
+    "whiteboard": {  # Whiteboard — dark node graph (purple/orange accents on near-black)
+        "bg": "#08090e", "ink": "#f0f0f8", "line": "rgba(255,255,255,.08)",
+        "accent": "#a78bfa", "glass": "rgba(16,18,28,.82)", "glass2": "rgba(167,139,250,.05)",
+        "ambient": "black", "ink_soft": "rgba(240,240,248,.7)", "ink_mute": "rgba(240,240,248,.4)"
     },
-    "shortcuts": {  # Dash (deep navy + cyan telemetry)
-        "bg": "#080c18", "ink": "#c8d4ee", "line": "rgba(80,180,255,.12)",
-        "accent": "#22d3ee", "glass": "rgba(12,18,34,.82)", "glass2": "rgba(34,211,238,.05)",
-        "ambient": "telemetry", "ink_soft": "rgba(200,212,238,.68)", "ink_mute": "rgba(200,212,238,.40)"
+    "shortcuts": {  # Dash — Network Traffic Analyzer (near-black, mono title, neon stat accents)
+        "bg": "#07090d", "ink": "#e4e8f0", "line": "rgba(255,255,255,.08)",
+        "accent": "#22c55e", "glass": "rgba(20,22,30,.7)", "glass2": "rgba(34,197,94,.05)",
+        "ambient": "telemetry", "ink_soft": "rgba(228,232,240,.68)", "ink_mute": "rgba(228,232,240,.38)"
     },
-    "board": {  # Working Board (charcoal + white)
-        "bg": "#0b0d14", "ink": "#e2e4ec", "line": "rgba(255,255,255,.09)",
-        "accent": "#f97316", "glass": "rgba(18,20,30,.84)", "glass2": "rgba(249,115,22,.05)",
-        "ambient": "dots", "ink_soft": "rgba(226,228,236,.70)", "ink_mute": "rgba(226,228,236,.40)"
+    "board": {  # Working Board — FlowForge canvas (dark dot grid, node connections)
+        "bg": "#0a0b10", "ink": "#e8eaf2", "line": "rgba(255,255,255,.07)",
+        "accent": "#f97316", "glass": "rgba(20,22,30,.8)", "glass2": "rgba(249,115,22,.05)",
+        "ambient": "dots", "ink_soft": "rgba(232,234,242,.7)", "ink_mute": "rgba(232,234,242,.4)"
     },
     "vault": {  # Library (deep indigo)
         "bg": "#0c0f1d", "ink": "#d4dcf0", "line": "rgba(160,180,230,.10)",

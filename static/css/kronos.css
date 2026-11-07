@@ -1,104 +1,146 @@
-/* KRONOS — Neobrutalist thick borders, hard shadows, yellow */
-.kronos-panel { max-width: 1000px; margin: 0 auto; }
+/* ═══════════════════════════════════════════════════════════════════════════
+   KRONOS — Postcraft neobrutalist (lavender/white, thick black borders, offset shadows)
+   ═══════════════════════════════════════════════════════════════════════════ */
 
-.kronos-neo {
-  background: #fef9e7; color: #1a1a1a;
-  border: 4px solid #000; border-radius: 0;
-  box-shadow: 8px 8px 0 #000;
-  padding: var(--sp-8);
+.kronos-panel {
+  position: relative; min-height: calc(100vh - 100px);
+  border-radius: 0; padding: 0;
+  background: transparent;
+}
+.kronos-schedule {
+  max-width: 1200px; margin: 0 auto; padding: 32px 24px 48px;
 }
 
-.kronos-header { margin-bottom: var(--sp-6); }
-.kronos-eyebrow { font-family:var(--mono); font-size:var(--fs-xs); font-weight:700; letter-spacing:.15em; display:block; margin-bottom:var(--sp-3); }
-
-.kronos-entry {
-  display: flex; gap: var(--sp-3); margin-top: var(--sp-4);
+/* Header */
+.kronos-header {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 16px; margin-bottom: 32px; flex-wrap: wrap;
 }
-.kronos-input {
-  flex: 1; padding: 14px 18px;
-  border: 3px solid #000; border-radius: 0;
-  background: #fff; font-size: var(--fs-base);
-  box-shadow: 4px 4px 0 #000;
-  transition: transform .1s, box-shadow .1s;
+.kronos-header-left {}
+.kronos-eyebrow {
+  display: inline-block;
+  font-family: 'Archivo Black', 'Inter', sans-serif;
+  font-size: 11px; font-weight: 900; letter-spacing: .18em; text-transform: uppercase;
+  background: #000; color: #f4f0ff; padding: 5px 12px; margin-bottom: 12px;
 }
-.kronos-input:focus { outline: none; transform: translate(2px,2px); box-shadow: 2px 2px 0 #000; }
+.kronos-title {
+  font-family: 'Archivo Black', 'Inter', sans-serif;
+  font-size: clamp(36px, 5vw, 56px); font-weight: 900; letter-spacing: -0.02em;
+  line-height: 1.05; color: #000; text-transform: uppercase;
+}
+.kronos-title span { color: #ff2d6f; }
 
-.kronos-add {
-  padding: 14px 28px; background: #000; color: #fff;
-  font-family: var(--mono); font-weight: 800; font-size: var(--fs-sm);
+.kronos-btn {
+  font-family: 'Archivo Black', 'Inter', sans-serif;
+  font-size: 13px; font-weight: 900; letter-spacing: .08em; text-transform: uppercase;
+  padding: 14px 22px; background: #000; color: #fff;
   border: 3px solid #000; border-radius: 0; cursor: pointer;
-  box-shadow: 4px 4px 0 #fbbf24;
+  box-shadow: 6px 6px 0 #ff2d6f;
+  transition: transform .1s, box-shadow .1s;
+  display: inline-flex; align-items: center; gap: 8px; text-decoration: none;
+}
+.kronos-btn:hover { transform: translate(-2px,-2px); box-shadow: 8px 8px 0 #ff2d6f; }
+.kronos-btn:active { transform: translate(4px,4px); box-shadow: 2px 2px 0 #ff2d6f; }
+
+/* Calendar grid */
+.kronos-cal {
+  display: grid; grid-template-columns: repeat(7, 1fr); gap: 12px; margin-bottom: 32px;
+}
+.kronos-day {
+  background: #f4f0ff; border: 3px solid #000;
+  padding: 14px 12px; min-height: 180px; position: relative;
+  box-shadow: 6px 6px 0 #000;
+  transition: transform .15s, box-shadow .15s;
+  display: flex; flex-direction: column;
+}
+.kronos-day:hover { transform: translate(-2px,-2px); box-shadow: 8px 8px 0 #000; }
+.kronos-day.today { background: #fff; border-color: #000; }
+.kronos-day.today .kronos-daynum { background: #ff2d6f; color: #fff; }
+.kronos-daynum {
+  font-family: 'Archivo Black', sans-serif;
+  font-size: 13px; font-weight: 900; display: inline-block;
+  background: #000; color: #f4f0ff; padding: 3px 8px; margin-bottom: 10px;
+  align-self: flex-start;
+}
+.kronos-events { display: flex; flex-direction: column; gap: 4px; flex: 1; }
+.kronos-event {
+  font-size: 11px; font-weight: 700; padding: 4px 6px; border: 2px solid #000;
+  background: #fff; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.kronos-event.ev-post { background: #fff3a6; }
+.kronos-event.ev-draft { background: #c8f5c8; }
+.kronos-event.ev-meeting { background: #ffcfcf; }
+
+/* Platform tabs */
+.kronos-platforms {
+  display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 24px;
+}
+.kronos-tab {
+  font-family: 'Archivo Black', sans-serif; font-size: 12px; font-weight: 900;
+  text-transform: uppercase; letter-spacing: .06em;
+  padding: 10px 18px; background: #fff; color: #000;
+  border: 3px solid #000; cursor: pointer;
+  box-shadow: 4px 4px 0 #000;
   transition: all .1s;
 }
-.kronos-add:hover { transform: translate(2px,2px); box-shadow: 2px 2px 0 #fbbf24; }
-.kronos-add:active { transform: translate(4px,4px); box-shadow: 0 0 0 #fbbf24; }
-.kronos-add:disabled { opacity: .5; }
+.kronos-tab.active { background: #ff2d6f; color: #fff; }
+.kronos-tab:hover { transform: translate(-2px,-2px); box-shadow: 6px 6px 0 #000; }
 
-.kronos-controls {
-  display: flex; align-items: center; justify-content: space-between;
-  margin: var(--sp-6) 0 var(--sp-4); flex-wrap: wrap; gap: var(--sp-3);
+/* Upcoming posts */
+.kronos-upcoming {
+  background: #fff; border: 3px solid #000;
+  box-shadow: 8px 8px 0 #000; padding: 24px; margin-top: 32px;
 }
-.kronos-btn {
-  width: 36px; height: 36px; border: 3px solid #000; background: #fff;
-  font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; justify-content: center;
-  box-shadow: 3px 3px 0 #000;
+.kronos-upcoming h2 {
+  font-family: 'Archivo Black', sans-serif;
+  font-size: 22px; font-weight: 900; text-transform: uppercase;
+  margin-bottom: 20px; padding-bottom: 12px; border-bottom: 3px solid #000;
 }
-.kronos-btn:hover { background: #fbbf24; }
-.kronos-btn:active { transform: translate(2px,2px); box-shadow: 1px 1px 0 #000; }
-.kronos-nav-btns { display: flex; align-items: center; gap: var(--sp-2); }
+.kronos-post {
+  display: flex; align-items: center; gap: 16px; padding: 14px 0;
+  border-bottom: 2px solid #000;
+}
+.kronos-post:last-child { border-bottom: none; }
+.kronos-post-date {
+  font-family: 'Archivo Black', sans-serif; font-size: 11px; font-weight: 900;
+  text-transform: uppercase; text-align: center; min-width: 60px;
+  background: #000; color: #f4f0ff; padding: 8px;
+}
+.kronos-post-date strong { display: block; font-size: 22px; color: #ff2d6f; }
+.kronos-post-body { flex: 1; }
+.kronos-post-title { font-weight: 800; font-size: 14px; color: #000; margin-bottom: 4px; }
+.kronos-post-meta { font-size: 11px; color: #555; font-weight: 600; }
+.kronos-post-action {
+  font-family: 'Archivo Black', sans-serif; font-size: 11px; font-weight: 900;
+  text-transform: uppercase; padding: 8px 14px; background: #fff; color: #000;
+  border: 2px solid #000; cursor: pointer; box-shadow: 3px 3px 0 #000;
+}
+.kronos-post-action:hover { background: #ff2d6f; color: #fff; }
 
-.kronos-cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px; border: 3px solid #000; }
-.kronos-cal-head {
-  background: #000; color: #fbbf24; padding: 8px; text-align: center;
-  font-family: var(--mono); font-size: var(--fs-xs); font-weight: 700;
+/* New post composer */
+.kronos-composer {
+  background: #f4f0ff; border: 3px solid #000;
+  box-shadow: 8px 8px 0 #000; padding: 24px; margin-top: 24px;
 }
-.kronos-cal-day {
-  min-height: 90px; background: #fff; border: 2px solid #000; padding: 6px;
-  display: flex; flex-direction: column; gap: 3px;
+.kronos-composer h3 {
+  font-family: 'Archivo Black', sans-serif; font-size: 16px; font-weight: 900;
+  text-transform: uppercase; margin-bottom: 16px;
 }
-.kronos-cal-day.empty { background: #f0eadd; border-color: #ccc; }
-.kronos-cal-day.today { background: #fbbf24; }
-.cal-day-num { font-weight: 800; font-family: var(--mono); font-size: var(--fs-sm); }
-.cal-event {
-  font-size: 9px; padding: 2px 4px; font-family: var(--mono); font-weight: 600;
-  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+.kronos-input, .kronos-textarea {
+  width: 100%; padding: 12px 14px; margin-bottom: 12px;
+  background: #fff; border: 3px solid #000; border-radius: 0;
+  font-family: inherit; font-size: 14px; font-weight: 500; color: #000;
+  outline: none; font-family: var(--sans);
 }
-.cal-more { font-size: 9px; font-family: var(--mono); opacity: .5; }
+.kronos-textarea { min-height: 100px; resize: vertical; }
+.kronos-input:focus, .kronos-textarea:focus { background: #fff9c4; }
+.kronos-compose-row { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
 
-.kronos-week { display: grid; grid-template-columns: repeat(7,1fr); gap: 3px; }
-.kronos-weekday { border: 3px solid #000; background: #fff; padding: 8px; min-height: 200px; }
-.weekday-name { font-family: var(--mono); font-weight: 700; margin-bottom: var(--sp-2); border-bottom: 2px solid #000; padding-bottom: 4px; }
-.weekday-event { padding: 4px 6px; font-size: var(--fs-xs); margin-bottom: 2px; background: #fff; }
-
-.kronos-day { display: flex; flex-direction: column; gap: var(--sp-2); }
-.kronos-day-event { padding: var(--sp-3); background: #fff; border: 2px solid #000; }
-
-.kronos-upcoming { margin-top: var(--sp-6); }
-.kronos-empty { font-family: var(--mono); font-size: var(--fs-sm); }
-.kronos-event-item {
-  display: flex; align-items: center; justify-content: space-between;
-  background: #fff; border: 3px solid #000; padding: var(--sp-3) var(--sp-4);
-  margin-bottom: var(--sp-2); box-shadow: 3px 3px 0 #000;
+.kronos-empty {
+  background: #f4f0ff; border: 3px dashed #000; padding: 48px;
+  text-align: center; font-weight: 700; font-size: 14px;
 }
-.kronos-event-item.done { opacity: .5; text-decoration: line-through; }
-.kronos-event-title { font-weight: 700; }
-.kronos-event-time { font-family: var(--mono); }
-.kronos-event-btns { display: flex; gap: var(--sp-1); }
-.kronos-event-done, .kronos-event-del {
-  width: 28px; height: 28px; border: 2px solid #000; background: #fff;
-  font-weight: 700; cursor: pointer; display:flex;align-items:center;justify-content:center;
-}
-.kronos-event-done:hover { background: #22c55e; color: #fff; border-color: #22c55e; }
-.kronos-event-del:hover { background: #ef4444; color: #fff; border-color: #ef4444; }
 
-.tab { border: 2px solid #000; border-radius: 0; padding: 6px 12px; opacity: 1; background: #fff; }
-.tab.active { background: #000; color: #fbbf24; }
-
-@media (max-width: 620px) {
-  .kronos-neo { padding: var(--sp-4); box-shadow: 4px 4px 0 #000; border-width: 3px; }
-  .kronos-cal-grid { grid-template-columns: repeat(7, 1fr); }
-  .kronos-cal-day { min-height: 50px; padding: 3px; }
-  .cal-event { display: none; }
-  .kronos-cal-head { font-size: 8px; padding: 4px; }
-  .cal-day-num { font-size: 10px; }
+@media (max-width: 900px) {
+  .kronos-cal { grid-template-columns: repeat(2,1fr); }
 }
