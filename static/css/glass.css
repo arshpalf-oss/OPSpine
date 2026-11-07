@@ -10,136 +10,140 @@
 
 .ambient-layer { position: absolute; inset: 0; transition: opacity var(--reveal-dur) var(--motion-ease); }
 
-/* Aurora mesh (dashboard only, dims in rooms) */
+/* Dashboard aurora — subtle color wash on dark base (bg is set on body) */
 .ambient-aurora {
   opacity: 1;
   background:
-    radial-gradient(ellipse 800px 600px at 20% 20%, rgba(123,156,255,.25), transparent 60%),
-    radial-gradient(ellipse 600px 800px at 80% 80%, rgba(167,139,250,.18), transparent 60%),
-    radial-gradient(ellipse 700px 500px at 50% 50%, rgba(56,189,248,.12), transparent 60%);
+    radial-gradient(ellipse 700px 500px at 20% 15%, color-mix(in srgb, var(--ws-accent) 22%, transparent), transparent 65%),
+    radial-gradient(ellipse 600px 700px at 85% 85%, rgba(167,139,250,.14), transparent 65%),
+    radial-gradient(ellipse 500px 400px at 50% 50%, rgba(56,189,248,.08), transparent 65%);
   animation: aurora-drift var(--aurora-dur) ease-in-out infinite alternate;
 }
 @keyframes aurora-drift {
   0%   { transform: translate(0,0) scale(1); }
-  50%  { transform: translate(-30px,20px) scale(1.05); }
-  100% { transform: translate(20px,-15px) scale(1.02); }
+  50%  { transform: translate(-25px,18px) scale(1.04); }
+  100% { transform: translate(15px,-12px) scale(1.02); }
 }
 
-/* Noise texture overlay */
+/* Noise texture — subtle grain */
 .ambient-noise {
-  opacity: .035;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  opacity: .03;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   background-size: 256px 256px;
+  mix-blend-mode: overlay;
 }
 
 .ambient-canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
 
-/* Room-specific ambients */
+/* Room-specific ambients — all dark, colored glow only */
 body[data-workspace="verify"] .ambient-aurora {
   background:
-    radial-gradient(ellipse 900px 700px at 50% 0%, rgba(135,206,235,.55), transparent 70%),
-    radial-gradient(ellipse 800px 600px at 20% 80%, rgba(255,255,255,.35), transparent 60%),
-    linear-gradient(180deg, #87CEEB 0%, #b8d4f0 50%, #d4e4f7 100%);
-  opacity: .9; animation: none;
+    radial-gradient(ellipse 700px 500px at 50% 0%, color-mix(in srgb, var(--ws-accent) 18%, transparent), transparent 65%),
+    radial-gradient(ellipse 600px 500px at 20% 90%, rgba(96,165,250,.10), transparent 60%);
+  animation: none;
 }
 body[data-workspace="studio"] .ambient-aurora {
   background:
-    radial-gradient(ellipse 400px 400px at 80% 20%, rgba(255,61,113,.12), transparent 60%),
-    radial-gradient(ellipse 300px 300px at 20% 80%, rgba(255,61,113,.08), transparent 60%),
-    #07070b;
-  opacity: 1; animation: none;
+    radial-gradient(ellipse 500px 400px at 85% 15%, color-mix(in srgb, var(--ws-accent) 18%, transparent), transparent 65%),
+    radial-gradient(ellipse 400px 400px at 15% 85%, rgba(255,61,113,.08), transparent 60%);
+  animation: none;
 }
 body[data-workspace="draft"] .ambient-aurora {
-  background: linear-gradient(135deg, #22d3ee 0%, #3b82f6 50%, #6366f1 100%);
-  opacity: .85; animation: none;
+  background:
+    radial-gradient(ellipse 800px 600px at 20% 10%, rgba(30,64,175,.08), transparent 65%),
+    radial-gradient(ellipse 500px 500px at 80% 90%, rgba(59,130,246,.06), transparent 60%);
+  animation: none;
 }
 body[data-workspace="cadence"] .ambient-aurora {
-  background: #fef9e7;
-  opacity: 1; animation: none;
+  background:
+    radial-gradient(ellipse 600px 500px at 50% 0%, rgba(225,29,72,.08), transparent 65%),
+    radial-gradient(ellipse 500px 400px at 80% 90%, rgba(225,29,72,.05), transparent 60%);
+  animation: none;
 }
 body[data-workspace="whiteboard"] .ambient-aurora {
-  background: #000;
-  opacity: 1; animation: none;
+  background:
+    radial-gradient(ellipse 600px 500px at 30% 30%, rgba(167,139,250,.10), transparent 65%),
+    radial-gradient(ellipse 500px 400px at 70% 70%, rgba(167,139,250,.06), transparent 60%);
+  animation: none;
 }
 body[data-workspace="shortcuts"] .ambient-aurora {
   background:
-    radial-gradient(ellipse 500px 500px at 30% 40%, rgba(79,195,247,.08), transparent 60%),
-    radial-gradient(ellipse 400px 400px at 70% 70%, rgba(79,195,247,.05), transparent 60%),
-    #0b0f1a;
-  opacity: 1; animation: none;
+    radial-gradient(ellipse 500px 500px at 30% 40%, color-mix(in srgb, var(--ws-accent) 12%, transparent), transparent 65%),
+    radial-gradient(ellipse 400px 400px at 70% 70%, rgba(34,211,238,.06), transparent 60%);
+  animation: none;
 }
 body[data-workspace="board"] .ambient-aurora {
   background:
-    #0a0a0f;
-  opacity: 1; animation: none;
+    radial-gradient(ellipse 600px 500px at 80% 20%, color-mix(in srgb, var(--ws-accent) 14%, transparent), transparent 65%),
+    radial-gradient(ellipse 400px 400px at 20% 80%, rgba(249,115,22,.06), transparent 60%);
+  animation: none;
 }
 body[data-workspace="home"] .ambient-aurora {
   background:
-    radial-gradient(ellipse 600px 600px at 50% 40%, rgba(143,174,255,.12), transparent 60%),
-    radial-gradient(ellipse 300px 300px at 30% 70%, rgba(143,174,255,.06), transparent 50%),
-    radial-gradient(ellipse 400px 400px at 80% 30%, rgba(143,174,255,.08), transparent 60%),
-    #05070f;
-  opacity: 1; animation: none;
+    radial-gradient(ellipse 600px 600px at 50% 30%, color-mix(in srgb, var(--ws-accent) 16%, transparent), transparent 65%),
+    radial-gradient(ellipse 400px 400px at 30% 80%, rgba(143,174,255,.07), transparent 55%),
+    radial-gradient(ellipse 500px 400px at 80% 40%, rgba(143,174,255,.08), transparent 60%);
+  animation: none;
+}
+body[data-workspace="vault"] .ambient-aurora,
+body[data-workspace="settings"] .ambient-aurora {
+  background:
+    radial-gradient(ellipse 600px 500px at 30% 20%, color-mix(in srgb, var(--ws-accent) 10%, transparent), transparent 65%),
+    radial-gradient(ellipse 400px 400px at 70% 80%, rgba(123,156,255,.05), transparent 60%);
+  animation: none;
 }
 
-/* Dim aurora when not on dashboard */
-body:not([data-workspace="dashboard"]) .ambient-aurora { opacity: .15; }
-body[data-workspace="verify"] .ambient-aurora,
-body[data-workspace="draft"] .ambient-aurora,
-body[data-workspace="cadence"] .ambient-aurora { opacity: .9; }
-
-/* ── Glass surfaces ──────────────────────────────────────────────────── */
+/* ── Glass surfaces — solid, readable, no over-blur ──────────────────── */
 .glass-surface {
   background: var(--ws-glass);
-  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-sat));
-  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-sat));
-  border: 1px solid var(--glass-line);
-  box-shadow: var(--glass-hi), var(--glass-lo), var(--glass-shadow);
+  border: 1px solid var(--ws-line);
   border-radius: var(--r-shell);
 }
 
-/* ── Card with tilt + sheen on hover ─────────────────────────────────── */
+/* ── Card ─────────────────────────────────────────────────────────── */
 .glass-card {
   position: relative; overflow: hidden;
   background: var(--ws-glass);
-  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-sat));
-  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-sat));
-  border: 1px solid var(--glass-line);
-  box-shadow: var(--glass-hi), var(--glass-lo), 0 4px 16px rgba(0,0,0,.1);
+  border: 1px solid var(--ws-line);
   border-radius: var(--r-lg);
   padding: var(--sp-5, 20px);
-  transition: transform .3s var(--motion-ease), box-shadow .3s var(--motion-ease);
-  will-change: transform;
+  transition: transform .25s var(--motion-ease), border-color .25s, box-shadow .25s;
+  color: var(--ws-ink);
+}
+.glass-card:hover {
+  border-color: color-mix(in srgb, var(--ws-accent) 40%, var(--ws-line));
+  transform: translateY(-1px);
 }
 
-/* Sheen effect on pointer-follow */
+/* Pointer sheen — subtle highlight, not a white flash */
 .glass-card .card-sheen {
   position: absolute; inset: 0; pointer-events: none;
   background: radial-gradient(circle at var(--sheen-x, 50%) var(--sheen-y, 50%),
-    rgba(255,255,255,.12) 0%, transparent 50%);
+    color-mix(in srgb, var(--ws-accent) 8%, transparent) 0%, transparent 50%);
   opacity: 0;
   transition: opacity .3s var(--motion-ease);
 }
-.glass-card:hover .card-sheen { opacity: var(--sheen-amount); }
+.glass-card:hover .card-sheen { opacity: 1; }
 
-/* Dot grid overlay for Forge / Board */
+/* Dot grid overlays */
 .dot-grid {
   background-image: radial-gradient(circle, currentColor 1px, transparent 1px);
   background-size: 20px 20px;
-  opacity: .08;
+  opacity: .06;
 }
 
-/* Forge neon dot grid */
 body[data-workspace="studio"] .dot-grid {
   background-image: radial-gradient(circle, var(--ws-accent) 1px, transparent 1px);
-  opacity: .12;
+  opacity: .15;
 }
 
-/* Dotted canvas for Whiteboard / Board */
 .canvas-dots {
-  background-image: radial-gradient(circle, rgba(255,255,255,.06) 1px, transparent 1px);
+  background-image: radial-gradient(circle, rgba(255,255,255,.05) 1px, transparent 1px);
   background-size: 24px 24px;
 }
 body[data-workspace="cadence"] .canvas-dots {
-  background-image: radial-gradient(circle, rgba(0,0,0,.08) 1px, transparent 1px);
+  background-image: radial-gradient(circle, rgba(0,0,0,.07) 1px, transparent 1px);
+}
+body[data-workspace="draft"] .canvas-dots {
+  background-image: radial-gradient(circle, rgba(30,64,175,.08) 1px, transparent 1px);
 }

@@ -21,7 +21,7 @@
 <link rel="stylesheet" href="/static/css/settings.css">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%230c1021'/><text x='16' y='22' text-anchor='middle' font-size='18' fill='%237b9cff' font-family='monospace'>◈</text></svg>">
 </head>
-<body data-workspace="{{ initial_key }}">
+<body data-workspace="{{ initial_key }}" style="background:#0a0e1a;color:#e8ecf8;--ws-bg:#0a0e1a;--ws-ink:#e8ecf8;--ws-line:rgba(255,255,255,.10);--ws-accent:#7b9cff;--ws-glass:rgba(20,26,46,.72);--ws-glass2:rgba(255,255,255,.06);--ws-ink-soft:rgba(232,236,248,.72);--ws-ink-mute:rgba(232,236,248,.45)">
 
 <!-- Ambient background (mounted once, never remounts) -->
 <div id="ambient" aria-hidden="true">
@@ -170,6 +170,7 @@
 <script src="/static/js/state.js"></script>
 <script src="/static/js/shell.js"></script>
 <script src="/static/js/commands.js"></script>
+<script src="/static/js/app.js"></script>
 <script src="/static/js/workspaces/dashboard.js"></script>
 <script src="/static/js/workspaces/abyss.js"></script>
 <script src="/static/js/workspaces/scout.js"></script>
@@ -181,6 +182,5 @@
 <script src="/static/js/workspaces/board.js"></script>
 <script src="/static/js/workspaces/library.js"></script>
 <script src="/static/js/workspaces/settings.js"></script>
-<script src="/static/js/app.js"></script>
 </body>
 </html>

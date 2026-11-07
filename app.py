@@ -42,48 +42,59 @@ ROUTES = [
 
 WORKSPACE_PALETTES = {
     "dashboard": {
-        "bg": "#0c1021", "ink": "#eef1ff", "line": "rgba(255,255,255,.14)",
-        "accent": "#7b9cff", "glass": "rgba(255,255,255,.08)", "ambient": "aurora"
+        "bg": "#0a0e1a", "ink": "#e8ecf8", "line": "rgba(255,255,255,.10)",
+        "accent": "#7b9cff", "glass": "rgba(20,26,46,.72)", "glass2": "rgba(255,255,255,.06)",
+        "ambient": "aurora", "ink_soft": "rgba(232,236,248,.72)", "ink_mute": "rgba(232,236,248,.45)"
     },
     "home": {  # Abyss
-        "bg": "#05070f", "ink": "#d0d8ff", "line": "rgba(120,160,255,.18)",
-        "accent": "#8faeff", "glass": "rgba(20,30,60,.45)", "ambient": "hologram"
+        "bg": "#060810", "ink": "#dfe6ff", "line": "rgba(140,170,255,.14)",
+        "accent": "#8faeff", "glass": "rgba(14,20,40,.78)", "glass2": "rgba(143,174,255,.06)",
+        "ambient": "hologram", "ink_soft": "rgba(223,230,255,.70)", "ink_mute": "rgba(223,230,255,.42)"
     },
-    "verify": {  # Scout
-        "bg": "#b8d4f0", "ink": "#1a2740", "line": "rgba(30,50,90,.15)",
-        "accent": "#3b5998", "glass": "rgba(255,255,255,.45)", "ambient": "sky"
+    "verify": {  # Scout (dark slate, research feel)
+        "bg": "#0d1220", "ink": "#e4e8f2", "line": "rgba(120,160,220,.12)",
+        "accent": "#60a5fa", "glass": "rgba(18,26,44,.78)", "glass2": "rgba(96,165,250,.06)",
+        "ambient": "sky", "ink_soft": "rgba(228,232,242,.70)", "ink_mute": "rgba(228,232,242,.42)"
     },
-    "studio": {  # Forge
-        "bg": "#07070b", "ink": "#e0e0e8", "line": "rgba(255,60,100,.15)",
-        "accent": "#ff3d71", "glass": "rgba(20,18,25,.75)", "ambient": "dotgrid"
+    "studio": {  # Forge (near-black with hot pink)
+        "bg": "#0a0a0f", "ink": "#eaeaf0", "line": "rgba(255,61,113,.14)",
+        "accent": "#ff3d71", "glass": "rgba(22,18,28,.82)", "glass2": "rgba(255,61,113,.05)",
+        "ambient": "dotgrid", "ink_soft": "rgba(234,234,240,.70)", "ink_mute": "rgba(234,234,240,.40)"
     },
-    "draft": {  # Quill
-        "bg": "#e8f4ff", "ink": "#0a0f1e", "line": "rgba(30,80,160,.12)",
-        "accent": "#2563eb", "glass": "rgba(255,255,255,.65)", "ambient": "cyangrad"
+    "draft": {  # Quill (soft ink on cream-dark)
+        "bg": "#f5f0e6", "ink": "#1a1a24", "line": "rgba(30,30,50,.14)",
+        "accent": "#1e40af", "glass": "rgba(255,252,244,.85)", "glass2": "rgba(30,64,175,.05)",
+        "ambient": "paper-light", "ink_soft": "rgba(26,26,36,.70)", "ink_mute": "rgba(26,26,36,.45)"
     },
-    "cadence": {  # Kronos
-        "bg": "#fef9e7", "ink": "#1a1a1a", "line": "rgba(0,0,0,.25)",
-        "accent": "#1a1a1a", "glass": "rgba(255,255,240,.85)", "ambient": "paper"
+    "cadence": {  # Kronos (warm paper, neobrutalist accents)
+        "bg": "#faf3df", "ink": "#1a1a1a", "line": "rgba(0,0,0,.22)",
+        "accent": "#e11d48", "glass": "rgba(255,250,232,.88)", "glass2": "rgba(0,0,0,.04)",
+        "ambient": "paper", "ink_soft": "rgba(26,26,26,.72)", "ink_mute": "rgba(26,26,26,.48)"
     },
     "whiteboard": {
-        "bg": "#000000", "ink": "#ffffff", "line": "rgba(255,255,255,.12)",
-        "accent": "#ffffff", "glass": "rgba(20,20,20,.80)", "ambient": "black"
+        "bg": "#060608", "ink": "#f0f0f5", "line": "rgba(255,255,255,.10)",
+        "accent": "#a78bfa", "glass": "rgba(18,18,26,.85)", "glass2": "rgba(167,139,250,.06)",
+        "ambient": "black", "ink_soft": "rgba(240,240,245,.70)", "ink_mute": "rgba(240,240,245,.40)"
     },
-    "shortcuts": {  # Dash
-        "bg": "#0b0f1a", "ink": "#b0c0e0", "line": "rgba(80,160,255,.10)",
-        "accent": "#4fc3f7", "glass": "rgba(15,22,38,.75)", "ambient": "telemetry"
+    "shortcuts": {  # Dash (deep navy + cyan telemetry)
+        "bg": "#080c18", "ink": "#c8d4ee", "line": "rgba(80,180,255,.12)",
+        "accent": "#22d3ee", "glass": "rgba(12,18,34,.82)", "glass2": "rgba(34,211,238,.05)",
+        "ambient": "telemetry", "ink_soft": "rgba(200,212,238,.68)", "ink_mute": "rgba(200,212,238,.40)"
     },
-    "board": {  # Working Board
-        "bg": "#0a0a0f", "ink": "#d8d8e8", "line": "rgba(255,255,255,.08)",
-        "accent": "#ffffff", "glass": "rgba(18,18,25,.80)", "ambient": "dots"
+    "board": {  # Working Board (charcoal + white)
+        "bg": "#0b0d14", "ink": "#e2e4ec", "line": "rgba(255,255,255,.09)",
+        "accent": "#f97316", "glass": "rgba(18,20,30,.84)", "glass2": "rgba(249,115,22,.05)",
+        "ambient": "dots", "ink_soft": "rgba(226,228,236,.70)", "ink_mute": "rgba(226,228,236,.40)"
     },
-    "vault": {  # Library
-        "bg": "#0f1320", "ink": "#c8d0e8", "line": "rgba(150,180,255,.12)",
-        "accent": "#90b0ff", "glass": "rgba(18,24,42,.70)", "ambient": "deep"
+    "vault": {  # Library (deep indigo)
+        "bg": "#0c0f1d", "ink": "#d4dcf0", "line": "rgba(160,180,230,.10)",
+        "accent": "#90b0ff", "glass": "rgba(18,22,38,.80)", "glass2": "rgba(144,176,255,.05)",
+        "ambient": "deep", "ink_soft": "rgba(212,220,240,.68)", "ink_mute": "rgba(212,220,240,.40)"
     },
     "settings": {
-        "bg": "#0d111c", "ink": "#c0c8e0", "line": "rgba(150,180,255,.10)",
-        "accent": "#7b9cff", "glass": "rgba(18,24,40,.70)", "ambient": "deep"
+        "bg": "#0c101c", "ink": "#d0d6e8", "line": "rgba(150,170,220,.10)",
+        "accent": "#7b9cff", "glass": "rgba(18,22,36,.80)", "glass2": "rgba(123,156,255,.05)",
+        "ambient": "deep", "ink_soft": "rgba(208,214,232,.68)", "ink_mute": "rgba(208,214,232,.40)"
     },
 }
 

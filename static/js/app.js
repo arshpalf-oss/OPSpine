@@ -9,18 +9,39 @@ const Workspace = {
   async mount(key, container) {
     const fn = this.mounts[key];
     if (!fn) {
+      const known = Object.keys(this.mounts).join(', ');
       const el = document.createElement('div');
       el.className = 'workspace-panel';
       el.dataset.key = key;
-      el.innerHTML = `<div class="empty-state"><div class="empty-icon">◈</div><p>Workspace "${key}" is loading…</p></div>`;
+      el.innerHTML = `<div class="empty-state" style="padding:48px;text-align:center">
+        <div class="empty-icon" style="font-size:48px;margin-bottom:16px;opacity:.3">◈</div>
+        <p style="margin-bottom:8px"><strong>Workspace "${key}" could not load.</strong></p>
+        <p class="small" style="opacity:.5">Registered mounts: ${known || '(none)'}</p>
+        <button class="glass-btn" style="margin-top:16px" onclick="location.reload()">Reload</button>
+      </div>`;
+      container.appendChild(el);
+      console.error('Workspace not registered:', key, '; known:', known);
+      return el;
+    }
+    try {
+      const el = await fn();
+      el.classList.add('workspace-panel');
+      el.dataset.key = key;
+      container.appendChild(el);
+      return el;
+    } catch(err) {
+      console.error('Error mounting workspace', key, err);
+      const el = document.createElement('div');
+      el.className = 'workspace-panel';
+      el.dataset.key = key;
+      el.innerHTML = `<div class="empty-state" style="padding:48px;text-align:center">
+        <p style="color:#ef4444"><strong>Error loading "${key}"</strong></p>
+        <p class="small" style="opacity:.6;margin-top:8px">${err.message}</p>
+        <button class="glass-btn" style="margin-top:16px" onclick="location.reload()">Reload</button>
+      </div>`;
       container.appendChild(el);
       return el;
     }
-    const el = await fn();
-    el.classList.add('workspace-panel');
-    el.dataset.key = key;
-    container.appendChild(el);
-    return el;
   }
 };
 

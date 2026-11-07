@@ -50,12 +50,22 @@ const OPS = (() => {
     state.currentKey = key;
     const palette = state.palettes[key] || state.palettes.dashboard;
     const root = document.documentElement;
-    document.body.setAttribute('data-workspace', key);
-    root.style.setProperty('--ws-bg', palette.bg);
-    root.style.setProperty('--ws-ink', palette.ink);
-    root.style.setProperty('--ws-line', palette.line);
-    root.style.setProperty('--ws-accent', palette.accent);
-    root.style.setProperty('--ws-glass', palette.glass);
+    const body = document.body;
+    body.setAttribute('data-workspace', key);
+    // Apply on BOTH root and body for reliability (body's background is what renders)
+    const targets = [root.style, body.style];
+    targets.forEach(t => {
+      t.setProperty('--ws-bg', palette.bg);
+      t.setProperty('--ws-ink', palette.ink);
+      t.setProperty('--ws-line', palette.line);
+      t.setProperty('--ws-accent', palette.accent);
+      t.setProperty('--ws-glass', palette.glass);
+      t.setProperty('--ws-glass2', palette.glass2 || palette.glass);
+      t.setProperty('--ws-ink-soft', palette.ink_soft || palette.ink);
+      t.setProperty('--ws-ink-mute', palette.ink_mute || 'rgba(128,128,128,.5)');
+      t.background = palette.bg;
+      t.color = palette.ink;
+    });
     document.documentElement.style.colorScheme = isDark(key) ? 'dark' : 'light';
   }
   
