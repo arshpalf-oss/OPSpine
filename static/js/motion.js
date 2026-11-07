@@ -146,10 +146,30 @@ const Motion = (() => {
             r: Math.random() * 1.5 + .5, a: Math.random() * .4 + .1,
           });
         }
+      } else if (key === 'verify') {
+        // Scout sky: drifting clouds and distant rocks
+        for (let i = 0; i < 6; i++) {
+          particles.push({
+            kind: 'cloud',
+            x: Math.random() * w, y: Math.random() * h * .55,
+            vx: Math.random() * .2 + .08, vy: 0,
+            r: Math.random() * 60 + 80, a: Math.random() * .08 + .05,
+          });
+        }
+        for (let i = 0; i < 4; i++) {
+          particles.push({
+            kind: 'rock',
+            x: Math.random() * w, y: Math.random() * h * .7 + h * .15,
+            vx: (Math.random() - .5) * .15, vy: (Math.random() - .5) * .05,
+            r: Math.random() * 14 + 8, a: Math.random() * .35 + .15,
+            rot: Math.random() * Math.PI, vrot: (Math.random()-.5)*.002,
+          });
+        }
       } else if (key === 'whiteboard' || key === 'board') {
         // Subtle floating dots
         for (let i = 0; i < 15; i++) {
           particles.push({
+            kind: 'dot',
             x: Math.random() * w, y: Math.random() * h,
             vx: (Math.random() - .5) * .15, vy: (Math.random() - .5) * .15,
             r: Math.random() * 1.5 + .5, a: Math.random() * .15 + .05,
@@ -182,14 +202,48 @@ const Motion = (() => {
       
       particles.forEach(p => {
         p.x += p.vx; p.y += p.vy;
-        if (p.x < -10) p.x = w + 10;
-        if (p.x > w + 10) p.x = -10;
-        if (p.y < -10) p.y = h + 10;
-        if (p.y > h + 10) p.y = -10;
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-        ctx.fillStyle = key === 'shortcuts' ? `rgba(79,195,247,${p.a})` : `rgba(143,174,255,${p.a})`;
-        ctx.fill();
+        if (p.rot !== undefined) p.rot += p.vrot || 0;
+        if (p.x < -p.r - 20) p.x = w + p.r + 20;
+        if (p.x > w + p.r + 20) p.x = -p.r - 20;
+        if (p.y < -p.r - 20) p.y = h + p.r + 20;
+        if (p.y > h + p.r + 20) p.y = -p.r - 20;
+
+        if (p.kind === 'cloud') {
+          // soft elliptical cloud glow
+          const grad = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.r);
+          grad.addColorStop(0, `rgba(255,255,255,${p.a})`);
+          grad.addColorStop(1, 'rgba(255,255,255,0)');
+          ctx.fillStyle = grad;
+          ctx.beginPath();
+          ctx.ellipse(p.x, p.y, p.r * 1.4, p.r * .7, 0, 0, Math.PI * 2);
+          ctx.fill();
+        } else if (p.kind === 'rock') {
+          // dark irregular asteroid
+          ctx.save();
+          ctx.translate(p.x, p.y); ctx.rotate(p.rot || 0);
+          ctx.fillStyle = `rgba(60,42,28,${p.a})`;
+          ctx.beginPath();
+          const sides = 7;
+          for (let i = 0; i < sides; i++) {
+            const ang = (i / sides) * Math.PI * 2;
+            const rad = p.r * (0.8 + 0.25 * Math.sin(i * 2.3));
+            const x = Math.cos(ang) * rad, y = Math.sin(ang) * rad;
+            if (i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+          }
+          ctx.closePath(); ctx.fill();
+          // rim highlight
+          ctx.strokeStyle = `rgba(255,210,160,${p.a*.5})`;
+          ctx.lineWidth = 1; ctx.stroke();
+          ctx.restore();
+        } else {
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+          ctx.fillStyle = key === 'shortcuts' ? `rgba(79,195,247,${p.a})` :
+                          key === 'whiteboard' ? `rgba(168,85,247,${p.a})` :
+                          key === 'board' ? `rgba(255,140,40,${p.a})` :
+                          `rgba(143,174,255,${p.a})`;
+          ctx.fill();
+        }
       });
       
       if (!reduced) requestAnimationFrame(draw);

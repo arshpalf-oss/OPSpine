@@ -61,9 +61,11 @@ const Shell = (() => {
       updateReopenVisibility();
     }
     
-    // Close buttons on sidebars
+    // Close buttons on sidebars (right close toggles expanded/collapsed, not full hide)
     leftSb?.querySelector('[data-close="left"]')?.addEventListener('click', () => toggleSide('left'));
-    rightSb?.querySelector('[data-close="right"]')?.addEventListener('click', () => toggleSide('right'));
+    rightSb?.querySelector('[data-close="right"]')?.addEventListener('click', () => {
+      rightSb.classList.toggle('right-open');
+    });
     
     // Reopen buttons
     leftReopen?.addEventListener('click', () => toggleSide('left'));
@@ -79,12 +81,69 @@ const Shell = (() => {
       Shell.toast('New conversation started');
     });
     
-    // Populate right tools list
+    // Populate right tools list and chat history
     populateRightTools();
-    
+    populateHistory();
+
     // Update visibility when workspace changes
     subscribeUpdates.push(updateReopenVisibility);
     updateReopenVisibility();
+  }
+
+  function populateHistory() {
+    const list = document.getElementById('sb-history-list');
+    if (!list) return;
+    const sampleChats = [
+      { title: 'Verify climate change study', time: '2h ago', workspace: 'verify', active: true },
+      { title: 'Spinlab: 3D loaders kit', time: 'Yesterday', workspace: 'studio', active: false },
+      { title: 'Pitch deck SaaS landing', time: 'Yesterday', workspace: 'draft', active: false },
+      { title: 'Postcraft: Q4 schedule', time: '2 days ago', workspace: 'cadence', active: false },
+      { title: 'Traffic anomaly sweep', time: '3 days ago', workspace: 'shortcuts', active: false },
+      { title: 'Content pipeline flow', time: '4 days ago', workspace: 'board', active: false },
+      { title: 'Onboarding email draft', time: 'Last week', workspace: 'draft', active: false },
+      { title: 'Verify vitamin C claims', time: 'Last week', workspace: 'verify', active: false },
+    ];
+    list.innerHTML = `
+      <div class="sb-search-wrap">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input class="sb-search" id="sb-history-search" placeholder="Search chats…">
+      </div>
+      <div class="sb-history-items" id="sb-history-items">
+        ${sampleChats.map((c,i) => `
+          <button class="sb-chat-item ${c.active?'active':''}" data-index="${i}">
+            <span class="sb-chat-dot" style="background:${wsAccent(c.workspace)}"></span>
+            <span class="sb-chat-text">
+              <span class="sb-chat-title">${c.title}</span>
+              <span class="sb-chat-time">${c.time}</span>
+            </span>
+          </button>
+        `).join('')}
+      </div>
+    `;
+    const search = list.querySelector('#sb-history-search');
+    const items = list.querySelectorAll('.sb-chat-item');
+    search.addEventListener('input', () => {
+      const q = search.value.toLowerCase();
+      items.forEach(it => {
+        const t = it.querySelector('.sb-chat-title').textContent.toLowerCase();
+        it.style.display = t.includes(q) ? '' : 'none';
+      });
+    });
+    items.forEach(it => {
+      it.addEventListener('click', () => {
+        items.forEach(x => x.classList.remove('active'));
+        it.classList.add('active');
+      });
+    });
+  }
+
+  function wsAccent(key) {
+    const accents = {
+      verify:'#3d74b8', studio:'#ff2d6f', draft:'#3d74ff',
+      cadence:'#ff2d6f', shortcuts:'#22e37a', board:'#ff8c28',
+      whiteboard:'#a855f7',
+    };
+    return accents[key] || '#7a8aa8';
   }
   
   function populateRightTools() {
