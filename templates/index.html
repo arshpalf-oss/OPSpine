@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="dark light">
+<title>OPSpine</title>
+<link rel="stylesheet" href="/static/css/design-system.css">
+<link rel="stylesheet" href="/static/css/glass.css">
+<link rel="stylesheet" href="/static/css/shell.css">
+<link rel="stylesheet" href="/static/css/dashboard.css">
+<link rel="stylesheet" href="/static/css/abyss.css">
+<link rel="stylesheet" href="/static/css/scout.css">
+<link rel="stylesheet" href="/static/css/forge.css">
+<link rel="stylesheet" href="/static/css/quill.css">
+<link rel="stylesheet" href="/static/css/kronos.css">
+<link rel="stylesheet" href="/static/css/whiteboard.css">
+<link rel="stylesheet" href="/static/css/dash.css">
+<link rel="stylesheet" href="/static/css/board.css">
+<link rel="stylesheet" href="/static/css/library.css">
+<link rel="stylesheet" href="/static/css/settings.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%230c1021'/><text x='16' y='22' text-anchor='middle' font-size='18' fill='%237b9cff' font-family='monospace'>◈</text></svg>">
+</head>
+<body data-workspace="{{ initial_key }}">
+
+<!-- Ambient background (mounted once, never remounts) -->
+<div id="ambient" aria-hidden="true">
+  <div class="ambient-layer ambient-aurora" id="aurora"></div>
+  <div class="ambient-layer ambient-noise" id="noise"></div>
+  <canvas id="ambient-canvas" class="ambient-canvas"></canvas>
+</div>
+
+<!-- Shell: Rail (mounted once) -->
+<nav id="rail" class="rail" role="navigation" aria-label="Main navigation">
+  <div class="rail-brand">
+    <button class="rail-logo" data-action="nav:dashboard" aria-label="Go to Dashboard">
+      <span class="logo-glyph">◈</span>
+      <span class="logo-text">OPSPINE</span>
+    </button>
+  </div>
+  <div class="rail-section">
+    <div class="rail-label">Workspaces</div>
+    <div class="rail-items" id="rail-items"></div>
+  </div>
+  <div class="rail-section rail-system">
+    <div class="rail-label">System</div>
+    <div class="rail-items" id="rail-system"></div>
+  </div>
+  <div class="rail-footer">
+    <button class="rail-collapse glass-btn" data-action="nav:toggle" aria-label="Toggle navigation" title="Collapse nav">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+    </button>
+  </div>
+</nav>
+
+<!-- Mobile drawer scrim -->
+<div id="drawer-scrim" class="drawer-scrim" hidden></div>
+
+<!-- Floating nav reopen button (when rail is hidden) -->
+<button id="rail-reopen" class="rail-reopen glass-btn" aria-label="Reopen navigation" hidden>
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+</button>
+
+<!-- Shell: Global Toolbar (mounted once) -->
+<header id="toolbar" class="toolbar glass-surface">
+  <button class="toolbar-back glass-btn-icon" data-action="nav:back" aria-label="Back to Dashboard">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+  </button>
+  <div class="toolbar-crumb" id="toolbar-crumb">
+    <span class="crumb-root" data-action="nav:dashboard">OPSPINE</span>
+    <span class="crumb-sep">/</span>
+    <span class="crumb-workspace" id="crumb-workspace">Dashboard</span>
+  </div>
+  <div class="toolbar-search">
+    <div class="toolbar-search-wrap">
+      <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input type="text" id="toolbar-input" class="toolbar-input" placeholder="Search commands, files, knowledge…" aria-label="Command palette" autocomplete="off">
+      <kbd class="toolbar-kbd">⌘K</kbd>
+      <div class="toolbar-spinner" id="toolbar-spinner" hidden></div>
+    </div>
+  </div>
+  <div class="toolbar-actions">
+    <button class="glass-btn-icon tb-mic" data-action="voice:toggle" aria-label="Voice input" title="Voice (⌘⇧V)">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+    </button>
+    <button class="glass-btn-icon tb-undo" data-action="history:undo" aria-label="Undo" title="Undo (⌘Z)">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
+    </button>
+    <button class="glass-btn-icon tb-redo" data-action="history:redo" aria-label="Redo" title="Redo (⌘⇧Z)">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+    </button>
+    <div class="tb-sep"></div>
+    <div class="tb-status">
+      <span class="status-dot" id="status-dot"></span>
+      <span class="status-label" id="status-label">LOCAL</span>
+    </div>
+    <div class="tb-clock" id="tb-clock"></div>
+    <button class="glass-btn-icon tb-settings" data-action="nav:settings" aria-label="Settings">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+    </button>
+  </div>
+</header>
+
+<!-- Main content area -->
+<main id="main" class="main">
+  <div id="workspace-container" class="workspace-container" aria-live="polite">
+    <!-- Workspaces are injected here by JS; only one is visible at a time -->
+  </div>
+</main>
+
+<!-- Command Palette (mounted once) -->
+<div id="palette" class="palette-overlay" role="dialog" aria-label="Command palette" hidden>
+  <div class="palette-backdrop" data-action="palette:close"></div>
+  <div class="palette-panel glass-surface">
+    <div class="palette-input-wrap">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input type="text" id="palette-input" class="palette-input" placeholder="Type a command or search…" autocomplete="off">
+      <kbd class="palette-kbd">Esc</kbd>
+    </div>
+    <div class="palette-results" id="palette-results"></div>
+  </div>
+</div>
+
+<!-- Shortcut help panel (mounted once) -->
+<div id="shortcuts-panel" class="palette-overlay" role="dialog" aria-label="Keyboard shortcuts" hidden>
+  <div class="palette-backdrop" data-action="shortcuts:close"></div>
+  <div class="palette-panel glass-surface shortcuts-panel">
+    <div class="shortcuts-header">
+      <h2>Keyboard Shortcuts</h2>
+      <button class="glass-btn-icon" data-action="shortcuts:close" aria-label="Close">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="shortcuts-grid" id="shortcuts-grid"></div>
+  </div>
+</div>
+
+<!-- Toast container (mounted once) -->
+<div id="toasts" class="toasts" aria-live="assertive"></div>
+
+<!-- Back to top button -->
+<button id="back-to-top" class="back-to-top glass-btn" aria-label="Back to top" hidden>
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="18 15 12 9 6 15"/></svg>
+</button>
+
+<!-- Initial data for instant render -->
+<script id="initial-data" type="application/json">
+{
+  "initialPath": {{ initial_path|tojson }},
+  "initialKey": {{ initial_key|tojson }},
+  "routes": {{ routes|tojson }},
+  "palettes": {{ palettes|tojson }}
+}
+</script>
+
+<script src="/static/js/state.js"></script>
+<script src="/static/js/api.js"></script>
+<script src="/static/js/motion.js"></script>
+<script src="/static/js/shell.js"></script>
+<script src="/static/js/commands.js"></script>
+<script src="/static/js/workspaces/dashboard.js"></script>
+<script src="/static/js/workspaces/abyss.js"></script>
+<script src="/static/js/workspaces/scout.js"></script>
+<script src="/static/js/workspaces/forge.js"></script>
+<script src="/static/js/workspaces/quill.js"></script>
+<script src="/static/js/workspaces/kronos.js"></script>
+<script src="/static/js/workspaces/whiteboard.js"></script>
+<script src="/static/js/workspaces/dash.js"></script>
+<script src="/static/js/workspaces/board.js"></script>
+<script src="/static/js/workspaces/library.js"></script>
+<script src="/static/js/workspaces/settings.js"></script>
+<script src="/static/js/app.js"></script>
+</body>
+</html>

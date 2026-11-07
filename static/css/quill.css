@@ -1,0 +1,65 @@
+/* QUILL — Cyan→blue gradient, white paper card */
+.quill-panel { max-width: 900px; margin: 0 auto; position: relative; }
+
+.quill-gradient {
+  position: fixed; inset: 0; pointer-events: none; z-index: -1;
+  background: linear-gradient(135deg, #22d3ee 0%, #3b82f6 40%, #6366f1 100%);
+  opacity: .9;
+}
+
+.quill-hero { padding: var(--sp-4) 0; }
+
+.quill-paper {
+  background: rgba(255,255,255,.92);
+  border-color: rgba(255,255,255,.7);
+  padding: 0; overflow: hidden;
+}
+.quill-paper-head {
+  padding: var(--sp-4) var(--sp-5);
+  border-bottom: 1px solid rgba(0,0,0,.06);
+  display: flex; flex-wrap: wrap; gap: var(--sp-2);
+}
+.quill-chips { display: flex; gap: var(--sp-1); flex-wrap: wrap; }
+.quill-chip {
+  padding: 5px 12px; border-radius: var(--r-pill);
+  font-size: var(--fs-xs); font-weight: 500;
+  background: #f0f4ff; color: #2563eb; border: 1px solid #dbeafe;
+  cursor: pointer; transition: all .15s; white-space: nowrap;
+}
+.quill-chip:hover { background: #2563eb; color: #fff; }
+.quill-chip.active { background: #1e40af; color: #fff; border-color: #1e40af; }
+.quill-chip.loading { opacity: .5; pointer-events: none; }
+
+.quill-editor {
+  width: 100%; min-height: 400px;
+  padding: var(--sp-6) var(--sp-8);
+  background: transparent; border: none; outline: none;
+  font-size: var(--fs-base); line-height: 1.75; color: #0a0f1e;
+  font-family: var(--serif); resize: vertical;
+}
+.quill-editor::placeholder { color: rgba(10,15,30,.3); }
+
+.quill-paper-foot {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: var(--sp-3) var(--sp-5);
+  border-top: 1px solid rgba(0,0,0,.06);
+  flex-wrap: wrap; gap: var(--sp-2);
+}
+.quill-actions { display: flex; gap: var(--sp-2); }
+
+.quill-drafts-section { margin-top: var(--sp-8); }
+.quill-drafts-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px,1fr)); gap: var(--sp-3); }
+.draft-card {
+  position: relative; padding: var(--sp-4); cursor: pointer;
+  background: rgba(255,255,255,.85); border-color: rgba(255,255,255,.6);
+}
+.draft-title { font-weight: 600; font-size: var(--fs-sm); margin-bottom: 4px; }
+.draft-preview { opacity: .6; line-height: 1.4; margin-bottom: 4px; }
+.draft-meta { font-family: var(--mono); opacity: .4; }
+.draft-del { position: absolute; top: var(--sp-2); right: var(--sp-2); width: 22px; height: 22px; border-radius:50%; display:flex;align-items:center;justify-content:center; font-size:10px; opacity:.4; }
+.draft-del:hover { opacity: 1; background: rgba(239,68,68,.15); color: #ef4444; }
+
+@media (max-width: 620px) {
+  .quill-editor { padding: var(--sp-4); font-size: 16px; }
+  .quill-drafts-list { grid-template-columns: 1fr; }
+}

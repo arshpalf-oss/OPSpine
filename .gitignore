@@ -1,0 +1,11 @@
+venv/
+__pycache__/
+*.pyc
+data/opspine.db
+data/documents/*
+!data/documents/.gitkeep
+ref/
+*.zip
+node_modules/
+.DS_Store
+screenshots/
