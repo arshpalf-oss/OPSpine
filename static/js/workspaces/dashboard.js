@@ -3,14 +3,14 @@
  */
 (function() {
   const TOOL_CARDS = [
-    { key: 'home', path: '/abyss', label: 'Abyss', desc: 'Route one prompt to the right engine', icon: 'sparkles', shortcut: '1', color: '#8faeff' },
-    { key: 'verify', path: '/scout', label: 'Scout', desc: 'Research & verify claims with sources', icon: 'search', shortcut: '2', color: '#3b5998' },
-    { key: 'studio', path: '/forge', label: 'Forge', desc: 'Produce real documents, decks, sheets', icon: 'hammer', shortcut: '3', color: '#ff3d71' },
-    { key: 'draft', path: '/quill', label: 'Quill', desc: 'Write, refine, and polish prose', icon: 'pen', shortcut: '4', color: '#2563eb' },
-    { key: 'cadence', path: '/kronos', label: 'Kronos', desc: 'Schedule work in plain language', icon: 'calendar', shortcut: '5', color: '#1a1a1a' },
-    { key: 'whiteboard', path: '/whiteboard', label: 'Whiteboard', desc: 'Think in connected nodes', icon: 'nodes', shortcut: '6', color: '#ffffff' },
-    { key: 'shortcuts', path: '/dash', label: 'Dash', desc: 'Fire any action in one hop', icon: 'zap', shortcut: '7', color: '#4fc3f7' },
-    { key: 'board', path: '/working-board', label: 'Working Board', desc: 'Execute projects end-to-end', icon: 'board', shortcut: '8', color: '#ffffff' },
+    { key: 'home', path: '/abyss', label: 'Abyss', eyebrow: 'CENTRAL AI WORKSPACE', desc: 'Holographic core — one prompt routed to the right engine', icon: 'sparkles', shortcut: '1', bg: '#131825', accent: '#8faeff', glyphBg: 'rgba(143,174,255,.15)' },
+    { key: 'studio', path: '/forge', label: 'Forge', eyebrow: 'DOCUMENT PRODUCTION', desc: 'Real PPTX, PDF, DOCX, XLSX deliverables', icon: 'hammer', shortcut: '3', bg: '#1a141c', accent: '#ff3d71', glyphBg: 'rgba(255,61,113,.18)' },
+    { key: 'verify', path: '/scout', label: 'Scout', eyebrow: 'RESEARCH & VERIFICATION', desc: 'Screened sources, claim verdicts, citations', icon: 'search', shortcut: '2', bg: '#1a2438', accent: '#60a5fa', glyphBg: 'rgba(96,165,250,.15)', bgImg: 'linear-gradient(180deg, rgba(96,165,250,.08) 0%, transparent 60%)' },
+    { key: 'cadence', path: '/kronos', label: 'Kronos', eyebrow: 'CALENDAR & REMINDERS', desc: 'Month, week and day views · plain-English scheduling', icon: 'calendar', shortcut: '5', bg: '#e8eefc', accent: '#1a1a1a', glyphBg: '#fcd34d', dark: true, line: '#000' },
+    { key: 'draft', path: '/quill', label: 'Quill', eyebrow: 'WRITING STUDIO', desc: 'Draft, convert, repair and refine any business text', icon: 'pen', shortcut: '4', bg: '#5b8def', accent: '#ffffff', glyphBg: '#ffffff', white: true },
+    { key: 'shortcuts', path: '/dash', label: 'Dash', eyebrow: 'QUICK ACTIONS', desc: 'Searchable commands and custom shortcuts', icon: 'zap', shortcut: '7', bg: '#1e2433', accent: '#4ade80', glyphBg: 'rgba(74,222,128,.18)' },
+    { key: 'whiteboard', path: '/whiteboard', label: 'Whiteboard', eyebrow: 'VISUAL THINKING', desc: 'Idea nodes, connections and local lenses', icon: 'nodes', shortcut: '6', bg: '#0d0f14', accent: '#a78bfa', glyphBg: 'rgba(167,139,250,.15)' },
+    { key: 'board', path: '/working-board', label: 'Working Board', eyebrow: 'PROJECT EXECUTION', desc: 'Task canvas, links and Run → Kronos', icon: 'board', shortcut: '8', bg: '#151922', accent: '#f97316', glyphBg: 'rgba(249,115,22,.15)' },
   ];
   
   const QUICK_ACTIONS = [
@@ -30,19 +30,8 @@
   ];
   
   function iconSVG(name, color) {
-    const icons = {
-      sparkles: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l2.09 6.26L20 9l-5 4.87L16.18 21 12 17.77 7.82 21 9 13.87 4 9l5.91-.74L12 2z"/></svg>',
-      search: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>',
-      hammer: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 12l-8.5 8.5c-.83.83-2.17.83-3 0a2.12 2.12 0 0 1 0-3L12 9"/><path d="M17.64 15L22 10.64"/><path d="m14.41 6.41-3.4-2.57-1.13 1.13 2.13 2.13"/></svg>',
-      pen: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>',
-      calendar: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>',
-      nodes: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="6" cy="6" r="3"/><circle cx="18" cy="18" r="3"/><circle cx="18" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="8.5" y1="7.5" x2="15.5" y2="16.5"/><line x1="15.5" y1="7.5" x2="8.5" y2="16.5"/></svg>',
-      zap: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>',
-      board: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>',
-      folder: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>',
-      settings: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>',
-    };
-    return icons[name] || icons.sparkles;
+    // Use Shell's canonical icon set for consistency with the rail
+    return Shell.iconSvg(name);
   }
   
   function mount() {
@@ -210,24 +199,32 @@
       btn.addEventListener('click', QUICK_ACTIONS[i].action);
     });
     
-    // Tool cards
+    // Tool cards — vibrant colored tiles (image 3 style)
     const tcEl = el.querySelector('#tool-cards');
-    tcEl.innerHTML = TOOL_CARDS.map(c => `
-      <button class="tool-card glass-card reveal-card" data-path="${c.path}" style="--card-accent:${c.color}">
-        <span class="card-sheen"></span>
+    tcEl.innerHTML = TOOL_CARDS.map(c => {
+      const inkColor = c.white || c.dark ? (c.dark ? '#1a1a1a' : '#ffffff') : '#e8ecf8';
+      const inkSoft = c.white || c.dark ? 'rgba(0,0,0,.6)' : 'rgba(232,236,248,.7)';
+      const lineColor = c.white || c.dark ? 'rgba(0,0,0,.18)' : 'rgba(255,255,255,.10)';
+      const glyphStyle = `background:${c.glyphBg};color:${c.accent};`;
+      const bgOverlay = c.bgImg || '';
+      return `
+      <button class="tool-card reveal-card" data-path="${c.path}" style="background:${c.bg};border-color:${lineColor};color:${inkColor};--tc-accent:${c.accent};--tc-ink-soft:${inkSoft};--tc-line:${lineColor}">
+        <span class="card-sheen" style="background:${bgOverlay}"></span>
         <div class="tc-head">
-          <span class="tc-icon" style="background:${c.color}20;color:${c.color}">${iconSVG(c.icon)}</span>
-          <span class="tc-kbd">⌘${c.shortcut}</span>
+          <span class="tc-icon" style="${glyphStyle}">${iconSVG(c.icon)}</span>
+          <span class="tc-kbd" style="border-color:${lineColor};color:${inkSoft};background:rgba(0,0,0,.12)">⌘${c.shortcut}</span>
         </div>
         <div class="tc-body">
+          <span class="tc-eyebrow">${c.eyebrow}</span>
           <h3 class="tc-name">${c.label}</h3>
           <p class="tc-desc">${c.desc}</p>
         </div>
         <div class="tc-foot">
-          <span class="tc-enter">Enter →</span>
+          <span class="tc-enter">OPEN WORKSPACE <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span>
         </div>
-      </button>
-    `).join('');
+        <span class="tc-divider" style="background:${lineColor}"></span>
+      </button>`;
+    }).join('');
     tcEl.querySelectorAll('.tool-card').forEach(card => {
       card.addEventListener('click', () => Shell.navigate(card.dataset.path));
     });

@@ -102,13 +102,16 @@ body[data-workspace="settings"] .ambient-aurora {
 
 /* ── Card ─────────────────────────────────────────────────────────── */
 .glass-card {
-  position: relative; overflow: hidden;
+  position: relative; overflow: visible;
   background: var(--ws-glass);
   border: 1px solid var(--ws-line);
   border-radius: var(--r-lg);
   padding: var(--sp-5, 20px);
   transition: transform .25s var(--motion-ease), border-color .25s, box-shadow .25s;
   color: var(--ws-ink);
+}
+.glass-card .card-sheen {
+  position: absolute; inset: 0; border-radius: inherit; overflow: hidden; pointer-events: none;
 }
 .glass-card:hover {
   border-color: color-mix(in srgb, var(--ws-accent) 40%, var(--ws-line));
