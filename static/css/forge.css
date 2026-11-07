@@ -8,7 +8,7 @@
   background: #05060a;
   border-radius: 18px;
   padding: 32px;
-  min-height: calc(100vh - 100px);
+  min-height: calc(100vh - 112px);
   overflow: hidden;
 }
 

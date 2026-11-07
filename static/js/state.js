@@ -56,7 +56,12 @@ const OPS = (() => {
     const layout = routeLayout(key);
     body.setAttribute('data-workspace', key);
     body.setAttribute('data-layout', layout);
-    // Apply on BOTH root and body for reliability (body's background is what renders)
+    // For full-bleed panel themes (Scout/Quill/Kronos), body bg should be dark/neutral
+    // so the panel's own gradient/background is what shows. Dark themes get palette.bg.
+    let bodyBg = palette.bg;
+    if (key === 'verify') bodyBg = '#0a0c12';            // Scout — sky shows inside panel
+    if (key === 'draft')  bodyBg = '#eef1f8';            // Quill — white paper on light blue
+    if (key === 'cadence') bodyBg = '#e7e0f4';           // Kronos — lavender neobrutalist
     const targets = [root.style, body.style];
     targets.forEach(t => {
       t.setProperty('--ws-bg', palette.bg);
@@ -67,12 +72,12 @@ const OPS = (() => {
       t.setProperty('--ws-glass2', palette.glass2 || palette.glass);
       t.setProperty('--ws-ink-soft', palette.ink_soft || palette.ink);
       t.setProperty('--ws-ink-mute', palette.ink_mute || 'rgba(128,128,128,.5)');
-      t.background = palette.bg;
+      t.background = bodyBg;
       t.color = palette.ink;
     });
     document.documentElement.style.colorScheme = isDark(key) ? 'dark' : 'light';
   }
-  
+
   function isDark(key) {
     const darkKeys = ['dashboard', 'home', 'studio', 'whiteboard', 'shortcuts', 'board', 'vault', 'settings'];
     return darkKeys.includes(key);
