@@ -1,146 +1,145 @@
 /* ═══════════════════════════════════════════════════════════════════════════
-   KRONOS — Postcraft neobrutalist (lavender/white, thick black borders, offset shadows)
+   KRONOS — Calendar. Neobrutalist Postcraft (thick black borders, chunky
+   offset shadows, lavender/white, hot-pink accent).
+   Actual markup: kronos-neo, kronos-entry, kronos-controls/kronos-tabs/kronos-nav-btns,
+   kronos-cal-grid (kronos-cal-head, kronos-cal-day, cal-day-num, cal-event, cal-more),
+   kronos-upcoming, kronos-event-item (.done).
    ═══════════════════════════════════════════════════════════════════════════ */
 
-.kronos-panel {
-  position: relative; min-height: calc(100vh - 100px);
-  border-radius: 0; padding: 0;
-  background: transparent;
-}
-.kronos-schedule {
-  max-width: 1200px; margin: 0 auto; padding: 32px 24px 48px;
-}
+.kronos-panel { padding: 24px 0 48px; min-height: calc(100vh - 80px); }
+.kronos-neo { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
 
-/* Header */
-.kronos-header {
-  display: flex; align-items: center; justify-content: space-between;
-  gap: 16px; margin-bottom: 32px; flex-wrap: wrap;
-}
-.kronos-header-left {}
+.kronos-header { margin-bottom: 24px; }
 .kronos-eyebrow {
-  display: inline-block;
-  font-family: 'Archivo Black', 'Inter', sans-serif;
+  display: inline-block; font-family: 'Archivo Black','Inter',sans-serif;
   font-size: 11px; font-weight: 900; letter-spacing: .18em; text-transform: uppercase;
-  background: #000; color: #f4f0ff; padding: 5px 12px; margin-bottom: 12px;
+  background: #000; color: #f4f0ff; padding: 6px 14px; margin-bottom: 12px;
 }
-.kronos-title {
-  font-family: 'Archivo Black', 'Inter', sans-serif;
-  font-size: clamp(36px, 5vw, 56px); font-weight: 900; letter-spacing: -0.02em;
-  line-height: 1.05; color: #000; text-transform: uppercase;
+.kronos-header h1 {
+  font-family: 'Archivo Black','Inter',sans-serif;
+  font-size: clamp(36px,6vw,64px); font-weight: 900; letter-spacing: -0.02em;
+  line-height: 1; color: #000; margin: 8px 0 10px; text-transform: none;
 }
-.kronos-title span { color: #ff2d6f; }
+.kronos-header p { color: #555; font-size: 16px; max-width: 600px; }
 
-.kronos-btn {
-  font-family: 'Archivo Black', 'Inter', sans-serif;
-  font-size: 13px; font-weight: 900; letter-spacing: .08em; text-transform: uppercase;
-  padding: 14px 22px; background: #000; color: #fff;
-  border: 3px solid #000; border-radius: 0; cursor: pointer;
-  box-shadow: 6px 6px 0 #ff2d6f;
+.kronos-entry {
+  display: flex; margin-bottom: 20px;
+  background: #fff; border: 3px solid #000; box-shadow: 6px 6px 0 #000;
+}
+.kronos-input {
+  flex: 1; padding: 14px 18px; background: #fff; border: none; outline: none;
+  font-size: 15px; color: #000; font-family: inherit;
+}
+.kronos-input::placeholder { color: #999; }
+.kronos-add {
+  padding: 0 22px; background: #ff2d6f; color: #fff; border: none; border-left: 3px solid #000;
+  font-family: 'Archivo Black',sans-serif; font-size: 13px; font-weight: 900;
+  letter-spacing: .1em; cursor: pointer; text-transform: uppercase;
+}
+.kronos-add:hover { background: #e0205e; }
+#kronos-parsed { min-height: 18px; margin-top: 0 !important; padding-bottom: 8px; }
+
+.kronos-controls {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 16px; margin: 8px 0 20px; flex-wrap: wrap;
+}
+.kronos-tabs { display: flex; gap: 6px; }
+.kronos-tabs .tab {
+  font-family: 'Archivo Black',sans-serif !important; font-weight: 900 !important;
+  font-size: 12px !important; text-transform: uppercase; letter-spacing: .06em;
+  padding: 10px 18px !important; border-radius: 0 !important;
+  background: #fff; color: #000 !important; border: 3px solid #000 !important;
+  box-shadow: 4px 4px 0 #000; opacity: 1 !important; min-height: auto;
   transition: transform .1s, box-shadow .1s;
-  display: inline-flex; align-items: center; gap: 8px; text-decoration: none;
 }
-.kronos-btn:hover { transform: translate(-2px,-2px); box-shadow: 8px 8px 0 #ff2d6f; }
-.kronos-btn:active { transform: translate(4px,4px); box-shadow: 2px 2px 0 #ff2d6f; }
+.kronos-tabs .tab:hover { transform: translate(-2px,-2px); box-shadow: 6px 6px 0 #000; }
+.kronos-tabs .tab.active {
+  background: #000 !important; color: #f4f0ff !important;
+  transform: translate(2px,2px); box-shadow: 2px 2px 0 #000;
+}
+.kronos-nav-btns { display: flex; align-items: center; gap: 12px; }
+.kronos-btn {
+  font-family: 'Archivo Black',sans-serif; font-size: 14px; font-weight: 900;
+  width: 44px; height: 44px; background: #fff; border: 3px solid #000;
+  cursor: pointer; box-shadow: 4px 4px 0 #ff2d6f;
+  transition: transform .1s, box-shadow .1s;
+  display: inline-flex; align-items: center; justify-content: center;
+}
+.kronos-btn:hover { transform: translate(-2px,-2px); box-shadow: 6px 6px 0 #ff2d6f; }
+.kronos-btn:active { transform: translate(2px,2px); box-shadow: 2px 2px 0 #ff2d6f; }
+#kronos-title {
+  font-family: 'Archivo Black',sans-serif !important; font-weight: 900 !important;
+  font-size: 16px; text-transform: uppercase; min-width: 160px; text-align: center;
+}
 
-/* Calendar grid */
-.kronos-cal {
-  display: grid; grid-template-columns: repeat(7, 1fr); gap: 12px; margin-bottom: 32px;
+.kronos-cal-grid {
+  display: grid; grid-template-columns: repeat(7,1fr); gap: 10px; margin-bottom: 32px;
 }
-.kronos-day {
-  background: #f4f0ff; border: 3px solid #000;
-  padding: 14px 12px; min-height: 180px; position: relative;
-  box-shadow: 6px 6px 0 #000;
-  transition: transform .15s, box-shadow .15s;
-  display: flex; flex-direction: column;
+.kronos-cal-head {
+  font-family: 'Archivo Black',sans-serif; font-size: 11px; font-weight: 900;
+  text-transform: uppercase; letter-spacing: .08em; text-align: left;
+  padding: 8px 4px; color: #000;
 }
-.kronos-day:hover { transform: translate(-2px,-2px); box-shadow: 8px 8px 0 #000; }
-.kronos-day.today { background: #fff; border-color: #000; }
-.kronos-day.today .kronos-daynum { background: #ff2d6f; color: #fff; }
-.kronos-daynum {
-  font-family: 'Archivo Black', sans-serif;
-  font-size: 13px; font-weight: 900; display: inline-block;
-  background: #000; color: #f4f0ff; padding: 3px 8px; margin-bottom: 10px;
-  align-self: flex-start;
+.kronos-cal-day {
+  background: #fff; border: 3px solid #000; padding: 10px; min-height: 130px;
+  box-shadow: 4px 4px 0 #000; display: flex; flex-direction: column; gap: 4px;
+  transition: transform .1s, box-shadow .1s;
 }
-.kronos-events { display: flex; flex-direction: column; gap: 4px; flex: 1; }
-.kronos-event {
-  font-size: 11px; font-weight: 700; padding: 4px 6px; border: 2px solid #000;
-  background: #fff; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+.kronos-cal-day:hover { transform: translate(-2px,-2px); box-shadow: 6px 6px 0 #000; }
+.kronos-cal-day.empty { background: transparent; border: none; box-shadow: none; min-height: 0; }
+.kronos-cal-day.empty:hover { transform: none; box-shadow: none; }
+.kronos-cal-day.today { background: #f4f0ff; }
+.cal-day-num {
+  font-family: 'Archivo Black',sans-serif; font-size: 14px; font-weight: 900;
+  background: #000; color: #fff; width: 28px; height: 28px;
+  display: inline-flex; align-items: center; justify-content: center;
+  margin-bottom: 6px;
 }
-.kronos-event.ev-post { background: #fff3a6; }
-.kronos-event.ev-draft { background: #c8f5c8; }
-.kronos-event.ev-meeting { background: #ffcfcf; }
+.kronos-cal-day.today .cal-day-num { background: #ff2d6f; }
+.cal-event {
+  font-size: 10px; font-weight: 700; padding: 3px 6px; border: 2px solid #000;
+  color: #000; background: #fff; overflow: hidden; text-overflow: ellipsis;
+  white-space: nowrap; line-height: 1.3;
+}
+.cal-more { font-size: 10px; font-weight: 700; color: #ff2d6f; padding: 2px 0; }
 
-/* Platform tabs */
-.kronos-platforms {
-  display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 24px;
-}
-.kronos-tab {
-  font-family: 'Archivo Black', sans-serif; font-size: 12px; font-weight: 900;
-  text-transform: uppercase; letter-spacing: .06em;
-  padding: 10px 18px; background: #fff; color: #000;
-  border: 3px solid #000; cursor: pointer;
-  box-shadow: 4px 4px 0 #000;
-  transition: all .1s;
-}
-.kronos-tab.active { background: #ff2d6f; color: #fff; }
-.kronos-tab:hover { transform: translate(-2px,-2px); box-shadow: 6px 6px 0 #000; }
+.kronos-week { display: grid; grid-template-columns: repeat(7,1fr); gap: 8px; margin-bottom: 32px; }
+.kronos-weekday { background: #fff; border: 3px solid #000; padding: 10px; box-shadow: 4px 4px 0 #000; min-height: 160px; }
+.weekday-name { font-family: 'Archivo Black',sans-serif; font-size: 11px; font-weight: 900; text-transform: uppercase; margin-bottom: 8px; }
+.weekday-event { padding: 4px 8px; margin-bottom: 4px; background: #f4f0ff; font-size: 12px; font-weight: 600; }
+.kronos-day { background: #fff; border: 3px solid #000; padding: 20px; box-shadow: 6px 6px 0 #000; margin-bottom: 32px; }
+.kronos-day-event { padding: 10px 0; border-bottom: 1px solid #eee; font-size: 14px; }
+.kronos-day-event strong { font-family: 'Archivo Black',sans-serif; font-size: 12px; }
 
-/* Upcoming posts */
 .kronos-upcoming {
-  background: #fff; border: 3px solid #000;
-  box-shadow: 8px 8px 0 #000; padding: 24px; margin-top: 32px;
+  background: #fff; border: 3px solid #000; box-shadow: 8px 8px 0 #000;
+  padding: 24px; margin-top: 24px;
 }
-.kronos-upcoming h2 {
-  font-family: 'Archivo Black', sans-serif;
-  font-size: 22px; font-weight: 900; text-transform: uppercase;
-  margin-bottom: 20px; padding-bottom: 12px; border-bottom: 3px solid #000;
+.kronos-upcoming h3 {
+  font-family: 'Archivo Black',sans-serif !important; font-size: 20px !important;
+  font-weight: 900 !important; text-transform: uppercase;
+  margin-bottom: 16px !important; padding-bottom: 12px; border-bottom: 3px solid #000;
 }
-.kronos-post {
-  display: flex; align-items: center; gap: 16px; padding: 14px 0;
+.kronos-event-item {
+  display: flex; align-items: center; gap: 14px; padding: 12px 0;
   border-bottom: 2px solid #000;
 }
-.kronos-post:last-child { border-bottom: none; }
-.kronos-post-date {
-  font-family: 'Archivo Black', sans-serif; font-size: 11px; font-weight: 900;
-  text-transform: uppercase; text-align: center; min-width: 60px;
-  background: #000; color: #f4f0ff; padding: 8px;
+.kronos-event-item:last-child { border-bottom: none; }
+.kronos-event-item.done { opacity: .5; }
+.kronos-event-info { flex: 1; }
+.kronos-event-title { font-weight: 800; font-size: 14px; color: #000; margin-bottom: 4px; }
+.kronos-event-time { font-size: 11px; color: #555; font-weight: 600; }
+.kronos-event-btns { display: flex; gap: 6px; }
+.kronos-event-done, .kronos-event-del {
+  width: 32px; height: 32px; border: 2px solid #000; background: #fff;
+  font-size: 12px; font-weight: 700; cursor: pointer; box-shadow: 2px 2px 0 #000;
 }
-.kronos-post-date strong { display: block; font-size: 22px; color: #ff2d6f; }
-.kronos-post-body { flex: 1; }
-.kronos-post-title { font-weight: 800; font-size: 14px; color: #000; margin-bottom: 4px; }
-.kronos-post-meta { font-size: 11px; color: #555; font-weight: 600; }
-.kronos-post-action {
-  font-family: 'Archivo Black', sans-serif; font-size: 11px; font-weight: 900;
-  text-transform: uppercase; padding: 8px 14px; background: #fff; color: #000;
-  border: 2px solid #000; cursor: pointer; box-shadow: 3px 3px 0 #000;
-}
-.kronos-post-action:hover { background: #ff2d6f; color: #fff; }
+.kronos-event-done:hover { background: #c8f5c8; }
+.kronos-event-del:hover { background: #ffcfcf; }
 
-/* New post composer */
-.kronos-composer {
-  background: #f4f0ff; border: 3px solid #000;
-  box-shadow: 8px 8px 0 #000; padding: 24px; margin-top: 24px;
-}
-.kronos-composer h3 {
-  font-family: 'Archivo Black', sans-serif; font-size: 16px; font-weight: 900;
-  text-transform: uppercase; margin-bottom: 16px;
-}
-.kronos-input, .kronos-textarea {
-  width: 100%; padding: 12px 14px; margin-bottom: 12px;
-  background: #fff; border: 3px solid #000; border-radius: 0;
-  font-family: inherit; font-size: 14px; font-weight: 500; color: #000;
-  outline: none; font-family: var(--sans);
-}
-.kronos-textarea { min-height: 100px; resize: vertical; }
-.kronos-input:focus, .kronos-textarea:focus { background: #fff9c4; }
-.kronos-compose-row { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+.kronos-empty { border: 2px dashed #000; padding: 40px; text-align: center; font-weight: 700; font-size: 14px; background: #f4f0ff; }
 
-.kronos-empty {
-  background: #f4f0ff; border: 3px dashed #000; padding: 48px;
-  text-align: center; font-weight: 700; font-size: 14px;
-}
-
-@media (max-width: 900px) {
-  .kronos-cal { grid-template-columns: repeat(2,1fr); }
+@media (max-width: 780px) {
+  .kronos-cal-grid { grid-template-columns: repeat(2,1fr); }
+  .kronos-cal-head { display: none; }
 }

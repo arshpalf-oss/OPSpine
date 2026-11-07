@@ -4,19 +4,19 @@
 
 .scout-panel {
   position: relative;
-  min-height: calc(100vh - 100px);
-  border-radius: 32px;
+  min-height: calc(100vh - 112px);
+  border-radius: 28px;
   overflow: hidden;
-  background: linear-gradient(180deg, #4a89d1 0%, #6aa3e0 35%, #d8a46a 72%, #c67a44 100%);
+  background: linear-gradient(180deg, #5b94d9 0%, #7fb0e4 32%, #dca870 74%, #c07142 100%);
   padding: 0;
 }
 
 /* Sky gradient layers (animated) */
 .scout-panel::before {
-  content: ''; position: absolute; inset: 0;
+  content: ''; position: absolute; inset: 0; z-index: 1;
   background:
-    radial-gradient(ellipse 60% 40% at 50% 20%, rgba(255,255,255,.9) 0%, rgba(255,255,255,0) 60%),  /* sun glow */
-    radial-gradient(ellipse 100% 30% at 50% 95%, rgba(198,122,68,.5) 0%, transparent 70%);  /* horizon */
+    radial-gradient(circle 100px at 50% 14%, rgba(255,250,220,.6) 0%, rgba(255,245,200,.3) 40%, transparent 70%),
+    radial-gradient(ellipse 100% 25% at 50% 98%, rgba(198,122,68,.55) 0%, transparent 70%);
   pointer-events: none;
 }
 
@@ -42,7 +42,7 @@
   position: absolute; border-radius: 40% 55% 50% 45% / 50% 45% 55% 45%;
   background: linear-gradient(135deg, #7a5a3d, #4a3525);
   box-shadow: inset -4px -6px 12px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.25);
-  pointer-events: none;
+  pointer-events: none; z-index: 1;
 }
 .scout-asteroid::before {
   content: ''; position: absolute; inset: 0; border-radius: inherit;

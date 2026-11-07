@@ -1,142 +1,86 @@
 /* ═══════════════════════════════════════════════════════════════════════════
-   QUILL — YourSaaS landing aesthetic (bright white, light blue, bold display)
+   QUILL — Drafting. Clean white paper card on soft blue.
+   Markup: .quill-panel > .quill-gradient, .quill-hero > .quill-paper (.glass-surface)
+     .quill-paper-head > .quill-chips > .quill-chip(active)
+     .quill-editor textarea
+     .quill-paper-foot (.small, .quill-actions, #quill-save, #quill-new)
+   .quill-drafts-section > h3 > .quill-drafts-list > .draft-card(.glass-card) (.draft-title, .draft-preview, .draft-meta, .draft-del)
    ═══════════════════════════════════════════════════════════════════════════ */
 
 .quill-panel {
-  position: relative; min-height: calc(100vh - 100px);
-  max-width: 1100px; margin: 0 auto;
-  border-radius: 32px; padding: 60px 48px 48px;
-  background: #f7f9ff;
-  overflow: hidden;
+  position: relative; min-height: calc(100vh - 80px);
+  max-width: 900px; margin: 0 auto; padding: 40px 24px 60px;
 }
-.quill-panel::before {
-  content: ''; position: absolute; inset: 0; pointer-events: none;
+.quill-gradient {
+  position: absolute; inset: 0; pointer-events: none; z-index: -1;
   background:
-    radial-gradient(ellipse 50% 40% at 90% -10%, rgba(120,160,255,.15), transparent 70%),
-    radial-gradient(ellipse 40% 30% at -5% 60%, rgba(120,160,255,.12), transparent 70%);
+    radial-gradient(ellipse 60% 40% at 10% 0%, rgba(61,116,255,.12), transparent 70%),
+    radial-gradient(ellipse 50% 40% at 90% 100%, rgba(61,116,255,.08), transparent 70%),
+    linear-gradient(180deg, #f7f9ff 0%, #eef3ff 100%);
+  border-radius: 24px;
 }
+.quill-hero { position: relative; }
+.quill-paper {
+  background: #fff !important; border: 1.5px solid #e0e8ff !important;
+  border-radius: 20px; padding: 20px;
+  box-shadow: 0 20px 50px -20px rgba(30,60,140,.25), 0 2px 8px rgba(30,60,140,.06);
+}
+.quill-paper-head { margin-bottom: 12px; overflow-x: auto; }
+.quill-chips { display: flex; gap: 6px; flex-wrap: nowrap; overflow-x: auto; padding-bottom: 4px; }
+.quill-chip {
+  padding: 8px 16px; border-radius: 8px;
+  background: #f4f6fb; border: 1px solid transparent;
+  color: #5c6a8c; font-size: 13px; font-weight: 600;
+  cursor: pointer; white-space: nowrap; transition: all .15s;
+  display: inline-flex; align-items: center; gap: 6px; font-family: inherit;
+}
+.quill-chip:hover { background: #e8eefc; color: #0b1430; }
+.quill-chip.active { background: #0b1430; color: #fff; border-color: #0b1430; }
+.quill-chip strong { font-weight: 800; }
+.quill-chip.loading { opacity: .6; pointer-events: none; }
+.quill-editor {
+  width: 100%; min-height: 300px; padding: 16px 0;
+  background: transparent; border: none; outline: none; resize: vertical;
+  font-family: inherit; font-size: 16px; line-height: 1.7; color: #0b1430;
+}
+.quill-editor::placeholder { color: #90a0c0; }
+.quill-paper-foot {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 12px; padding-top: 14px; border-top: 1px solid #eef2ff; flex-wrap: wrap;
+}
+.quill-paper-foot .small { color: #8090b5; font-size: 12px; font-family: var(--mono); }
+.quill-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.quill-actions .glass-btn {
+  border-radius: 999px; padding: 9px 18px; font-size: 13px; font-weight: 600;
+  background: #f5f7ff !important; color: #3d58a0 !important; border-color: #e0e8ff !important;
+}
+.quill-actions .glass-btn:hover { background: #eaf0ff !important; color: #0b1430 !important; }
+#quill-save {
+  background: #3d74ff !important; color: #fff !important; border-color: #3d74ff !important;
+  box-shadow: 0 4px 14px rgba(61,116,255,.3);
+}
+#quill-save:hover { filter: brightness(1.08); }
 
-/* Hero */
-.quill-hero {
-  position: relative; z-index: 2; text-align: center; margin-bottom: 48px;
-}
-.quill-badge {
-  display: inline-flex; align-items: center; gap: 8px;
-  background: #fff; border: 1.5px solid #e0e8ff;
-  border-radius: 999px; padding: 6px 16px 6px 8px;
-  font-size: 12px; font-weight: 600; color: #2a4dbf;
-  margin-bottom: 24px;
-}
-.quill-badge-dot {
-  width: 6px; height: 6px; border-radius: 50%; background: #3d74ff;
-  box-shadow: 0 0 0 4px rgba(61,116,255,.15);
-}
-.quill-title {
-  font-family: 'Inter', system-ui, sans-serif;
-  font-size: clamp(44px, 6vw, 72px); font-weight: 800;
-  letter-spacing: -0.04em; line-height: 1.05;
-  color: #0b1430; margin-bottom: 20px;
-}
-.quill-title em { font-style: normal; color: #3d74ff; }
-.quill-sub {
-  font-size: 18px; color: #5c6a8c; max-width: 560px; margin: 0 auto 32px; line-height: 1.5;
-}
-
-.quill-actions {
-  display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-bottom: 32px;
-}
-.quill-btn-primary {
-  background: #3d74ff; color: #fff; border: none; padding: 14px 28px;
-  border-radius: 999px; font-size: 15px; font-weight: 700; cursor: pointer;
-  box-shadow: 0 8px 24px rgba(61,116,255,.35);
-  transition: transform .15s, box-shadow .2s;
-}
-.quill-btn-primary:hover { transform: translateY(-2px); box-shadow: 0 12px 32px rgba(61,116,255,.45); }
-.quill-btn-ghost {
-  background: #fff; color: #0b1430; border: 1.5px solid #e0e8ff;
-  padding: 14px 24px; border-radius: 999px; font-size: 15px; font-weight: 600; cursor: pointer;
-}
-.quill-btn-ghost:hover { background: #f0f4ff; }
-
-/* Draft chat-style interface */
-.quill-chat {
-  position: relative; z-index: 2;
-  max-width: 780px; margin: 0 auto;
-  background: #fff; border-radius: 24px;
-  border: 1.5px solid #e0e8ff;
-  box-shadow: 0 24px 60px -20px rgba(30,60,140,.2);
-  overflow: hidden;
-}
-.quill-chat-messages {
-  padding: 28px 28px 0;
-  max-height: 420px; overflow-y: auto;
-}
-.quill-msg { display: flex; gap: 12px; margin-bottom: 20px; }
-.quill-msg.user { flex-direction: row-reverse; }
-.quill-avatar {
-  width: 36px; height: 36px; border-radius: 50%; flex-shrink: 0;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 14px; font-weight: 700;
-}
-.quill-msg.user .quill-avatar { background: #3d74ff; color: #fff; }
-.quill-msg.ai .quill-avatar { background: #eef2ff; color: #3d74ff; border: 1.5px solid #dde5ff; }
-.quill-bubble {
-  padding: 12px 16px; border-radius: 16px; font-size: 15px; line-height: 1.55;
-  max-width: 80%;
-}
-.quill-msg.user .quill-bubble { background: #3d74ff; color: #fff; border-bottom-right-radius: 4px; }
-.quill-msg.ai .quill-bubble { background: #f5f7ff; color: #0b1430; border-bottom-left-radius: 4px; }
-
-.quill-composer {
-  padding: 16px 20px; border-top: 1.5px solid #eef2ff;
-  display: flex; gap: 10px; align-items: center; background: #fff;
-}
-.quill-composer input {
-  flex: 1; background: #f5f7ff; border: 1.5px solid #e0e8ff;
-  border-radius: 999px; padding: 12px 18px; font-size: 14px; color: #0b1430; outline: none;
-}
-.quill-composer input:focus { border-color: #3d74ff; }
-.quill-composer input::placeholder { color: #90a0c0; }
-.quill-send {
-  width: 42px; height: 42px; border-radius: 50%;
-  background: #3d74ff; color: #fff; border: none; cursor: pointer;
-  display: flex; align-items: center; justify-content: center;
-  flex-shrink: 0; transition: transform .15s;
-}
-.quill-send:hover { transform: scale(1.06); }
-
-.quill-suggestions {
-  display: flex; gap: 8px; flex-wrap: wrap; justify-content: center;
-  padding: 16px 28px 24px;
-}
-.quill-sug {
-  padding: 8px 14px; border-radius: 999px; font-size: 13px;
-  background: #f5f7ff; border: 1.5px solid #e0e8ff; color: #3d58a0;
-  cursor: pointer; transition: all .15s;
-}
-.quill-sug:hover { background: #eaf0ff; border-color: #3d74ff; }
-
-/* Drafts list */
-.quill-drafts {
-  position: relative; z-index: 2; margin-top: 48px;
-}
-.quill-drafts h3 {
+.quill-drafts-section { margin-top: 32px; }
+.quill-drafts-section h3 {
   font-size: 13px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
-  color: #8090b5; margin-bottom: 16px;
+  color: #8090b5; margin-bottom: 14px;
 }
-.quill-drafts-grid {
-  display: grid; grid-template-columns: repeat(auto-fill, minmax(240px,1fr)); gap: 12px;
+.quill-drafts-list { display: grid; grid-template-columns: repeat(auto-fill,minmax(240px,1fr)); gap: 12px; }
+.quill-drafts-list .glass-card {
+  background: #fff !important; border: 1.5px solid #e0e8ff !important;
+  border-radius: 14px; padding: 16px; cursor: pointer; position: relative;
 }
-.quill-draft-card {
-  background: #fff; border: 1.5px solid #e0e8ff; border-radius: 16px; padding: 20px;
-  cursor: pointer; transition: all .2s;
+.quill-drafts-list .glass-card:hover {
+  border-color: #b9ccff !important;
+  box-shadow: 0 8px 20px -10px rgba(30,60,140,.25); transform: translateY(-2px);
 }
-.quill-draft-card:hover { transform: translateY(-2px); box-shadow: 0 12px 28px -12px rgba(30,60,140,.2); border-color: #b9ccff; }
-.quill-draft-type {
-  display: inline-block; font-size: 10px; font-weight: 700; letter-spacing: .08em;
-  text-transform: uppercase; padding: 4px 10px; border-radius: 6px; background: #eef2ff; color: #3d74ff;
-  margin-bottom: 12px;
+.draft-title { font-weight: 600; font-size: 14px; color: #0b1430; margin-bottom: 6px; padding-right: 24px; line-height: 1.4; }
+.draft-preview { font-size: 12px; color: #7080a5; line-height: 1.5; margin-bottom: 8px; }
+.draft-meta { font-size: 11px; color: #a0b0d0; }
+.draft-del {
+  position: absolute; top: 10px; right: 10px; width: 24px; height: 24px;
+  border-radius: 6px; background: transparent; border: none;
+  color: #a0b0d0; cursor: pointer; font-size: 12px;
 }
-.quill-draft-title { font-weight: 600; font-size: 14px; color: #0b1430; margin-bottom: 6px; line-height: 1.4; }
-.quill-draft-preview { font-size: 12px; color: #7080a5; line-height: 1.5; margin-bottom: 10px; }
-.quill-draft-meta { font-size: 11px; color: #a0b0d0; }
+.draft-del:hover { background: #fde2e2; color: #ef4444; }
