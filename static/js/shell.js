@@ -228,6 +228,27 @@ const Shell = (() => {
   // ── Navigation (single navigate function used everywhere) ───────────
   let transitioning = false;
   
+  // Workspaces that get the full expanded rail (hub / universal router)
+  const EXPANDED_RAIL_KEYS = new Set(['dashboard', 'home']);
+  
+  function applyNavModeForWorkspace(key) {
+    // Parent/hub workspaces (Dashboard, Abyss) keep full rail visible.
+    // Dedicated tool workspaces (Scout, Forge, Quill, …) default to icon-only
+    // so each feels like its own app. Users can still toggle via the collapse button.
+    if (EXPANDED_RAIL_KEYS.has(key)) {
+      if (OPS.state.navMode === 'collapsed' || OPS.state.navMode === 'hidden') {
+        OPS.setNavMode('expanded');
+      }
+      applyNavMode('expanded');
+    } else {
+      // Tool workspace: collapse rail to icons unless user explicitly set 'hidden'
+      if (OPS.state.navMode !== 'hidden') {
+        OPS.setNavMode('collapsed');
+        applyNavMode('collapsed');
+      }
+    }
+  }
+  
   async function navigate(path, pushState = true) {
     if (transitioning) return;
     if (path === OPS.state.currentPath && pushState) return;
@@ -252,6 +273,7 @@ const Shell = (() => {
     // Update state + palette tokens
     OPS.setCurrentPath(path);
     OPS.applyWorkspace(newKey);
+    applyNavModeForWorkspace(newKey);
     recordVisit(newKey);
     
     // Find panels
@@ -609,6 +631,7 @@ const Shell = (() => {
   return {
     init, navigate, toast, openPalette, closePalette, openShortcuts, closeShortcuts,
     showSpinner, hideSpinner, goBack, toggleNav, iconSvg,
+    applyNavModeForWorkspace,
     get toolbar() { return toolbar; },
     get container() { return container; },
   };

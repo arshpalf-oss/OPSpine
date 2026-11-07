@@ -32,6 +32,9 @@ const Workspace = {
     Shell.init();
     Commands.init();
     
+    // Set initial rail mode based on landing workspace
+    Shell.applyNavModeForWorkspace(OPS.state.currentKey);
+    
     // Mount initial workspace
     const initKey = OPS.state.currentKey;
     const fn = Workspace.mounts[initKey];
