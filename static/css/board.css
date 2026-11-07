@@ -1,9 +1,10 @@
 /* WORKING BOARD — Dotted near-black canvas, connected task cards */
 .board-panel {
   position: relative;
-  height: calc(100vh - 220px);
-  min-height: 500px;
+  height: calc(100vh - 120px);
+  min-height: 600px;
   overflow: hidden;
+  border-radius: var(--r-lg);
 }
 .board-canvas-area {
   position: absolute; inset: 0; overflow: hidden;
