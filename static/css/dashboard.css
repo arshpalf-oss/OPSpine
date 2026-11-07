@@ -1,8 +1,12 @@
 /* ═══════════════════════════════════════════════════════════════════════════
-   DASHBOARD — Aurora glass launcher
+   DASHBOARD — Full-screen hub (no rail/toolbar in hub layout)
    ═══════════════════════════════════════════════════════════════════════════ */
 
-.dashboard-panel { max-width: 1280px; margin: 0 auto; }
+.dashboard-panel {
+  min-height: 100vh;
+  padding: var(--sp-8) var(--sp-8) var(--sp-12);
+  max-width: 1400px; margin: 0 auto;
+}
 
 .dashboard-hero {
   text-align: center;

@@ -20,6 +20,7 @@ const Shell = (() => {
     initToolbarSearch();
     initPalette();
     initShortcutsPanel();
+    initSidebars();
     initBackToTop();
     initDelegatedActions();
     initScrollState();
@@ -27,6 +28,7 @@ const Shell = (() => {
     Motion.initAmbientCanvas();
     updateCrumb();
     updateStatusDot();
+    applyNavModeForWorkspace(OPS.state.currentKey);
     
     // Update status dot when AI status is fetched
     API.aiStatus().then(s => {
@@ -34,6 +36,73 @@ const Shell = (() => {
       updateStatusDot();
     }).catch(() => {});
   }
+  
+  // ── Sidebars (chat-history left, tools/connectors right) ─────────────
+  function initSidebars() {
+    const leftReopen = document.getElementById('left-reopen');
+    const rightReopen = document.getElementById('right-reopen');
+    const leftSb = document.getElementById('left-sidebar');
+    const rightSb = document.getElementById('right-sidebar');
+    
+    function updateReopenVisibility() {
+      const layout = OPS.routeLayout(OPS.state.currentKey);
+      const isSide = layout === 'abyss' || layout === 'tool';
+      if (!isSide) {
+        leftReopen.hidden = true; rightReopen.hidden = true; return;
+      }
+      leftReopen.hidden = OPS.state.leftSidebarOpen;
+      // Right reopen is hidden because right bar collapses to icons, never fully hidden
+      rightReopen.hidden = true;
+    }
+    
+    function toggleSide(which) {
+      if (which === 'left') OPS.toggleLeftSidebar();
+      else OPS.toggleRightSidebar();
+      updateReopenVisibility();
+    }
+    
+    // Close buttons on sidebars
+    leftSb?.querySelector('[data-close="left"]')?.addEventListener('click', () => toggleSide('left'));
+    rightSb?.querySelector('[data-close="right"]')?.addEventListener('click', () => toggleSide('right'));
+    
+    // Reopen buttons
+    leftReopen?.addEventListener('click', () => toggleSide('left'));
+    rightReopen?.addEventListener('click', () => toggleSide('right'));
+    
+    // Footer nav buttons (Dashboard / Library / Settings)
+    leftSb?.querySelectorAll('[data-path]').forEach(b => {
+      b.addEventListener('click', () => navigate(b.dataset.path));
+    });
+    
+    // New chat button
+    leftSb?.querySelector('#sb-new-chat')?.addEventListener('click', () => {
+      Shell.toast('New conversation started');
+    });
+    
+    // Populate right tools list
+    populateRightTools();
+    
+    // Update visibility when workspace changes
+    subscribeUpdates.push(updateReopenVisibility);
+    updateReopenVisibility();
+  }
+  
+  function populateRightTools() {
+    const list = document.getElementById('sb-tools-list');
+    if (!list) return;
+    const tools = OPS.state.routes.filter(r => r.group === 'workspace');
+    list.innerHTML = tools.map(t => `
+      <button class="sb-tool-item" data-path="${t.path}" data-key="${t.key}">
+        <span class="sb-tool-item-icon">${iconSvg(t.icon)}</span>
+        <span class="sb-tool-item-label">${t.label}</span>
+      </button>
+    `).join('');
+    list.querySelectorAll('.sb-tool-item').forEach(b => {
+      b.addEventListener('click', () => navigate(b.dataset.path));
+    });
+  }
+  
+  const subscribeUpdates = [];
   
   // ── Rail building ───────────────────────────────────────────────────
   function buildRail() {
@@ -102,6 +171,12 @@ const Shell = (() => {
   
   function updateActiveRail() {
     document.querySelectorAll('.rail-item').forEach(el => {
+      el.classList.toggle('active', el.dataset.path === OPS.state.currentPath);
+    });
+  }
+  
+  function updateActiveTool() {
+    document.querySelectorAll('.sb-tool-item').forEach(el => {
       el.classList.toggle('active', el.dataset.path === OPS.state.currentPath);
     });
   }
@@ -232,21 +307,19 @@ const Shell = (() => {
   const EXPANDED_RAIL_KEYS = new Set(['dashboard', 'home']);
   
   function applyNavModeForWorkspace(key) {
-    // Parent/hub workspaces (Dashboard, Abyss) keep full rail visible.
-    // Dedicated tool workspaces (Scout, Forge, Quill, …) default to icon-only
-    // so each feels like its own app. Users can still toggle via the collapse button.
-    if (EXPANDED_RAIL_KEYS.has(key)) {
-      if (OPS.state.navMode === 'collapsed' || OPS.state.navMode === 'hidden') {
-        OPS.setNavMode('expanded');
-      }
-      applyNavMode('expanded');
-    } else {
-      // Tool workspace: collapse rail to icons unless user explicitly set 'hidden'
-      if (OPS.state.navMode !== 'hidden') {
-        OPS.setNavMode('collapsed');
-        applyNavMode('collapsed');
-      }
+    const layout = OPS.routeLayout(key);
+    if (layout === 'hub') {
+      // Dashboard: completely hide the rail (it's a standalone landing page)
+      applyNavMode('hidden');
+      return;
     }
+    if (layout === 'system') {
+      // Library/Settings: icon rail
+      applyNavMode('collapsed');
+      return;
+    }
+    // Abyss + tools: use the new dual-sidebar layout (CSS handles it), hide legacy rail
+    applyNavMode('hidden');
   }
   
   async function navigate(path, pushState = true) {
@@ -289,7 +362,11 @@ const Shell = (() => {
     
     // Transition
     updateActiveRail();
+    updateActiveTool();
     updateCrumb();
+    
+    // Sidebar reopen-visibility refresh
+    subscribeUpdates.forEach(fn => { try { fn(); } catch(e){} });
     
     await Motion.transitionTo(oldPanel, newPanel);
     

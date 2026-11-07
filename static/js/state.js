@@ -12,6 +12,8 @@ const OPS = (() => {
     palettes: initData.palettes || {},
     navMode: localStorage.getItem('opspine.navMode') || 'expanded',
     motionPreset: localStorage.getItem('opspine.motion') || 'liquid',
+    leftSidebarOpen: localStorage.getItem('opspine.leftSidebar') !== 'closed',  // chat/history sidebar
+    rightSidebarOpen: localStorage.getItem('opspine.rightSidebar') !== 'closed', // tools/connectors strip
     panelStates: {}, // per-workspace state (scroll, tabs, drafts, etc.)
     commands: [],
     activity: [],
@@ -51,7 +53,9 @@ const OPS = (() => {
     const palette = state.palettes[key] || state.palettes.dashboard;
     const root = document.documentElement;
     const body = document.body;
+    const layout = routeLayout(key);
     body.setAttribute('data-workspace', key);
+    body.setAttribute('data-layout', layout);
     // Apply on BOTH root and body for reliability (body's background is what renders)
     const targets = [root.style, body.style];
     targets.forEach(t => {
@@ -86,6 +90,30 @@ const OPS = (() => {
     return state.routes.find(r => r.key === keyOrPath || r.path === keyOrPath);
   }
   
+  function routeLayout(keyOrPath) {
+    const r = findRoute(keyOrPath);
+    return r ? (r.layout || 'tool') : 'tool';
+  }
+  
+  function toggleLeftSidebar() {
+    state.leftSidebarOpen = !state.leftSidebarOpen;
+    localStorage.setItem('opspine.leftSidebar', state.leftSidebarOpen ? 'open' : 'closed');
+    applySidebars();
+    emit();
+  }
+  
+  function toggleRightSidebar() {
+    state.rightSidebarOpen = !state.rightSidebarOpen;
+    localStorage.setItem('opspine.rightSidebar', state.rightSidebarOpen ? 'open' : 'closed');
+    applySidebars();
+    emit();
+  }
+  
+  function applySidebars() {
+    document.body.classList.toggle('left-closed', !state.leftSidebarOpen);
+    document.body.classList.toggle('right-closed', !state.rightSidebarOpen);
+  }
+  
   function keyFromPath(path) {
     const r = state.routes.find(r => r.path === path);
     return r ? r.key : 'dashboard';
@@ -105,6 +133,7 @@ const OPS = (() => {
   // Initialize motion
   applyMotion(state.motionPreset);
   applyWorkspace(state.currentKey);
+  applySidebars();
   
   return {
     state,
@@ -117,9 +146,9 @@ const OPS = (() => {
     isDark,
     rememberPanelState,
     getPanelState,
-    findRoute,
-    keyFromPath,
-    pathFromKey,
+    findRoute, routeLayout,
+    keyFromPath, pathFromKey,
     setCurrentPath,
+    toggleLeftSidebar, toggleRightSidebar, applySidebars,
   };
 })();

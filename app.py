@@ -26,18 +26,23 @@ init_db()
 
 # ── Route manifest ──────────────────────────────────────────────────────────
 
+# Layout modes:
+#   "hub"       — Full-screen landing (Dashboard): no rail, no toolbar, tiles + entry point
+#   "abyss"     — Chat-style: left history sidebar + right tools strip + center
+#   "tool"      — Dedicated tool: left history sidebar (hideable) + right connectors (icon-min) + center
+#   "system"    — Utility page (Library, Settings): collapsed rail + toolbar
 ROUTES = [
-    {"path": "/dashboard", "key": "dashboard", "label": "Dashboard", "icon": "home", "group": "parent"},
-    {"path": "/abyss", "key": "home", "label": "Abyss", "icon": "sparkles", "shortcut": "1", "group": "workspace", "description": "Central AI router"},
-    {"path": "/scout", "key": "verify", "label": "Scout", "icon": "search", "shortcut": "2", "group": "workspace", "description": "Research & verification"},
-    {"path": "/forge", "key": "studio", "label": "Forge", "icon": "hammer", "shortcut": "3", "group": "workspace", "description": "Document production"},
-    {"path": "/quill", "key": "draft", "label": "Quill", "icon": "pen", "shortcut": "4", "group": "workspace", "description": "Writing & drafting"},
-    {"path": "/kronos", "key": "cadence", "label": "Kronos", "icon": "calendar", "shortcut": "5", "group": "workspace", "description": "Calendar & reminders"},
-    {"path": "/whiteboard", "key": "whiteboard", "label": "Whiteboard", "icon": "nodes", "shortcut": "6", "group": "workspace", "description": "Visual thinking"},
-    {"path": "/dash", "key": "shortcuts", "label": "Dash", "icon": "zap", "shortcut": "7", "group": "workspace", "description": "Shortcuts & quick actions"},
-    {"path": "/working-board", "key": "board", "label": "Working Board", "icon": "board", "shortcut": "8", "group": "workspace", "description": "Project execution"},
-    {"path": "/library", "key": "vault", "label": "Library", "icon": "folder", "group": "system", "description": "Files & documents"},
-    {"path": "/settings", "key": "settings", "label": "Settings", "icon": "settings", "group": "system", "description": "Configuration"},
+    {"path": "/dashboard", "key": "dashboard", "label": "Dashboard", "icon": "home", "group": "parent", "layout": "hub"},
+    {"path": "/abyss", "key": "home", "label": "Abyss", "icon": "sparkles", "shortcut": "1", "group": "workspace", "description": "Central AI router", "layout": "abyss"},
+    {"path": "/scout", "key": "verify", "label": "Scout", "icon": "search", "shortcut": "2", "group": "workspace", "description": "Research & verification", "layout": "tool"},
+    {"path": "/forge", "key": "studio", "label": "Forge", "icon": "hammer", "shortcut": "3", "group": "workspace", "description": "Document production", "layout": "tool"},
+    {"path": "/quill", "key": "draft", "label": "Quill", "icon": "pen", "shortcut": "4", "group": "workspace", "description": "Writing & drafting", "layout": "tool"},
+    {"path": "/kronos", "key": "cadence", "label": "Kronos", "icon": "calendar", "shortcut": "5", "group": "workspace", "description": "Calendar & reminders", "layout": "tool"},
+    {"path": "/whiteboard", "key": "whiteboard", "label": "Whiteboard", "icon": "nodes", "shortcut": "6", "group": "workspace", "description": "Visual thinking", "layout": "tool"},
+    {"path": "/dash", "key": "shortcuts", "label": "Dash", "icon": "zap", "shortcut": "7", "group": "workspace", "description": "Shortcuts & quick actions", "layout": "tool"},
+    {"path": "/working-board", "key": "board", "label": "Working Board", "icon": "board", "shortcut": "8", "group": "workspace", "description": "Project execution", "layout": "tool"},
+    {"path": "/library", "key": "vault", "label": "Library", "icon": "folder", "group": "system", "description": "Files & documents", "layout": "system"},
+    {"path": "/settings", "key": "settings", "label": "Settings", "icon": "settings", "group": "system", "description": "Configuration", "layout": "system"},
 ]
 
 WORKSPACE_PALETTES = {
