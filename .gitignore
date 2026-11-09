@@ -3,6 +3,9 @@ venv/
 __pycache__/
 *.pyc
 data/opspine.db
+data/opspine.db-wal
+data/opspine.db-shm
+data/opspine.log
 data/documents/*
 !data/documents/.gitkeep
 ref/

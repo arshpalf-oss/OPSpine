@@ -1,0 +1,40 @@
+{# Inline SVG icon set. One macro, keyed by workspace key, so markup is the
+   single source of truth for both the sidebar and the dashboard cards. #}
+{% macro icon(key, size=18) -%}
+<svg class="i i--{{ key }}" viewBox="0 0 24 24" width="{{ size }}" height="{{ size }}"
+     fill="none" stroke="currentColor" stroke-width="1.7"
+     stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+  {%- if key == 'dashboard' -%}
+    <path d="M4 11.5L12 4l8 7.5"/><path d="M6.5 10v9h11v-9"/><path d="M10 19v-5h4v5"/>
+  {%- elif key == 'abyss' -%}
+    <circle cx="12" cy="12" r="3.2"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3"/>
+    <path d="M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M18.4 5.6l-2.1 2.1M7.7 16.3l-2.1 2.1"/>
+  {%- elif key == 'scout' -%}
+    <circle cx="11" cy="11" r="6.2"/><path d="M20 20l-4.4-4.4"/>
+  {%- elif key == 'forge' -%}
+    <path d="M4 8.5h7l2 2h7v8a1.5 1.5 0 01-1.5 1.5h-13A1.5 1.5 0 014 18.5z"/>
+    <path d="M4 8.5V6.5A1.5 1.5 0 015.5 5h4.2l1.8 3.5"/>
+  {%- elif key == 'quill' -%}
+    <path d="M16.5 4.5a2.1 2.1 0 013 3L8 19l-4 1 1-4z"/><path d="M14 7l3 3"/>
+  {%- elif key == 'kronos' -%}
+    <rect x="4" y="5.5" width="16" height="14.5" rx="2"/>
+    <path d="M4 10h16M8.5 3.5v4M15.5 3.5v4"/><path d="M8 14h3"/>
+  {%- elif key == 'whiteboard' -%}
+    <rect x="3.5" y="4.5" width="7" height="6" rx="1.5"/>
+    <rect x="13.5" y="13.5" width="7" height="6" rx="1.5"/>
+    <path d="M10.5 7.5h4a2 2 0 012 2v4"/>
+  {%- elif key == 'dash' -%}
+    <path d="M13 3L5 13.5h6L11 21l8-10.5h-6z"/>
+  {%- elif key == 'working-board' -%}
+    <rect x="3.5" y="4.5" width="17" height="15" rx="2"/>
+    <path d="M3.5 9.5h17M9.5 9.5v10"/>
+  {%- elif key == 'library' -%}
+    <path d="M4 6.5A1.5 1.5 0 015.5 5h3.6L11 7.5h7.5A1.5 1.5 0 0120 9v8.5A1.5 1.5 0 0118.5 19h-13A1.5 1.5 0 014 17.5z"/>
+  {%- elif key == 'settings' -%}
+    <circle cx="12" cy="12" r="3"/>
+    <path d="M12 3.5v2.2M12 18.3v2.2M4.9 7.8l1.9 1.1M17.2 15.1l1.9 1.1M4.9 16.2l1.9-1.1M17.2 8.9l1.9-1.1"/>
+  {%- else -%}
+    <circle cx="12" cy="12" r="8"/>
+  {%- endif -%}
+</svg>
+{%- endmacro %}

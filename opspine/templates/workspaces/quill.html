@@ -1,0 +1,123 @@
+{% extends 'layout.html' %}
+
+{% block title %}Quill{% endblock %}
+
+{% block workspace %}
+<div class="quill" data-quill>
+  {# Drafts rail #}
+  <aside class="drafts" aria-label="Drafts">
+    <div class="drafts__head">
+      <h2>Drafts</h2>
+      <button class="btn btn--sm" id="quill-new" type="button">New draft</button>
+    </div>
+    <div class="drafts__search">
+      <input type="search" class="input input--sm" id="quill-search"
+             placeholder="Search drafts" aria-label="Search drafts" autocomplete="off">
+    </div>
+    <ul class="drafts__list" id="quill-list"></ul>
+  </aside>
+
+  {# Editor #}
+  <section class="paper" aria-label="Editor">
+    <div class="paper__toolbar">
+      <input class="paper__title" id="quill-title" type="text"
+             placeholder="Untitled draft" maxlength="160" aria-label="Draft title">
+
+      <div class="paper__meta">
+        <span id="quill-save-state" class="save-state">No draft open</span>
+      </div>
+    </div>
+
+    <div class="paper__chips" role="toolbar" aria-label="Text tools">
+      <span class="paper__chips-label">Offline</span>
+      {% for tool, label in [
+        ('stats', 'Word count'),
+        ('summary', 'Summary'),
+        ('bullets', 'Bullets'),
+        ('title_case', 'Title case'),
+        ('sentence_case', 'Sentence case'),
+        ('dedupe_lines', 'De-dupe lines'),
+        ('sort_lines', 'Sort'),
+        ('slug', 'Slug')
+      ] %}
+        <button class="chip-btn" type="button" data-tool="{{ tool }}">{{ label }}</button>
+      {% endfor %}
+      <span class="paper__chips-sep" aria-hidden="true"></span>
+      <button class="chip-btn chip-btn--ai" type="button" id="quill-ai"
+              disabled title="Requires a configured AI provider">
+        Rewrite with provider
+      </button>
+    </div>
+
+    <div class="paper__sheet" id="quill-sheet">
+      <textarea class="paper__editor" id="quill-editor" spellcheck="true"
+                aria-label="Draft content"
+                placeholder="Start writing. Everything is saved to this machine."></textarea>
+      <div class="paper__empty" id="quill-empty">
+        <p class="paper__empty-title">No draft open</p>
+        <p class="paper__empty-body">
+          Create a draft or choose one from the list. Autosave keeps your words
+          on disk a moment after you stop typing.
+        </p>
+        <button class="btn btn--primary" id="quill-start" type="button">Start a new draft</button>
+      </div>
+    </div>
+
+    <footer class="paper__foot">
+      <div class="paper__stats" id="quill-stats">0 words · 0 characters</div>
+      <div class="paper__actions">
+        <button class="btn btn--sm" id="quill-save" type="button" disabled>Save now</button>
+        <button class="btn btn--sm btn--danger" id="quill-delete" type="button" disabled>Delete</button>
+      </div>
+    </footer>
+  </section>
+
+  {# Result drawer for offline tools #}
+  <aside class="toolout" id="quill-toolout" aria-label="Tool result" hidden>
+    <div class="toolout__head">
+      <span id="quill-toolout-label">Result</span>
+      <div class="toolout__actions">
+        <button class="icon-btn" id="quill-copy" type="button" aria-label="Copy result"
+                title="Copy">
+          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor"
+               stroke-width="1.8"><rect x="9" y="9" width="11" height="11" rx="2"/>
+            <path d="M5 15V5a2 2 0 012-2h10"/></svg>
+        </button>
+        <button class="icon-btn" id="quill-close-out" type="button" aria-label="Close result">
+          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor"
+               stroke-width="1.8" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+        </button>
+      </div>
+    </div>
+    <pre class="toolout__body" id="quill-toolout-body"></pre>
+    <div class="toolout__foot">
+      <button class="btn btn--sm" id="quill-insert" type="button" disabled>Replace text</button>
+      <button class="btn btn--sm" id="quill-append" type="button" disabled>Append</button>
+    </div>
+  </aside>
+</div>
+{% endblock %}
+
+{% block tools %}
+<section class="tools__section">
+  <h2 class="tools__heading">Assistant</h2>
+  <div class="prov-card" id="quill-prov"></div>
+  <a class="tools__link" href="/settings">Configure in Settings →</a>
+</section>
+
+<section class="tools__section">
+  <h2 class="tools__heading">About autosave</h2>
+  <p class="tools__para">
+    Quill saves a moment after you stop typing, and again when you leave the
+    page. The status line above the sheet always shows the last real save.
+  </p>
+</section>
+
+<section class="tools__section">
+  <h2 class="tools__heading">Offline tools</h2>
+  <p class="tools__para">
+    The chips above the editor run deterministic local operations on your text.
+    “Rewrite with provider” only works with a configured model.
+  </p>
+</section>
+{% endblock %}

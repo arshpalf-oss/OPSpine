@@ -1,0 +1,160 @@
+{% extends 'layout.html' %}
+{% from 'partials/icons.html' import icon as ws_icon %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block workspace %}
+<div class="dash">
+  <header class="dash__hero">
+    <p class="dash__kicker">
+      <span class="dash__dot" aria-hidden="true"></span>
+      {% if local_only %}Local-only mode{% else %}Network access enabled{% endif %}
+      <span class="dash__sep">·</span>
+      <span data-today></span>
+    </p>
+    <h2 class="dash__title">
+      {% if settings.display_name %}Welcome back, {{ settings.display_name }}.{% else %}Welcome to OPSpine.{% endif %}
+    </h2>
+    <p class="dash__lede">
+      Nine specialist workspaces, one local database, no account. Everything you make
+      stays in <code>data/</code> on this machine.
+    </p>
+
+    <div class="dash__search">
+      <button class="dash__search-btn" data-action="open-palette" type="button">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor"
+             stroke-width="1.8" stroke-linecap="round" aria-hidden="true">
+          <circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+        <span>Search workspaces, drafts, files, events…</span>
+        <kbd>Ctrl K</kbd>
+      </button>
+    </div>
+  </header>
+
+  <section class="dash__section" aria-labelledby="dash-workspaces">
+    <div class="section-title">
+      <h2 id="dash-workspaces">Workspaces</h2>
+      <span class="section-title__meta">Press Ctrl 0–8 to jump directly</span>
+    </div>
+
+    <div class="cards">
+      {% for item in workspaces %}
+        {% if item.group != 'launcher' %}
+          <a class="card" href="{{ item.path }}" style="--card-accent: {{ item.accent }}">
+            <span class="card__icon" aria-hidden="true">{{ ws_icon(item.key, 20) }}</span>
+            <span class="card__head">
+              <span class="card__name">{{ item.name }}</span>
+              {% if item.shortcut %}<kbd class="card__key">{{ item.shortcut }}</kbd>{% endif %}
+            </span>
+            <span class="card__tag">{{ item.tagline }}</span>
+            <span class="card__desc">{{ item.description }}</span>
+            <span class="card__open">Open workspace</span>
+          </a>
+        {% endif %}
+      {% endfor %}
+    </div>
+  </section>
+
+  <section class="dash__section" aria-labelledby="dash-recent">
+    <div class="section-title">
+      <h2 id="dash-recent">Recent activity</h2>
+      {% if recent_activity %}
+        <span class="section-title__meta">{{ counts.actions_total }} action{{ '' if counts.actions_total == 1 else 's' }} recorded</span>
+      {% endif %}
+    </div>
+
+    {% if recent_activity %}
+      <ul class="recent">
+        {% for item in recent_activity %}
+          <li class="recent__row">
+            <span class="recent__ws">{{ item.workspace_label }}</span>
+            <a class="recent__label" href="{{ item.target or '/' ~ item.workspace }}">{{ item.label }}</a>
+            <time class="recent__time">{{ item.created_at | relative_time }}</time>
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <div class="empty-first">
+        <div class="empty-first__art" aria-hidden="true">
+          <span></span><span></span><span></span>
+        </div>
+        <p class="empty-first__title">Nothing here yet — and that is accurate.</p>
+        <p class="empty-first__body">
+          OPSpine does not invent history. As soon as you create a document, draft,
+          event or conversation, it appears here and in the tools panel.
+        </p>
+        <div class="empty-first__actions">
+          <a class="btn btn--primary" href="/forge">Make your first file</a>
+          <a class="btn" href="/abyss">Open Abyss</a>
+        </div>
+      </div>
+    {% endif %}
+  </section>
+
+  <section class="dash__section" aria-labelledby="dash-motion">
+    <div class="section-title">
+      <h2 id="dash-motion">Motion</h2>
+      <span class="section-title__meta">Applies across every workspace</span>
+    </div>
+    <div class="motion" role="group" aria-label="Motion preset">
+      {% for key, label, note in [
+        ('liquid', 'Liquid', 'Fluid, balanced'),
+        ('calm', 'Calm', 'Slower, gentler'),
+        ('cinematic', 'Cinematic', 'Deeper, longer'),
+        ('still', 'Still', 'No animation')
+      ] %}
+        <button class="motion__option{% if settings.motion == key %} is-active{% endif %}"
+                data-motion-option="{{ key }}" type="button"
+                aria-pressed="{{ 'true' if settings.motion == key else 'false' }}">
+          <span class="motion__name">{{ label }}</span>
+          <span class="motion__note">{{ note }}</span>
+        </button>
+      {% endfor %}
+    </div>
+  </section>
+</div>
+{% endblock %}
+
+{% block tools %}
+<section class="tools__section">
+  <h2 class="tools__heading">This machine</h2>
+  <dl class="tools__stats">
+    <div><dt>Conversations</dt><dd>{{ counts.conversations }}</dd></div>
+    <div><dt>Documents</dt><dd>{{ counts.documents }}</dd></div>
+    <div><dt>Drafts</dt><dd>{{ counts.drafts }}</dd></div>
+    <div><dt>Events</dt><dd>{{ counts.events }}</dd></div>
+    <div><dt>Tasks</dt><dd>{{ counts.tasks }}</dd></div>
+    <div><dt>Research</dt><dd>{{ counts.research }}</dd></div>
+    <div><dt>Boards</dt><dd>{{ counts.boards }}</dd></div>
+  </dl>
+</section>
+
+<section class="tools__section">
+  <h2 class="tools__heading">Providers</h2>
+  <ul class="prov-list">
+    <li>
+      <span>Assistant</span>
+      <span class="prov-state {{ 'is-on' if provider_status.ai_available else 'is-off' }}">
+        {{ provider_status.ai_provider if provider_status.ai_available else 'Not configured' }}
+      </span>
+    </li>
+    <li>
+      <span>Research</span>
+      <span class="prov-state {{ 'is-on' if provider_status.search_available else 'is-off' }}">
+        {{ provider_status.search_provider if provider_status.search_available else 'Not configured' }}
+      </span>
+    </li>
+  </ul>
+  <a class="tools__link" href="/settings">Configure providers →</a>
+</section>
+
+<section class="tools__section">
+  <h2 class="tools__heading">Quick start</h2>
+  <ul class="quicklist">
+    <li><a href="/forge">Generate a real file</a></li>
+    <li><a href="/quill?new=1">Start writing</a></li>
+    <li><a href="/kronos">Schedule something</a></li>
+    <li><a href="/dash">Browse all commands</a></li>
+  </ul>
+</section>
+{% endblock %}

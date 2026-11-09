@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ code }} · OPSpine</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <style>
+    body { display: grid; place-items: center; padding: 40px 20px; overflow: auto; }
+    .err { max-width: 460px; text-align: center; display: flex; flex-direction: column;
+           align-items: center; gap: 14px; }
+    .err__code { font-family: var(--font-mono); font-size: 52px; font-weight: 700;
+                 letter-spacing: -0.04em; color: var(--ink-400); line-height: 1; }
+    .err__title { font-size: 19px; font-weight: 640; color: var(--ink-950); }
+    .err__body { font-size: 13.5px; line-height: 1.65; color: var(--ink-600); }
+    .err__links { display: flex; gap: 9px; margin-top: 6px; flex-wrap: wrap;
+                  justify-content: center; }
+  </style>
+</head>
+<body>
+  <main class="err">
+    <p class="err__code">{{ code }}</p>
+    <h1 class="err__title">{{ message }}</h1>
+    <p class="err__body">
+      Nothing was changed. You can head back to the dashboard or open the
+      command palette from any workspace.
+    </p>
+    <div class="err__links">
+      <a class="btn btn--primary" href="/dashboard">Back to dashboard</a>
+      <a class="btn" href="/library">Open Library</a>
+    </div>
+  </main>
+</body>
+</html>

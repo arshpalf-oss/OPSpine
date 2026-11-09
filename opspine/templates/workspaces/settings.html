@@ -1,0 +1,310 @@
+{% extends 'layout.html' %}
+
+{% block title %}Settings{% endblock %}
+
+{% block workspace %}
+<div class="settings" data-settings>
+  <header class="settings__head">
+    <p class="settings__eyebrow">Configuration</p>
+    <h2 class="settings__title">Settings</h2>
+    <p class="settings__lede">
+      Everything here is stored on this machine. API keys are written to the
+      local database and never sent back to the browser.
+    </p>
+  </header>
+
+  {# ---------- local-only ---------- #}
+  <section class="panel" aria-labelledby="set-local">
+    <div class="panel__head">
+      <div>
+        <h3 class="panel__title" id="set-local">Local-only mode</h3>
+        <p class="panel__hint">
+          Enforced on the server. While this is on, OPSpine refuses to open any
+          outbound connection, regardless of what the interface shows.
+        </p>
+      </div>
+      <span class="panel__badge" id="set-local-badge">on</span>
+    </div>
+
+    <label class="switchrow">
+      <span class="switchrow__copy">
+        <strong>Block all network requests</strong>
+        <em id="set-local-copy">
+          AI and research providers will be unreachable. Local tools still work.
+        </em>
+      </span>
+      <input type="checkbox" id="set-local-toggle" hidden>
+      <span class="switch__track" aria-hidden="true"><span class="switch__thumb"></span></span>
+    </label>
+
+    <div class="panel__status" id="set-local-status"></div>
+  </section>
+
+  {# ---------- providers ---------- #}
+  <section class="panel" aria-labelledby="set-ai">
+    <div class="panel__head">
+      <div>
+        <h3 class="panel__title" id="set-ai">AI provider</h3>
+        <p class="panel__hint">
+          Optional. Without one, Abyss and Quill use local deterministic text
+          tools that are clearly labelled as such.
+        </p>
+      </div>
+    </div>
+
+    <div class="field">
+      <label class="field__label" for="set-provider-ai">Provider</label>
+      <select class="field__input" id="set-provider-ai">
+        <option value="none">None — local tools only</option>
+        <option value="gemini">Google Gemini</option>
+        <option value="groq">Groq</option>
+        <option value="openrouter">OpenRouter</option>
+      </select>
+    </div>
+
+    <div class="keyrows" id="set-ai-keys">
+      <div class="keyrow" data-key="gemini">
+        <div class="keyrow__label">
+          <strong>Gemini</strong>
+          <span class="keyrow__state" data-key-state="key_gemini">not set</span>
+        </div>
+        <div class="keyrow__input">
+          <input type="password" class="field__input" id="key-gemini"
+                 placeholder="Paste API key" autocomplete="off" spellcheck="false"
+                 aria-label="Gemini API key">
+          <button class="btn btn--sm" type="button" data-key-save="gemini">Save</button>
+          <button class="btn btn--sm btn--danger" type="button"
+                  data-key-clear="gemini" hidden>Remove</button>
+        </div>
+      </div>
+
+      <div class="keyrow" data-key="groq">
+        <div class="keyrow__label">
+          <strong>Groq</strong>
+          <span class="keyrow__state" data-key-state="key_groq">not set</span>
+        </div>
+        <div class="keyrow__input">
+          <input type="password" class="field__input" id="key-groq"
+                 placeholder="Paste API key" autocomplete="off" spellcheck="false"
+                 aria-label="Groq API key">
+          <button class="btn btn--sm" type="button" data-key-save="groq">Save</button>
+          <button class="btn btn--sm btn--danger" type="button"
+                  data-key-clear="groq" hidden>Remove</button>
+        </div>
+      </div>
+
+      <div class="keyrow" data-key="openrouter">
+        <div class="keyrow__label">
+          <strong>OpenRouter</strong>
+          <span class="keyrow__state" data-key-state="key_openrouter">not set</span>
+        </div>
+        <div class="keyrow__input">
+          <input type="password" class="field__input" id="key-openrouter"
+                 placeholder="Paste API key" autocomplete="off" spellcheck="false"
+                 aria-label="OpenRouter API key">
+          <button class="btn btn--sm" type="button" data-key-save="openrouter">Save</button>
+          <button class="btn btn--sm btn--danger" type="button"
+                  data-key-clear="openrouter" hidden>Remove</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  {# ---------- search provider ---------- #}
+  <section class="panel" aria-labelledby="set-search">
+    <div class="panel__head">
+      <div>
+        <h3 class="panel__title" id="set-search">Research provider</h3>
+        <p class="panel__hint">
+          Optional. Scout only shows sourced results when a provider returns
+          them; it never invents citations.
+        </p>
+      </div>
+    </div>
+
+    <div class="field">
+      <label class="field__label" for="set-provider-search">Provider</label>
+      <select class="field__input" id="set-provider-search">
+        <option value="none">None — notes only</option>
+        <option value="brave">Brave Search</option>
+        <option value="tavily">Tavily</option>
+      </select>
+    </div>
+
+    <div class="keyrows">
+      <div class="keyrow" data-key="brave">
+        <div class="keyrow__label">
+          <strong>Brave</strong>
+          <span class="keyrow__state" data-key-state="key_brave">not set</span>
+        </div>
+        <div class="keyrow__input">
+          <input type="password" class="field__input" id="key-brave"
+                 placeholder="Paste API key" autocomplete="off" spellcheck="false"
+                 aria-label="Brave API key">
+          <button class="btn btn--sm" type="button" data-key-save="brave">Save</button>
+          <button class="btn btn--sm btn--danger" type="button"
+                  data-key-clear="brave" hidden>Remove</button>
+        </div>
+      </div>
+
+      <div class="keyrow" data-key="tavily">
+        <div class="keyrow__label">
+          <strong>Tavily</strong>
+          <span class="keyrow__state" data-key-state="key_tavily">not set</span>
+        </div>
+        <div class="keyrow__input">
+          <input type="password" class="field__input" id="key-tavily"
+                 placeholder="Paste API key" autocomplete="off" spellcheck="false"
+                 aria-label="Tavily API key">
+          <button class="btn btn--sm" type="button" data-key-save="tavily">Save</button>
+          <button class="btn btn--sm btn--danger" type="button"
+                  data-key-clear="tavily" hidden>Remove</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  {# ---------- appearance ---------- #}
+  <section class="panel" aria-labelledby="set-motion">
+    <div class="panel__head">
+      <div>
+        <h3 class="panel__title" id="set-motion">Motion</h3>
+        <p class="panel__hint">
+          Applies to every workspace. “Still” removes all animation, and the
+          system reduced-motion preference always wins.
+        </p>
+      </div>
+    </div>
+
+    <div class="motiongrid" id="set-motion-grid" role="radiogroup" aria-label="Motion style">
+      <button class="motioncard" type="button" role="radio" aria-checked="false"
+              data-motion="liquid">
+        <span class="motioncard__swatch motioncard__swatch--liquid"></span>
+        <strong>Liquid</strong>
+        <em>Soft springs and fades</em>
+      </button>
+      <button class="motioncard" type="button" role="radio" aria-checked="false"
+              data-motion="calm">
+        <span class="motioncard__swatch motioncard__swatch--calm"></span>
+        <strong>Calm</strong>
+        <em>Short, quiet transitions</em>
+      </button>
+      <button class="motioncard" type="button" role="radio" aria-checked="false"
+              data-motion="cinematic">
+        <span class="motioncard__swatch motioncard__swatch--cinematic"></span>
+        <strong>Cinematic</strong>
+        <em>Longer, expressive easing</em>
+      </button>
+      <button class="motioncard" type="button" role="radio" aria-checked="false"
+              data-motion="still">
+        <span class="motioncard__swatch motioncard__swatch--still"></span>
+        <strong>Still</strong>
+        <em>No animation at all</em>
+      </button>
+    </div>
+  </section>
+
+  {# ---------- backup ---------- #}
+  <section class="panel" aria-labelledby="set-backup">
+    <div class="panel__head">
+      <div>
+        <h3 class="panel__title" id="set-backup">Backup</h3>
+        <p class="panel__hint">
+          A JSON file with your conversations, drafts, events, tasks, boards,
+          research, file records and preferences. API keys are excluded.
+        </p>
+      </div>
+    </div>
+
+    <div class="backup__row">
+      <button class="btn btn--primary" type="button" id="set-export">
+        Export backup
+      </button>
+      <label class="btn" for="set-import-file">Choose backup file</label>
+      <input type="file" id="set-import-file" accept="application/json,.json" hidden>
+    </div>
+
+    <div class="backup__preview" id="set-import-preview" hidden>
+      <h4 class="backup__preview-title">This backup contains</h4>
+      <dl class="backup__counts" id="set-import-counts"></dl>
+      <p class="backup__warning" id="set-import-warning"></p>
+      <div class="backup__actions">
+        <button class="btn" type="button" id="set-import-cancel">Cancel</button>
+        <button class="btn btn--danger" type="button" id="set-import-confirm">
+          Replace all data
+        </button>
+      </div>
+    </div>
+  </section>
+
+  {# ---------- data ---------- #}
+  <section class="panel" aria-labelledby="set-data">
+    <div class="panel__head">
+      <div>
+        <h3 class="panel__title" id="set-data">Your data</h3>
+        <p class="panel__hint">
+          OPSpine keeps everything in a single folder. Nothing is uploaded
+          anywhere, and there is no telemetry.
+        </p>
+      </div>
+    </div>
+
+    <dl class="datapaths">
+      <div>
+        <dt>Database</dt>
+        <dd id="set-path-db">data/opspine.db</dd>
+      </div>
+      <div>
+        <dt>Generated files</dt>
+        <dd>data/documents/</dd>
+      </div>
+      <div>
+        <dt>Logs</dt>
+        <dd>data/opspine.log</dd>
+      </div>
+    </dl>
+
+    <div class="dangerzone">
+      <div>
+        <strong>Delete all local data</strong>
+        <em>
+          Removes every conversation, draft, event, task, board, research
+          session, activity entry and generated file. This cannot be undone.
+        </em>
+      </div>
+      <button class="btn btn--danger" type="button" id="set-reset">
+        Delete everything
+      </button>
+    </div>
+  </section>
+</div>
+{% endblock %}
+
+{% block tools %}
+<section class="tools__section">
+  <h2 class="tools__heading">Active capability</h2>
+  <dl class="tools__stats" id="set-capability">
+    <div><dt>Local-only</dt><dd>on</dd></div>
+    <div><dt>AI</dt><dd>none</dd></div>
+    <div><dt>Search</dt><dd>none</dd></div>
+  </dl>
+</section>
+
+<section class="tools__section">
+  <h2 class="tools__heading">Privacy</h2>
+  <p class="tools__para">
+    Keys are stored in the local SQLite database. OPSpine has no analytics, no
+    crash reporting and no cloud sync. Outbound requests happen only when you
+    explicitly use a configured provider, and never while local-only is on.
+  </p>
+</section>
+
+<section class="tools__section">
+  <h2 class="tools__heading">Shortcuts</h2>
+  <ul class="tools__keys">
+    <li><kbd>?</kbd><span>Shortcut sheet</span></li>
+    <li><kbd>Ctrl K</kbd><span>Command palette</span></li>
+    <li><kbd>Esc</kbd><span>Close panels</span></li>
+  </ul>
+</section>
+{% endblock %}

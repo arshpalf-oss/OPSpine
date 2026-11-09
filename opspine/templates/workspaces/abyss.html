@@ -1,0 +1,118 @@
+{% extends 'layout.html' %}
+
+{% block title %}Abyss{% endblock %}
+
+{% block workspace %}
+<div class="abyss" data-abyss>
+  <div class="abyss__bar">
+    <div class="abyss__conv">
+      <button class="abyss__conv-toggle" data-action="toggle-conv" type="button"
+              aria-expanded="false" aria-controls="abyss-conv-list">
+        <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor"
+             stroke-width="1.8" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 17h10"/></svg>
+        <span data-conv-label>Conversations</span>
+      </button>
+    </div>
+    <div class="abyss__status" id="abyss-status" aria-live="polite"></div>
+    <div class="abyss__bar-actions">
+      <label class="switch" title="Ask the configured model instead of local tools">
+        <input type="checkbox" id="abyss-use-ai">
+        <span class="switch__track" aria-hidden="true"><span class="switch__thumb"></span></span>
+        <span class="switch__text">Use provider</span>
+      </label>
+      <button class="btn btn--sm" id="abyss-new" type="button">New</button>
+    </div>
+  </div>
+
+  <div class="abyss__body">
+    {# Conversation list #}
+    <aside class="convs" id="abyss-conv-list" aria-label="Conversations">
+      <div class="convs__search">
+        <input type="search" id="abyss-search" class="input input--sm"
+               placeholder="Search conversations" aria-label="Search conversations"
+               autocomplete="off">
+      </div>
+      <ul class="convs__list" id="abyss-convs"></ul>
+    </aside>
+
+    {# Thread #}
+    <section class="thread" aria-label="Conversation">
+      <div class="thread__scroll" id="abyss-thread">
+        <div class="thread__inner" id="abyss-messages"></div>
+      </div>
+
+      <form class="composer" id="abyss-form" autocomplete="off">
+        <div class="composer__field">
+          <textarea id="abyss-input" rows="1" placeholder="Write a message…"
+                    aria-label="Message"></textarea>
+          <button class="composer__send" type="submit" id="abyss-send"
+                  aria-label="Send message">
+            <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor"
+                 stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M4 12l16-8-6 16-3.2-6.2z"/></svg>
+          </button>
+        </div>
+        <p class="composer__hint">
+          <span id="abyss-hint">Local tools ready. Turn on “Use provider” once a key is configured.</span>
+          <span class="composer__keys"><kbd>Ctrl ↵</kbd> send · <kbd>Shift ↵</kbd> newline</span>
+        </p>
+      </form>
+    </section>
+
+    {# Local tools panel #}
+    <aside class="local" aria-label="Local text tools">
+      <div class="local__head">
+        <span class="local__badge">Offline</span>
+        <h2>Local tools</h2>
+        <p>Deterministic text operations. Not a language model.</p>
+      </div>
+      <div class="local__body">
+        <label class="field">
+          <span class="field__label">Tool</span>
+          <select class="select" id="tool-select"></select>
+        </label>
+        <label class="field">
+          <span class="field__label">Text</span>
+          <textarea class="textarea" id="tool-input" rows="5"
+                    placeholder="Paste the text to process…"></textarea>
+        </label>
+        <button class="btn btn--primary btn--sm" id="tool-run" type="button">Run tool</button>
+        <div class="local__out" id="tool-output" hidden>
+          <div class="local__out-head">
+            <span id="tool-out-label"></span>
+            <button class="icon-btn" id="tool-copy" type="button" aria-label="Copy result">
+              <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor"
+                   stroke-width="1.8"><rect x="9" y="9" width="11" height="11" rx="2"/>
+                <path d="M5 15V5a2 2 0 012-2h10"/></svg>
+            </button>
+          </div>
+          <pre id="tool-out-body"></pre>
+        </div>
+        <p class="local__note" id="tool-note"></p>
+      </div>
+    </aside>
+  </div>
+</div>
+{% endblock %}
+
+{% block tools %}
+<section class="tools__section">
+  <h2 class="tools__heading">Assistant provider</h2>
+  <div class="prov-card" id="abyss-prov-card"></div>
+  <a class="tools__link" href="/settings">Configure in Settings →</a>
+</section>
+
+<section class="tools__section">
+  <h2 class="tools__heading">About Abyss</h2>
+  <p class="tools__para">
+    Abyss stores conversations locally. When a provider is configured and
+    local-only mode is off, your message text is sent to that provider.
+    Otherwise it stays on this machine.
+  </p>
+</section>
+
+<section class="tools__section">
+  <h2 class="tools__heading">Local tools</h2>
+  <ul class="tools__keys" id="abyss-tool-list"></ul>
+</section>
+{% endblock %}

@@ -1,0 +1,81 @@
+{% extends 'layout.html' %}
+
+{% block title %}Scout{% endblock %}
+
+{% block workspace %}
+<div class="scout" data-scout>
+  {# Decorative sky: behind content, pointer-events none. #}
+  <div class="sky" aria-hidden="true">
+    <div class="sky__glow"></div>
+    <div class="sky__cloud sky__cloud--1"></div>
+    <div class="sky__cloud sky__cloud--2"></div>
+    <div class="sky__cloud sky__cloud--3"></div>
+  </div>
+
+  <div class="scout__inner">
+    <header class="scout__hero">
+      <p class="scout__eyebrow">Research &amp; evidence</p>
+      <h2 class="scout__title">Ask. Then check the source.</h2>
+      <p class="scout__lede">
+        Scout runs live web searches through your configured provider and keeps
+        the citations it receives. It never manufactures a verdict — notes you
+        write are labelled as yours.
+      </p>
+
+      <form class="ask" id="scout-form" autocomplete="off">
+        <label class="visually-hidden" for="scout-question">Research question</label>
+        <textarea class="ask__input" id="scout-question" rows="2"
+                  placeholder="What question do you want to research?"></textarea>
+        <div class="ask__row">
+          <span class="ask__state" id="scout-capability"></span>
+          <button class="ask__go" type="submit" id="scout-go">
+            <span>Start session</span>
+            <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor"
+                 stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M4 12h15M13 6l6 6-6 6"/></svg>
+          </button>
+        </div>
+      </form>
+    </header>
+
+    <div class="scout__grid">
+      {# Sessions #}
+      <section class="panel panel--sessions" aria-labelledby="scout-sessions-h">
+        <div class="panel__head">
+          <h3 id="scout-sessions-h">Sessions</h3>
+          <input type="search" class="input input--sm" id="scout-search"
+                 placeholder="Search" aria-label="Search sessions" autocomplete="off">
+        </div>
+        <ul class="sessions" id="scout-sessions"></ul>
+      </section>
+
+      {# Results + notes #}
+      <section class="panel panel--workspace" aria-labelledby="scout-workspace-h">
+        <h3 id="scout-workspace-h" class="visually-hidden">Session detail</h3>
+        <div id="scout-detail"></div>
+      </section>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block tools %}
+<section class="tools__section">
+  <h2 class="tools__heading">Research provider</h2>
+  <div class="prov-card" id="scout-prov"></div>
+  <a class="tools__link" href="/settings">Configure in Settings →</a>
+</section>
+
+<section class="tools__section">
+  <h2 class="tools__heading">What Scout will not do</h2>
+  <ul class="tools__keys">
+    <li><span>Invent citations</span></li>
+    <li><span>Claim a source was read</span></li>
+    <li><span>Score truth without evidence</span></li>
+  </ul>
+  <p class="tools__para" style="margin-top:10px">
+    When no provider is available, Scout still records your notes and links.
+    It will say plainly that it could not search.
+  </p>
+</section>
+{% endblock %}

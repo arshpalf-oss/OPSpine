@@ -1,0 +1,159 @@
+{% extends 'layout.html' %}
+
+{% block title %}Working Board{% endblock %}
+
+{% block workspace %}
+<div class="wboard" data-wboard>
+  <header class="wboard__head">
+    <div class="wboard__intro">
+      <p class="wboard__eyebrow">Project execution</p>
+      <h2 class="wboard__title">Working Board</h2>
+      <p class="wboard__lede">
+        Tasks with a real status, priority and due date. Everything is stored in
+        your local database.
+      </p>
+    </div>
+
+    <div class="wboard__actions">
+      <input type="search" class="wboard__search" id="wboard-search"
+             placeholder="Search tasks" aria-label="Search tasks" autocomplete="off">
+      <button class="wboard__add" id="wboard-add" type="button">
+        <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor"
+             stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+        New task
+      </button>
+    </div>
+  </header>
+
+  <div class="wboard__counts" id="wboard-counts"></div>
+
+  <div class="wboard__body">
+    {# Task list grouped by status #}
+    <section class="columns" aria-label="Tasks">
+      <div class="column" data-status="todo">
+        <header class="column__head">
+          <span class="column__dot" aria-hidden="true"></span>
+          <h3>To do</h3>
+          <span class="column__count" data-count="todo">0</span>
+        </header>
+        <ul class="column__list" id="col-todo"></ul>
+      </div>
+
+      <div class="column" data-status="in_progress">
+        <header class="column__head">
+          <span class="column__dot" aria-hidden="true"></span>
+          <h3>In progress</h3>
+          <span class="column__count" data-count="in_progress">0</span>
+        </header>
+        <ul class="column__list" id="col-in_progress"></ul>
+      </div>
+
+      <div class="column" data-status="done">
+        <header class="column__head">
+          <span class="column__dot" aria-hidden="true"></span>
+          <h3>Done</h3>
+          <span class="column__count" data-count="done">0</span>
+        </header>
+        <ul class="column__list" id="col-done"></ul>
+      </div>
+    </section>
+
+    {# Detail panel #}
+    <aside class="detail" id="wboard-detail" aria-label="Task detail" aria-hidden="true">
+      <div class="detail__empty" id="wboard-detail-empty">
+        <p class="detail__empty-title">No task selected</p>
+        <p class="detail__empty-body">
+          Choose a task from the list to see its detail, or create a new one.
+        </p>
+      </div>
+
+      <form class="detail__form" id="wboard-form" hidden novalidate>
+        <div class="detail__head">
+          <span class="detail__badge" id="wboard-form-badge">New task</span>
+          <button class="detail__close" type="button" id="wboard-close"
+                  aria-label="Close task detail">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor"
+                 stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+          </button>
+        </div>
+
+        <label class="detail__field">
+          <span>Title</span>
+          <input class="detail__input" id="wboard-title" type="text" maxlength="160"
+                 placeholder="What needs doing?">
+        </label>
+
+        <label class="detail__field">
+          <span>Description</span>
+          <textarea class="detail__input" id="wboard-desc" rows="4" maxlength="4000"
+                    placeholder="Detail, links, acceptance criteria…"></textarea>
+        </label>
+
+        <div class="detail__pair">
+          <label class="detail__field">
+            <span>Status</span>
+            <select class="detail__input" id="wboard-status">
+              <option value="todo">To do</option>
+              <option value="in_progress">In progress</option>
+              <option value="done">Done</option>
+            </select>
+          </label>
+
+          <label class="detail__field">
+            <span>Priority</span>
+            <select class="detail__input" id="wboard-priority">
+              <option value="low">Low</option>
+              <option value="normal">Normal</option>
+              <option value="high">High</option>
+            </select>
+          </label>
+        </div>
+
+        <label class="detail__field">
+          <span>Due date <em>(optional)</em></span>
+          <input class="detail__input" id="wboard-due" type="date">
+        </label>
+
+        <p class="detail__error" id="wboard-error" hidden></p>
+
+        <div class="detail__actions">
+          <button class="detail__btn" type="button" id="wboard-cancel">Cancel</button>
+          <button class="detail__btn detail__btn--danger" type="button"
+                  id="wboard-delete" hidden>Delete</button>
+          <button class="detail__btn detail__btn--primary" type="submit"
+                  id="wboard-save">Save task</button>
+        </div>
+      </form>
+    </aside>
+  </div>
+</div>
+{% endblock %}
+
+{% block tools %}
+<section class="tools__section">
+  <h2 class="tools__heading">Board state</h2>
+  <dl class="tools__stats" id="wboard-stats">
+    <div><dt>Total</dt><dd>0</dd></div>
+    <div><dt>To do</dt><dd>0</dd></div>
+    <div><dt>In progress</dt><dd>0</dd></div>
+    <div><dt>Done</dt><dd>0</dd></div>
+  </dl>
+</section>
+
+<section class="tools__section">
+  <h2 class="tools__heading">How it works</h2>
+  <p class="tools__para">
+    Every task has a title, description, status, priority and optional due date.
+    Clicking a card opens the detail panel. Deleting asks for confirmation.
+  </p>
+</section>
+
+<section class="tools__section">
+  <h2 class="tools__heading">Shortcuts</h2>
+  <ul class="tools__keys">
+    <li><kbd>N</kbd><span>New task</span></li>
+    <li><kbd>Ctrl ↵</kbd><span>Save the open task</span></li>
+    <li><kbd>Esc</kbd><span>Close the detail panel</span></li>
+  </ul>
+</section>
+{% endblock %}

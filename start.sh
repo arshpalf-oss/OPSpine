@@ -3,14 +3,20 @@
 set -e
 cd "$(dirname "$0")"
 
-# Create venv if missing
-if [ ! -d "venv" ]; then
-  echo "[opspine] Creating virtual environment..."
-  python3 -m venv venv
+# Prefer an existing environment (venv/ or .venv/) so a fresh clone reuses
+# whatever the user already set up.
+if [ -d ".venv" ]; then
+  VENV_DIR=".venv"
+elif [ -d "venv" ]; then
+  VENV_DIR="venv"
+else
+  echo "[opspine] Creating virtual environment in .venv ..."
+  python3 -m venv .venv
+  VENV_DIR=".venv"
 fi
 
-# Activate venv
-source venv/bin/activate
+# shellcheck disable=SC1091
+source "$VENV_DIR/bin/activate"
 
 # Upgrade pip for better wheel resolution (helps with Python 3.14+)
 echo "[opspine] Upgrading pip..."
