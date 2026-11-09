@@ -1,0 +1,136 @@
+{% extends 'layout.html' %}
+
+{% block title %}Whiteboard{% endblock %}
+
+{% block workspace %}
+<div class="wb" data-whiteboard>
+  {# Floating toolbar — never overlaps the toolbar row, stays above the canvas. #}
+  <div class="wb__bar" role="toolbar" aria-label="Board tools">
+    <div class="wb__group">
+      <label class="wb__board-select">
+        <span class="visually-hidden">Board</span>
+        <select id="wb-boards" class="wb__select" aria-label="Select board"></select>
+      </label>
+      <button class="wb__btn" id="wb-new-board" type="button" title="Create a board">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+        New
+      </button>
+    </div>
+
+    <div class="wb__group">
+      <button class="wb__btn is-active" data-tool="select" type="button" title="Select and move (V)">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor"
+             stroke-width="1.9" stroke-linejoin="round"><path d="M5 3l14 8-6 1.6L11 19z"/></svg>
+        Select
+        <kbd>V</kbd>
+      </button>
+      <button class="wb__btn" data-tool="note" type="button" title="Add note (N)">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor"
+             stroke-width="1.9" stroke-linecap="round"><rect x="4" y="4" width="16" height="16"
+            rx="2.5"/><path d="M8 10h8M8 14h5"/></svg>
+        Note
+        <kbd>N</kbd>
+      </button>
+      <button class="wb__btn" data-tool="link" type="button" title="Connect two notes (L)">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor"
+             stroke-width="1.9" stroke-linecap="round"><circle cx="6" cy="18" r="2.4"/>
+          <circle cx="18" cy="6" r="2.4"/><path d="M8 16L16 8"/></svg>
+        Link
+        <kbd>L</kbd>
+      </button>
+    </div>
+
+    <div class="wb__group wb__group--end">
+      <div class="wb__zoom">
+        <button class="wb__btn wb__btn--icon" id="wb-zoom-out" type="button"
+                aria-label="Zoom out">−</button>
+        <button class="wb__btn wb__btn--icon" id="wb-zoom-reset" type="button"
+                aria-label="Reset zoom"><span id="wb-zoom-label">100%</span></button>
+        <button class="wb__btn wb__btn--icon" id="wb-zoom-in" type="button"
+                aria-label="Zoom in">+</button>
+      </div>
+      <button class="wb__btn" id="wb-save" type="button" title="Save board (Ctrl+S)">
+        Save
+      </button>
+      <button class="wb__btn wb__btn--danger" id="wb-delete-board" type="button"
+              title="Delete this board">Delete</button>
+    </div>
+  </div>
+
+  {# Canvas #}
+  <div class="wb__stage" id="wb-stage" tabindex="0"
+       aria-label="Board canvas. Press N to add a note.">
+    <svg class="wb__links" id="wb-links" aria-hidden="true"></svg>
+    <div class="wb__nodes" id="wb-nodes"></div>
+
+    <div class="wb__hint" id="wb-hint">
+      <strong>Select</strong> — drag notes to move, click to edit ·
+      <strong>Note</strong> — click empty space to add ·
+      <strong>Link</strong> — click two notes to connect ·
+      <strong>Space+drag</strong> pans · <strong>Delete</strong> removes
+    </div>
+
+    <div class="wb__empty" id="wb-empty" hidden>
+      <p class="wb__empty-title">This board is empty</p>
+      <p class="wb__empty-body">
+        Press <kbd>N</kbd> or choose Note, then click anywhere on the canvas.
+        Select two notes and press <kbd>L</kbd> to connect them.
+      </p>
+      <button class="btn btn--primary btn--sm" id="wb-empty-add" type="button">
+        Add the first note
+      </button>
+    </div>
+  </div>
+
+  {# Note editor popover #}
+  <div class="wb__editor" id="wb-editor" hidden>
+    <label class="visually-hidden" for="wb-editor-input">Note text</label>
+    <textarea id="wb-editor-input" rows="3" maxlength="600"
+              placeholder="Write the note…"></textarea>
+    <div class="wb__editor-row">
+      <div class="wb__swatches" role="group" aria-label="Note colour">
+        {% for colour in ['#c4a1ff', '#8faeff', '#5eead4', '#ffd166', '#ff8a3d', '#ff6b9d'] %}
+          <button class="wb__swatch" type="button" data-colour="{{ colour }}"
+                  style="--sw: {{ colour }}" aria-label="Colour {{ colour }}"></button>
+        {% endfor %}
+      </div>
+      <div class="wb__editor-actions">
+        <button class="wb__btn wb__btn--danger" id="wb-editor-delete" type="button">Delete</button>
+        <button class="wb__btn wb__btn--primary" id="wb-editor-done" type="button">Done</button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block tools %}
+<section class="tools__section">
+  <h2 class="tools__heading">Board</h2>
+  <dl class="tools__stats" id="wb-stats">
+    <div><dt>Notes</dt><dd>0</dd></div>
+    <div><dt>Links</dt><dd>0</dd></div>
+    <div><dt>Zoom</dt><dd>100%</dd></div>
+  </dl>
+</section>
+
+<section class="tools__section">
+  <h2 class="tools__heading">Controls</h2>
+  <ul class="tools__keys">
+    <li><kbd>V</kbd><span>Select tool</span></li>
+    <li><kbd>N</kbd><span>Add a note</span></li>
+    <li><kbd>L</kbd><span>Link two notes</span></li>
+    <li><kbd>Del</kbd><span>Delete selection</span></li>
+    <li><kbd>Space</kbd><span>Pan the canvas</span></li>
+    <li><kbd>Ctrl S</kbd><span>Save the board</span></li>
+  </ul>
+</section>
+
+<section class="tools__section">
+  <h2 class="tools__heading">Saving</h2>
+  <p class="tools__para">
+    Boards are stored in your local database. Changes stay in this browser tab
+    until you press Save.
+  </p>
+</section>
+{% endblock %}

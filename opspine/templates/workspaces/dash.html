@@ -1,0 +1,89 @@
+{% extends 'layout.html' %}
+
+{% block title %}Dash{% endblock %}
+
+{% block workspace %}
+<div class="dashconsole" data-dash>
+  <header class="dashconsole__head">
+    <div class="dashconsole__title-row">
+      <span class="dashconsole__status" aria-hidden="true"></span>
+      <p class="dashconsole__kicker">Command center</p>
+      <span class="dashconsole__cursor" id="dash-cursor">online</span>
+    </div>
+    <h2 class="dashconsole__title">dash<span class="dashconsole__slash">/</span>commands</h2>
+    <p class="dashconsole__lede">
+      Every command below runs a real action in this application. Nothing is a
+      placeholder, and no counters are invented.
+    </p>
+
+    <div class="dashconsole__counters" id="dash-counters"></div>
+  </header>
+
+  <section class="cmdpanel" aria-labelledby="dash-cmd-h">
+    <div class="cmdpanel__head">
+      <h3 id="dash-cmd-h">Available commands</h3>
+      <div class="cmdpanel__tools">
+        <input type="search" class="cmdpanel__search" id="dash-search"
+               placeholder="Filter commands…" aria-label="Filter commands"
+               autocomplete="off">
+      </div>
+    </div>
+
+    <div class="cmdfilters" role="group" aria-label="Command categories" id="dash-filters">
+      <button class="cmdfilter is-active" data-cat="all" type="button">All</button>
+      <button class="cmdfilter" data-cat="navigate" type="button">Navigate</button>
+      <button class="cmdfilter" data-cat="create" type="button">Create</button>
+      <button class="cmdfilter" data-cat="system" type="button">System</button>
+    </div>
+
+    <div class="cmdtable" role="table" aria-label="Commands">
+      <div class="cmdtable__head" role="row">
+        <span role="columnheader">Command</span>
+        <span role="columnheader">Category</span>
+        <span role="columnheader">Shortcut</span>
+        <span role="columnheader"><span class="visually-hidden">Run</span></span>
+      </div>
+      <div id="dash-rows" role="rowgroup"></div>
+    </div>
+  </section>
+
+  <section class="dashcol" aria-labelledby="dash-recent-h">
+    <div class="dashcol__card">
+      <h3 id="dash-recent-h">Recent actions</h3>
+      <ul class="dashrecent" id="dash-recent"></ul>
+    </div>
+
+    <div class="dashcol__card">
+      <h3>Keyboard</h3>
+      <ul class="dashkeys">
+        <li><kbd>Ctrl K</kbd><span>Command palette</span></li>
+        <li><kbd>Ctrl 0–8</kbd><span>Jump to workspace</span></li>
+        <li><kbd>Ctrl ↵</kbd><span>Primary action</span></li>
+        <li><kbd>Ctrl \</kbd><span>Toggle navigation</span></li>
+        <li><kbd>?</kbd><span>Shortcut reference</span></li>
+      </ul>
+    </div>
+  </section>
+</div>
+{% endblock %}
+
+{% block tools %}
+<section class="tools__section">
+  <h2 class="tools__heading">State</h2>
+  <dl class="tools__stats" id="dash-tools-state"></dl>
+</section>
+
+<section class="tools__section">
+  <h2 class="tools__heading">Local-only switch</h2>
+  <p class="tools__para" id="dash-mode-copy"></p>
+  <button class="btn btn--sm" id="dash-mode-toggle" type="button">Toggle mode</button>
+</section>
+
+<section class="tools__section">
+  <h2 class="tools__heading">Note</h2>
+  <p class="tools__para">
+    Dash only lists actions OPSpine can actually perform. If a capability is
+    unavailable, the row says so instead of pretending.
+  </p>
+</section>
+{% endblock %}

@@ -1,0 +1,155 @@
+{% extends 'layout.html' %}
+
+{% block title %}Forge{% endblock %}
+
+{% block workspace %}
+<div class="forge" data-forge>
+  <div class="forge__grid">
+    {# ---------------- configuration ---------------- #}
+    <form class="cfg" id="forge-form" autocomplete="off" novalidate>
+      <header class="cfg__head">
+        <p class="cfg__eyebrow">Document production</p>
+        <h2 class="cfg__title">Build a real file.</h2>
+        <p class="cfg__lede">
+          Forge writes genuine Office, PDF, Markdown and PNG files on this machine
+          using local libraries. Your text becomes the document — nothing is invented.
+        </p>
+      </header>
+
+      <fieldset class="formats" id="forge-formats">
+        <legend>Format</legend>
+        {% for key, label, hint in [
+          ('pptx', 'PPTX', 'Slides'),
+          ('docx', 'DOCX', 'Word'),
+          ('xlsx', 'XLSX', 'Sheet'),
+          ('pdf', 'PDF', 'Print'),
+          ('md', 'Markdown', '.md'),
+          ('png', 'PNG', 'Image')
+        ] %}
+          <label class="format" data-format="{{ key }}">
+            <input type="radio" name="format" value="{{ key }}"
+                   {% if key == 'pdf' %}checked{% endif %}>
+            <span class="format__box">
+              <span class="format__key">{{ label }}</span>
+              <span class="format__hint">{{ hint }}</span>
+            </span>
+          </label>
+        {% endfor %}
+      </fieldset>
+
+      <div class="field">
+        <label for="forge-title">Title</label>
+        <input class="input" id="forge-title" type="text" maxlength="160"
+               placeholder="What is this document called?">
+      </div>
+
+      <div class="field">
+        <label for="forge-body" id="forge-body-label">Content</label>
+        <textarea class="textarea forge__body" id="forge-body" rows="12"
+                  maxlength="60000"></textarea>
+        <p class="hint" id="forge-body-hint"></p>
+      </div>
+
+      {# Format-specific options, shown/hidden by JS. #}
+      <div class="opts" id="forge-opts">
+        <div class="field" data-opt="author">
+          <label for="forge-author">Author <span class="opt-note">(optional)</span></label>
+          <input class="input" id="forge-author" type="text" maxlength="80"
+                 placeholder="Name on the document">
+        </div>
+
+        <div class="field" data-opt="subtitle">
+          <label for="forge-subtitle">Subtitle <span class="opt-note">(optional)</span></label>
+          <input class="input" id="forge-subtitle" type="text" maxlength="160"
+                 placeholder="Shown on the cover slide">
+        </div>
+
+        <div class="field" data-opt="page_size">
+          <label for="forge-page">Page size</label>
+          <select class="select" id="forge-page">
+            <option value="A4">A4</option>
+            <option value="LETTER">US Letter</option>
+          </select>
+        </div>
+
+        <div class="field opt-pair" data-opt="size">
+          <label>Canvas size</label>
+          <div class="opt-pair__row">
+            <input class="input" id="forge-width" type="number" min="320" max="4000"
+                   step="10" value="1280" aria-label="Width in pixels">
+            <span class="opt-x">×</span>
+            <input class="input" id="forge-height" type="number" min="320" max="4000"
+                   step="10" value="720" aria-label="Height in pixels">
+          </div>
+        </div>
+
+        <div class="field" data-opt="accent">
+          <label for="forge-accent">Accent colour</label>
+          <input class="input input--color" id="forge-accent" type="color" value="#7b9cff">
+        </div>
+      </div>
+
+      <div class="cfg__actions">
+        <button class="btn btn--primary" type="submit" id="forge-generate">
+          Generate file
+        </button>
+        <button class="btn" type="button" id="forge-sample">Load example structure</button>
+      </div>
+      <p class="cfg__note" id="forge-note">
+        Files are stored in <code>data/documents</code> and listed in the Library.
+      </p>
+    </form>
+
+    {# ---------------- output ---------------- #}
+    <section class="out" aria-labelledby="forge-out-h">
+      <h2 id="forge-out-h" class="visually-hidden">Output</h2>
+
+      <div class="out__stage" id="forge-stage">
+        <div class="out__idle" id="forge-idle">
+          <div class="out__glyph" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="30" height="30" fill="none"
+                 stroke="currentColor" stroke-width="1.4" stroke-linejoin="round">
+              <path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4"/>
+              <path d="M9 12h6M9 16h4"/>
+            </svg>
+          </div>
+          <h3>Nothing generated yet</h3>
+          <p>
+            Fill in a title and content, choose a format, then generate.
+            The file will appear here with a download link.
+          </p>
+        </div>
+      </div>
+
+      <div class="out__history">
+        <div class="section-title">
+          <h2>Recent output</h2>
+          <a class="section-title__meta" href="/library" style="color:inherit">Library →</a>
+        </div>
+        <ul class="out__list" id="forge-history"></ul>
+      </div>
+    </section>
+  </div>
+</div>
+{% endblock %}
+
+{% block tools %}
+<section class="tools__section">
+  <h2 class="tools__heading">Library</h2>
+  <dl class="tools__stats">
+    <div><dt>Files stored</dt><dd>{{ counts.documents }}</dd></div>
+    <div><dt>Location</dt><dd>data/documents</dd></div>
+  </dl>
+  <a class="tools__link" href="/library">Open Library →</a>
+</section>
+
+<section class="tools__section">
+  <h2 class="tools__heading">Format notes</h2>
+  <ul class="tools__keys">
+    <li><span>PPTX</span><kbd>headings → slides</kbd></li>
+    <li><span>XLSX</span><kbd>csv rows</kbd></li>
+    <li><span>PDF</span><kbd>sections</kbd></li>
+    <li><span>PNG</span><kbd>title + body</kbd></li>
+  </ul>
+</section>
+{% endblock %}

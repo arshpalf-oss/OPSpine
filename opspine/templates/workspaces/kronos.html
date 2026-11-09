@@ -1,0 +1,156 @@
+{% extends 'layout.html' %}
+
+{% block title %}Kronos{% endblock %}
+
+{% block workspace %}
+<div class="kronos" data-kronos>
+  <header class="kronos__head">
+    <div>
+      <p class="kronos__eyebrow">Calendar &amp; planning</p>
+      <h2 class="kronos__title">Your time, on disk.</h2>
+    </div>
+    <div class="kronos__clock">
+      <span class="kronos__today-label">Today</span>
+      <span class="kronos__today-date" id="kronos-today"></span>
+    </div>
+  </header>
+
+  {# Natural-language entry #}
+  <section class="nl" aria-labelledby="nl-h">
+    <h3 id="nl-h" class="nl__label">Quick add</h3>
+    <form class="nl__form" id="kronos-nl-form" autocomplete="off">
+      <label class="visually-hidden" for="kronos-nl">Describe an event</label>
+      <input class="nl__input" id="kronos-nl" type="text"
+             placeholder="Team standup tomorrow at 9am for 20 minutes">
+      <button class="nl__go" type="submit" id="kronos-nl-go">Read it</button>
+    </form>
+    <p class="nl__hint">
+      Kronos parses dates and times offline, then shows you what it understood
+      before anything is saved. No background alarms — events do not notify you
+      while OPSpine is closed.
+    </p>
+
+    <div class="parse" id="kronos-parse" hidden>
+      <div class="parse__row">
+        <span class="parse__k">Title</span>
+        <input class="parse__input" id="parse-title" type="text" aria-label="Parsed title">
+      </div>
+      <div class="parse__row">
+        <span class="parse__k">Starts</span>
+        <input class="parse__input" id="parse-start" type="datetime-local" aria-label="Start time">
+      </div>
+      <div class="parse__row">
+        <span class="parse__k">Ends</span>
+        <input class="parse__input" id="parse-end" type="datetime-local" aria-label="End time">
+      </div>
+      <div class="parse__row parse__row--meta">
+        <span class="parse__confidence" id="parse-confidence"></span>
+        <span class="parse__clash" id="parse-clash"></span>
+      </div>
+      <div class="parse__actions">
+        <button class="btn btn--sm nl__cancel" type="button" id="parse-cancel">Discard</button>
+        <button class="kronos-btn kronos-btn--pink" type="button" id="parse-save">
+          Confirm &amp; save
+        </button>
+      </div>
+    </div>
+  </section>
+
+  {# Calendar #}
+  <section class="cal" aria-labelledby="cal-h">
+    <h3 id="cal-h" class="visually-hidden">Calendar</h3>
+
+    <div class="cal__bar">
+      <div class="cal__nav">
+        <button class="kronos-btn kronos-btn--icon" id="cal-prev" type="button"
+                aria-label="Previous period">←</button>
+        <button class="kronos-btn" id="cal-today" type="button">Today</button>
+        <button class="kronos-btn kronos-btn--icon" id="cal-next" type="button"
+                aria-label="Next period">→</button>
+      </div>
+
+      <h4 class="cal__period" id="cal-period" aria-live="polite"></h4>
+
+      <div class="cal__views" role="group" aria-label="Calendar view">
+        <button class="cal__view" data-view="month" type="button">Month</button>
+        <button class="cal__view" data-view="week" type="button">Week</button>
+        <button class="cal__view" data-view="day" type="button">Day</button>
+      </div>
+    </div>
+
+    <div class="cal__body" id="cal-body"></div>
+  </section>
+</div>
+
+{# Event editor dialog #}
+<div class="overlay" id="kronos-editor" hidden role="dialog" aria-modal="true"
+     aria-labelledby="ke-title">
+  <div class="overlay__scrim" data-action="ke-close"></div>
+  <form class="ke" id="kronos-form" novalidate>
+    <h2 id="ke-title" class="ke__title">New event</h2>
+
+    <label class="ke__field">
+      <span>Title</span>
+      <input class="ke__input" id="ke-name" type="text" maxlength="160" required>
+    </label>
+
+    <div class="ke__pair">
+      <label class="ke__field">
+        <span>Starts</span>
+        <input class="ke__input" id="ke-start" type="datetime-local" required>
+      </label>
+      <label class="ke__field">
+        <span>Ends</span>
+        <input class="ke__input" id="ke-end" type="datetime-local" required>
+      </label>
+    </div>
+
+    <label class="ke__field">
+      <span>Notes</span>
+      <textarea class="ke__input" id="ke-notes" rows="3" maxlength="4000"></textarea>
+    </label>
+
+    <label class="ke__check">
+      <input type="checkbox" id="ke-done">
+      <span>Mark as done</span>
+    </label>
+
+    <p class="ke__clash" id="ke-clash" hidden></p>
+    <p class="ke__error" id="ke-error" hidden></p>
+
+    <div class="ke__actions">
+      <button class="kronos-btn" type="button" data-action="ke-close">Cancel</button>
+      <button class="kronos-btn kronos-btn--danger" type="button" id="ke-delete" hidden>Delete</button>
+      <button class="kronos-btn kronos-btn--pink" type="submit" id="ke-save">Save event</button>
+    </div>
+  </form>
+</div>
+{% endblock %}
+
+{% block tools %}
+<section class="tools__section">
+  <h2 class="tools__heading">This month</h2>
+  <dl class="tools__stats" id="kronos-tools-stats">
+    <div><dt>Events</dt><dd>0</dd></div>
+    <div><dt>Done</dt><dd>0</dd></div>
+    <div><dt>Upcoming</dt><dd>0</dd></div>
+  </dl>
+</section>
+
+<section class="tools__section">
+  <h2 class="tools__heading">What Kronos does</h2>
+  <p class="tools__para">
+    Events are stored in your local database. Kronos parses plain English for
+    dates and durations, and shows a conflict warning when a new event overlaps
+    an existing one.
+  </p>
+</section>
+
+<section class="tools__section">
+  <h2 class="tools__heading">Honest limits</h2>
+  <p class="tools__para">
+    There is no background service, so OPSpine cannot notify you while it is
+    closed. Events are a record of your plan, not an alarm clock.
+  </p>
+</section>
+{% endblock %}
