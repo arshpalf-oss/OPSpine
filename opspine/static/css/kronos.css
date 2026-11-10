@@ -986,3 +986,89 @@ body[data-workspace="kronos"] :focus-visible {
 .day__dotcount {
   display: none;
 }
+
+/* ==========================================================================
+   Nav additions: period range, jump-to-date, shortcut hints
+   ========================================================================== */
+.cal__period {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  line-height: 1.15;
+}
+
+.cal__period-main {
+  font-size: 1.0625rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.cal__period-range,
+.cal__period-main {
+  display: block;
+}
+
+
+.cal__period-range {
+  font-family: var(--font-mono);
+  font-size: 0.5625rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #6b6278;
+}
+
+/* Jump-to-date: a bordered field that matches the nav buttons. */
+.cal__jump {
+  display: inline-flex;
+}
+
+.cal__jump-input {
+  height: 30px;
+  padding: 0 8px;
+  border-radius: var(--radius-sm);
+  border: 1.5px solid var(--k-ink);
+  background: #ffffff;
+  color: #14101c;
+  font-family: var(--font-mono);
+  font-size: 0.625rem;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+}
+
+.cal__jump-input:hover {
+  border-color: var(--k-ink);
+}
+
+.cal__jump-input:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(201, 182, 255, 0.55);
+}
+
+/* Shortcut hints under the quick-add field. */
+.nl__keys {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: 6px;
+  font-family: var(--font-mono);
+  font-size: 0.5625rem;
+  letter-spacing: 0.04em;
+  color: #6b6278;
+  flex-wrap: wrap;
+}
+
+.nl__keys kbd {
+  padding: 1px 4px;
+  border-radius: 3px;
+  border: 1px solid var(--k-ink);
+  background: #ffffff;
+  font-size: 0.5625rem;
+  color: #14101c;
+}
+
+@media (max-width: 760px) {
+  .cal__jump,
+  .nl__keys {
+    display: none;
+  }
+}

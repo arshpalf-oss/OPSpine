@@ -31,6 +31,9 @@
     cancel: document.getElementById('wboard-cancel'),
     del: document.getElementById('wboard-delete'),
     save: document.getElementById('wboard-save'),
+    move: document.getElementById('wboard-move'),
+    statusLine: document.getElementById('wboard-status-line'),
+    dirty: document.getElementById('wboard-dirty'),
   };
 
   const state = {
@@ -39,6 +42,9 @@
     selectedId: null,
     query: '',
     saving: false,
+    /* What the open form looked like when it was loaded, so the panel can
+       say whether there is anything unsaved. */
+    pristine: '',
   };
 
   const STATUS_LABEL = { todo: 'To do', in_progress: 'In progress', done: 'Done' };
@@ -119,6 +125,10 @@
       );
     }
 
+    /* A card is a button, so the move controls live beside it in the list
+       item rather than inside it — nested buttons are invalid. */
+    card.dataset.taskId = String(task.id);
+
     const foot = U.el('div', { class: 'tcard__foot' });
     const due = dueInfo(task);
     if (due) {
@@ -150,6 +160,26 @@
     );
     button.appendChild(foot);
     card.appendChild(button);
+
+    const moves = U.el('div', { class: 'tcard__moves' });
+    const targets = [
+      ['todo', 'To do'],
+      ['in_progress', 'In progress'],
+      ['done', 'Done'],
+    ].filter(([value]) => value !== task.status);
+    targets.forEach(([value, label]) => {
+      moves.appendChild(U.el('button', {
+        type: 'button',
+        class: 'tcard__move',
+        text: label,
+        'aria-label': `Move ${task.title} to ${label}`,
+        onClick: (event) => {
+          event.stopPropagation();
+          moveTask(task, value);
+        },
+      }));
+    });
+    card.appendChild(moves);
     return card;
   }
 
@@ -194,9 +224,64 @@
   /* ------------------------------------------------------------------ */
   /* Detail panel                                                       */
   /* ------------------------------------------------------------------ */
+  function formSignature() {
+    return [dom.title.value, dom.desc.value, dom.status.value,
+      dom.priority.value, dom.due.value].join('\u0000');
+  }
+
+  function markPristine() {
+    state.pristine = formSignature();
+    syncDirty();
+  }
+
+  function syncDirty() {
+    if (dom.form.hidden) {
+      dom.dirty.hidden = true;
+      return;
+    }
+    const dirty = formSignature() !== state.pristine;
+    dom.dirty.hidden = !dirty;
+  }
+
+  /* Moving between columns is the core board action, so it is one click
+     from the card and one keystroke from the keyboard. */
+  async function moveTask(task, status) {
+    const previous = task.status;
+    if (previous === status) return;
+    const reverse = { status: previous };
+    try {
+      await api.put(`/api/tasks/${task.id}`, { status });
+      await load(state.query);
+      if (state.selectedId === task.id) openTask(task.id);
+      announce(`Moved “${task.title}” to ${STATUS_LABEL[status]}.`);
+      U.toast({
+        message: `Moved “${task.title}” to ${STATUS_LABEL[status]}.`,
+        kind: 'success',
+        action: {
+          label: 'Undo',
+          onClick: () => {
+            api.put(`/api/tasks/${task.id}`, reverse).then(() => {
+              load(state.query).then(() => {
+                if (state.selectedId === task.id) openTask(task.id);
+              });
+              U.toast('Move undone.');
+            }).catch((err) => U.error(err.message));
+          },
+        },
+      });
+      window.OPS.shell.refreshActivity();
+    } catch (err) {
+      U.error(err.message);
+    }
+  }
+
+  function announce(text) {
+    if (dom.statusLine) dom.statusLine.textContent = text;
+  }
   const drawer = document.getElementById('wboard-detail');
 
   function showForm() {
+    dom.move.disabled = false;
     dom.detailEmpty.hidden = true;
     dom.form.hidden = false;
     drawer.classList.add('is-open');
@@ -205,6 +290,8 @@
 
   function hideForm() {
     dom.form.hidden = true;
+    dom.dirty.hidden = true;
+    dom.move.disabled = true;
     dom.detailEmpty.hidden = false;
     drawer.classList.remove('is-open');
     drawer.setAttribute('aria-hidden', 'true');
@@ -225,6 +312,7 @@
     dom.del.hidden = false;
     dom.error.hidden = true;
     showForm();
+    markPristine();
     render();
     dom.title.focus();
   }
@@ -240,6 +328,7 @@
     dom.del.hidden = true;
     dom.error.hidden = true;
     showForm();
+    markPristine();
     render();
     dom.title.focus();
   }
@@ -337,6 +426,20 @@
   /* ------------------------------------------------------------------ */
   /* Wiring                                                             */
   /* ------------------------------------------------------------------ */
+  dom.move.addEventListener('click', async () => {
+    const task = state.tasks.find((item) => item.id === state.selectedId);
+    if (!task) return;
+    const next = task.status === 'todo' ? 'in_progress'
+      : task.status === 'in_progress' ? 'done' : 'todo';
+    await moveTask(task, next);
+  });
+
+  ['input', 'change'].forEach((type) => {
+    [dom.title, dom.desc, dom.status, dom.priority, dom.due].forEach((field) => {
+      field.addEventListener(type, syncDirty);
+    });
+  });
+
   dom.form.addEventListener('submit', save);
   dom.add.addEventListener('click', openNew);
   dom.cancel.addEventListener('click', hideForm);
@@ -360,15 +463,34 @@
   document.addEventListener('keydown', (event) => {
     const typing = ['INPUT', 'TEXTAREA', 'SELECT'].includes(event.target.tagName) ||
       event.target.isContentEditable;
-    if (event.key === 'Escape' && !dom.form.hidden) {
-      hideForm();
+    const mod = event.metaKey || event.ctrlKey;
+
+    if (mod && (event.key === 's' || event.key === 'S') && !dom.form.hidden) {
       event.preventDefault();
+      save();
       return;
     }
-    if (typing) return;
+    if (event.key === 'Escape' && !dom.form.hidden) {
+      event.preventDefault();
+      if (!dom.dirty.hidden) {
+        U.confirm({
+          title: 'Discard changes?',
+          message: 'This task has unsaved edits. Close the panel and lose them?',
+          confirmLabel: 'Discard',
+        }).then((okd) => { if (okd) hideForm(); });
+        return;
+      }
+      hideForm();
+      return;
+    }
+    if (typing || mod) return;
     if (event.key === 'n' || event.key === 'N') {
       event.preventDefault();
       openNew();
+    } else if (event.key === '/') {
+      event.preventDefault();
+      dom.search.focus();
+      dom.search.select();
     }
   });
 

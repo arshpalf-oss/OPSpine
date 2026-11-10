@@ -18,6 +18,10 @@
     <div class="wboard__actions">
       <input type="search" class="wboard__search" id="wboard-search"
              placeholder="Search tasks" aria-label="Search tasks" autocomplete="off">
+      <button class="wboard__move" id="wboard-move" type="button"
+              aria-label="Move the selected task to another status" disabled>
+        Move
+      </button>
       <button class="wboard__add" id="wboard-add" type="button">
         <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor"
              stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
@@ -27,6 +31,7 @@
   </header>
 
   <div class="wboard__counts" id="wboard-counts"></div>
+  <p class="wboard__status" id="wboard-status-line" role="status" aria-live="polite"></p>
 
   <div class="wboard__body">
     {# Task list grouped by status #}
@@ -118,6 +123,7 @@
         <p class="detail__error" id="wboard-error" hidden></p>
 
         <div class="detail__actions">
+          <span class="detail__hint" id="wboard-dirty" hidden>Unsaved changes</span>
           <button class="detail__btn" type="button" id="wboard-cancel">Cancel</button>
           <button class="detail__btn detail__btn--danger" type="button"
                   id="wboard-delete" hidden>Delete</button>
@@ -126,6 +132,41 @@
         </div>
       </form>
     </aside>
+  </div>
+
+
+
+  {# Workspace-owned context. Previously this lived in a global
+     right-hand panel; it belongs to this tool, so it renders here. #}
+  <div class="ws-aside" data-ws-aside>
+
+  <section class="tools__section">
+    <h2 class="tools__heading">Board state</h2>
+    <dl class="tools__stats" id="wboard-stats">
+      <div><dt>Total</dt><dd>0</dd></div>
+      <div><dt>To do</dt><dd>0</dd></div>
+      <div><dt>In progress</dt><dd>0</dd></div>
+      <div><dt>Done</dt><dd>0</dd></div>
+    </dl>
+  </section>
+  
+  <section class="tools__section">
+    <h2 class="tools__heading">How it works</h2>
+    <p class="tools__para">
+      Every task has a title, description, status, priority and optional due date.
+      Clicking a card opens the detail panel. Deleting asks for confirmation.
+    </p>
+  </section>
+  
+  <section class="tools__section">
+    <h2 class="tools__heading">Shortcuts</h2>
+    <ul class="tools__keys">
+      <li><kbd>N</kbd><span>New task</span></li>
+      <li><kbd>/</kbd><span>Focus the task search</span></li>
+      <li><kbd>Ctrl ↵</kbd><span>Save the open task</span></li>
+      <li><kbd>Esc</kbd><span>Close the detail panel</span></li>
+    </ul>
+  </section>
   </div>
 </div>
 

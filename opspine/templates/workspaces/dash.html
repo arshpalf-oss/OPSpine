@@ -29,12 +29,15 @@
                autocomplete="off">
       </div>
     </div>
+    <p class="cmdpanel__count" id="dash-count" role="status" aria-live="polite"></p>
+    </div>
 
     <div class="cmdfilters" role="group" aria-label="Command categories" id="dash-filters">
       <button class="cmdfilter is-active" data-cat="all" type="button">All</button>
       <button class="cmdfilter" data-cat="navigate" type="button">Navigate</button>
       <button class="cmdfilter" data-cat="create" type="button">Create</button>
       <button class="cmdfilter" data-cat="system" type="button">System</button>
+      <button class="cmdfilter" data-cat="recent" type="button">Ran this session</button>
     </div>
 
     <div class="cmdtable" role="table" aria-label="Commands">
@@ -57,6 +60,7 @@
     <div class="dashcol__card">
       <h3>Keyboard</h3>
       <ul class="dashkeys">
+        <li><kbd>/</kbd><span>Focus the command filter</span></li>
         <li><kbd>Ctrl K</kbd><span>Command palette</span></li>
         <li><kbd>Ctrl 0–8</kbd><span>Jump to workspace</span></li>
         <li><kbd>Ctrl ↵</kbd><span>Primary action</span></li>
@@ -65,6 +69,32 @@
       </ul>
     </div>
   </section>
+
+
+
+  {# Workspace-owned context. Previously this lived in a global
+     right-hand panel; it belongs to this tool, so it renders here. #}
+  <div class="ws-aside" data-ws-aside>
+
+  <section class="tools__section">
+    <h2 class="tools__heading">State</h2>
+    <dl class="tools__stats" id="dash-tools-state"></dl>
+  </section>
+  
+  <section class="tools__section">
+    <h2 class="tools__heading">Local-only switch</h2>
+    <p class="tools__para" id="dash-mode-copy"></p>
+    <button class="btn btn--sm" id="dash-mode-toggle" type="button">Toggle mode</button>
+  </section>
+  
+  <section class="tools__section">
+    <h2 class="tools__heading">Note</h2>
+    <p class="tools__para">
+      Dash only lists actions OPSpine can actually perform. If a capability is
+      unavailable, the row says so instead of pretending.
+    </p>
+  </section>
+  </div>
 </div>
 
   {# Workspace-owned context. Previously this lived in a global

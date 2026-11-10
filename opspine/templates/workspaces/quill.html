@@ -11,6 +11,7 @@
       <h2>Drafts</h2>
       <button class="btn btn--sm" id="quill-new" type="button">New draft</button>
     </div>
+    <p class="drafts__count" id="quill-count" role="status" aria-live="polite"></p>
     <div class="drafts__search">
       <input type="search" class="input input--sm" id="quill-search"
              placeholder="Search drafts" aria-label="Search drafts" autocomplete="off">
@@ -67,7 +68,14 @@
     <footer class="paper__foot">
       <div class="paper__stats" id="quill-stats">0 words · 0 characters</div>
       <div class="paper__actions">
-        <button class="btn btn--sm" id="quill-save" type="button" disabled>Save now</button>
+        <span class="paper__actions-label">Export</span>
+        <button class="btn btn--sm" id="quill-export-txt" type="button" disabled
+                title="Download this draft as a plain text file">.txt</button>
+        <button class="btn btn--sm" id="quill-export-md" type="button" disabled
+                title="Download this draft as a Markdown file">.md</button>
+        <span class="paper__actions-sep" aria-hidden="true"></span>
+        <button class="btn btn--sm" id="quill-save" type="button" disabled
+                title="Save immediately (Ctrl or Cmd + S)">Save now</button>
         <button class="btn btn--sm btn--danger" id="quill-delete" type="button" disabled>Delete</button>
       </div>
     </footer>
@@ -96,6 +104,35 @@
       <button class="btn btn--sm" id="quill-append" type="button" disabled>Append</button>
     </div>
   </aside>
+
+
+
+  {# Workspace-owned context. Previously this lived in a global
+     right-hand panel; it belongs to this tool, so it renders here. #}
+  <div class="ws-aside" data-ws-aside>
+
+  <section class="tools__section">
+    <h2 class="tools__heading">Assistant</h2>
+    <div class="prov-card" id="quill-prov"></div>
+    <a class="tools__link" href="/settings">Configure in Settings →</a>
+  </section>
+  
+  <section class="tools__section">
+    <h2 class="tools__heading">About autosave</h2>
+    <p class="tools__para">
+      Quill saves a moment after you stop typing, and again when you leave the
+      page. The status line above the sheet always shows the last real save.
+    </p>
+  </section>
+  
+  <section class="tools__section">
+    <h2 class="tools__heading">Offline tools</h2>
+    <p class="tools__para">
+      The chips above the editor run deterministic local operations on your text.
+      “Rewrite with provider” only works with a configured model.
+    </p>
+  </section>
+  </div>
 </div>
 
   {# Workspace-owned context. Previously this lived in a global

@@ -361,6 +361,12 @@
 
     /* Escape closes whatever is open. */
     if (event.key === 'Escape') {
+      const prompt = document.getElementById('prompt');
+      if (prompt && !prompt.hidden) {
+        U.closePrompt(null);
+        event.preventDefault();
+        return;
+      }
       if (!document.getElementById('confirm').hidden) {
         U.closeConfirm(false);
         event.preventDefault();
@@ -381,7 +387,9 @@
     /* Focus trap inside the top overlay. */
     if (event.key === 'Tab' && openNow) {
       const overlay = U.$$('.overlay').find((node) => !node.hidden);
-      if (overlay) U.trapFocus(overlay.querySelector('.palette, .sheet, .confirm'), event);
+      if (overlay) {
+        U.trapFocus(overlay.querySelector('.palette, .sheet, .confirm'), event);
+      }
       return;
     }
 
@@ -472,6 +480,9 @@
       case 'close-confirm':
         U.closeConfirm(false);
         break;
+      case 'close-prompt':
+        U.closePrompt(null);
+        break;
       default:
         break;
     }
@@ -480,6 +491,28 @@
   document.getElementById('confirm-accept').addEventListener('click', () => {
     U.closeConfirm(true);
   });
+
+  /* Every styled switch renders its real checkbox as a visually hidden
+     sibling. Label forwarding handles the common case, but this makes the
+     track itself an explicit control so the switch works even where label
+     activation is not forwarded. preventDefault stops a double toggle. */
+  document.addEventListener('click', (event) => {
+    const track = event.target.closest('.switch__track');
+    if (!track || !track.parentElement) return;
+    const input = track.parentElement.querySelector('input[type="checkbox"]');
+    if (!input || input.disabled) return;
+    event.preventDefault();
+    input.checked = !input.checked;
+    input.dispatchEvent(new Event('change', { bubbles: true }));
+  });
+
+  const promptForm = document.getElementById('prompt-form');
+  if (promptForm) {
+    promptForm.addEventListener('submit', (event) => {
+      event.preventDefault();
+      U.closePrompt(document.getElementById('prompt-input').value);
+    });
+  }
 
   /* ------------------------------------------------------------------ */
   /* Responsive reset                                                   */

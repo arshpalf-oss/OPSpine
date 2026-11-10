@@ -151,7 +151,9 @@
       .map((ln) => ln.trim())
       .filter(Boolean)
       .map((line) => {
-        if (line.includes('|')) return line.replace(/^\|+|\|+$/g, '').split('|').map((c) => c.trim());
+        if (line.includes('|')) {
+          return line.replace(/^\|+|\|+$/g, '').split('|').map((c) => c.trim());
+        }
         if (line.includes('\t')) return line.split('\t').map((c) => c.trim());
         return line.split(',').map((c) => c.trim());
       });
@@ -221,8 +223,7 @@
       rows.slice(0, 12).forEach((row, r) => {
         const tr = U.el('tr', {});
         for (let c = 0; c < cols; c += 1) {
-          const cell = U.el(r === 0 ? 'th' : 'td', { text: row[c] ?? '' });
-          tr.appendChild(cell);
+          tr.appendChild(U.el(r === 0 ? 'th' : 'td', { text: row[c] ?? '' }));
         }
         table.appendChild(tr);
       });
@@ -259,22 +260,19 @@
     const page = U.el('div', { class: 'prev__page' });
     page.appendChild(U.el('h4', { class: 'prev__page-title', text: title || 'Untitled' }));
     if (dom.author.value.trim() && !U.$('[data-opt="author"]', dom.opts).hidden) {
-      page.appendChild(U.el('p', {
-        class: 'prev__page-by', text: dom.author.value.trim(),
-      }));
+      page.appendChild(U.el('p', { class: 'prev__page-by', text: dom.author.value.trim() }));
     }
     sections.forEach((section) => {
       if (section.heading) {
         page.appendChild(U.el('h5', { class: 'prev__page-h', text: section.heading }));
       }
       const bullets = [];
-      const paragraphs = [];
       section.lines.forEach((line) => {
-        if (line.startsWith('-')) bullets.push(line.replace(/^[-*•\s]+/, ''));
-        else paragraphs.push(line);
-      });
-      paragraphs.forEach((text) => {
-        page.appendChild(U.el('p', { class: 'prev__page-p', text }));
+        if (line.startsWith('-')) {
+          bullets.push(line.replace(/^[-*•\s]+/, ''));
+        } else {
+          page.appendChild(U.el('p', { class: 'prev__page-p', text: line }));
+        }
       });
       if (bullets.length) {
         const ul = U.el('ul', { class: 'prev__bullets' });
@@ -290,9 +288,9 @@
     dom.bodyCount.textContent = words ? `${words} ${words === 1 ? 'word' : 'words'}` : '';
   }
 
-  /* A plain function declaration, not a const arrow: the input listeners above
-     are registered before this point in the file, and a const would still be in
-     its temporal dead zone when they are wired. */
+  /* A plain function declaration, not a const arrow: the input listeners are
+     registered before this point in the file, and a const would still be in its
+     temporal dead zone when they are wired. */
   let previewTimer = null;
 
   function refreshPreview() {

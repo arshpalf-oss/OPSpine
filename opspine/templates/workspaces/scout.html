@@ -45,8 +45,9 @@
         <div class="panel__head">
           <h3 id="scout-sessions-h">Sessions</h3>
           <input type="search" class="input input--sm" id="scout-search"
-                 placeholder="Search" aria-label="Search sessions" autocomplete="off">
+                 placeholder="Search questions" aria-label="Search sessions" autocomplete="off">
         </div>
+        <p class="sessions__count" id="scout-count" aria-live="polite"></p>
         <ul class="sessions" id="scout-sessions"></ul>
       </section>
 
@@ -56,6 +57,32 @@
         <div id="scout-detail"></div>
       </section>
     </div>
+  </div>
+
+
+
+  {# Workspace-owned context. Previously this lived in a global
+     right-hand panel; it belongs to this tool, so it renders here. #}
+  <div class="ws-aside" data-ws-aside>
+
+  <section class="tools__section">
+    <h2 class="tools__heading">Research provider</h2>
+    <div class="prov-card" id="scout-prov"></div>
+    <a class="tools__link" href="/settings">Configure in Settings →</a>
+  </section>
+  
+  <section class="tools__section">
+    <h2 class="tools__heading">What Scout will not do</h2>
+    <ul class="tools__keys">
+      <li><span>Invent citations</span></li>
+      <li><span>Claim a source was read</span></li>
+      <li><span>Score truth without evidence</span></li>
+    </ul>
+    <p class="tools__para" style="margin-top:10px">
+      When no provider is available, Scout still records your notes and links.
+      It will say plainly that it could not search.
+    </p>
+  </section>
   </div>
 </div>
 

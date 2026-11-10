@@ -544,3 +544,31 @@ body[data-workspace="dash"] .topbar {
     max-width: none;
   }
 }
+
+/* ---------------- filter count + run feedback ---------------- */
+.cmdpanel__count {
+  margin: 0 0 10px;
+  padding: 0 16px;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.04em;
+  color: #8fa3c4;
+  text-transform: uppercase;
+}
+
+.cmdpanel__count:empty {
+  display: none;
+}
+
+/* A header key and the shell's own shortcut are different things; rows that
+   carry a shortcut shown as "custom" keep a readable dash instead of a kbd. */
+.cmdrow__key .keynote {
+  font-size: 10.5px;
+  letter-spacing: 0.03em;
+  color: #8fa3c4;
+}
+
+.runbtn.is-ran {
+  color: #9ef7c4;
+  border-color: rgba(94, 234, 212, 0.5);
+}

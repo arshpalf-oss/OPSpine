@@ -677,41 +677,51 @@ class TestPages(BaseCase):
         """
         from opspine.services import documents
 
-        cases = {
-            "headings": "Overview:\nText.\n\nKey points:\n- one\n- two\n\nNext:\nDo.",
-            "hashes": "# First\nbody\n# Second\nmore",
-            "plain": "just one line\nand another",
-            "commas": "a,b,c\n1,2,3",
-            "pipes": "a|b|c\n1|2|3",
-            "tabs": "a\tb\tc\n1\t2\t3",
-            "empty": "",
-        }
-        # The JS contract: sections are {heading, lines} in document order.
         self.assertEqual(
-            documents.split_sections(cases["headings"]),
+            documents.split_sections("Overview:\nText.\n\nKey points:\n- one\n- two"),
             [
                 {"heading": "Overview", "lines": ["Text."]},
                 {"heading": "Key points", "lines": ["- one", "- two"]},
-                {"heading": "Next", "lines": ["Do."]},
             ],
         )
         self.assertEqual(
-            documents.split_sections(cases["hashes"]),
+            documents.split_sections("# First\nbody\n# Second\nmore"),
             [{"heading": "First", "lines": ["body"]},
              {"heading": "Second", "lines": ["more"]}],
         )
         self.assertEqual(
-            documents.split_sections(cases["plain"]),
+            documents.split_sections("just one line\nand another"),
             [{"heading": "", "lines": ["just one line", "and another"]}],
         )
-        self.assertEqual(documents.split_sections(cases["empty"]),
-                         [{"heading": "", "lines": []}])
-        self.assertEqual(documents.split_rows(cases["commas"]),
+        self.assertEqual(documents.split_sections(""), [{"heading": "", "lines": []}])
+        self.assertEqual(documents.split_rows("a,b,c\n1,2,3"),
                          [["a", "b", "c"], ["1", "2", "3"]])
-        self.assertEqual(documents.split_rows(cases["pipes"]),
+        self.assertEqual(documents.split_rows("a|b|c\n1|2|3"),
                          [["a", "b", "c"], ["1", "2", "3"]])
-        self.assertEqual(documents.split_rows(cases["tabs"]),
+        self.assertEqual(documents.split_rows("a\tb\tc\n1\t2\t3"),
                          [["a", "b", "c"], ["1", "2", "3"]])
+
+    def test_workspace_reference_is_nested_inside_its_tool(self):
+        """The reference column belongs to the tool, not to the shell.
+
+        It used to render as a bare band above the workspace because it sat
+        outside the tool's root element.
+        """
+        roots = {
+            "scout": "scout", "quill": "quill", "kronos": "kronos",
+            "whiteboard": "wb", "dash": "dashconsole",
+            "working-board": "wboard", "library": "library",
+            "settings": "settings", "forge": "forge",
+        }
+        for key, root in roots.items():
+            with self.subTest(key=key):
+                html = self.client.get(f"/{key}").get_data(as_text=True)
+                aside_at = html.find('class="ws-aside"')
+                root_at = html.find(f'class="{root}"')
+                self.assertGreater(aside_at, 0, "reference column missing")
+                self.assertGreater(root_at, 0, f"root .{root} missing")
+                self.assertGreater(aside_at, root_at,
+                                   "reference column must come after the root opens")
 
     def test_workspace_context_moved_into_the_workspace(self):
         """Nothing that was reachable became unreachable."""

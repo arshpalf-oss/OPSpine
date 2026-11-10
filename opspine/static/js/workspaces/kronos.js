@@ -27,6 +27,7 @@
     body: document.getElementById('cal-body'),
     prev: document.getElementById('cal-prev'),
     next: document.getElementById('cal-next'),
+    jump: document.getElementById('cal-jump'),
     todayBtn: document.getElementById('cal-today'),
     editor: document.getElementById('kronos-editor'),
     form: document.getElementById('kronos-form'),
@@ -126,22 +127,43 @@
   /* ------------------------------------------------------------------ */
   /* Rendering                                                          */
   /* ------------------------------------------------------------------ */
+  function syncJumpField() {
+    if (!dom.jump) return;
+    const c = state.cursor;
+    dom.jump.value = `${c.getFullYear()}-${String(c.getMonth() + 1).padStart(2, '0')}`
+      + `-${String(c.getDate()).padStart(2, '0')}`;
+  }
+
   function render() {
+    syncJumpField();
     if (state.view === 'month') renderMonth();
     else if (state.view === 'week') renderWeek();
     else renderDay();
 
     U.$$('.cal__view').forEach((button) => {
-      button.classList.toggle('is-active', button.dataset.view === state.view);
+      const active = button.dataset.view === state.view;
+      button.classList.toggle('is-active', active);
+      button.setAttribute('aria-pressed', String(active));
     });
   }
 
   function renderMonth() {
     const year = state.cursor.getFullYear();
     const month = state.cursor.getMonth();
-    dom.period.textContent = `${MONTHS[month]} ${year}`;
-
+    /* Name the whole period, not just the month: in month view the grid shows
+       trailing days from the months either side. */
     const first = new Date(year, month, 1);
+    const last = new Date(year, month + 1, 0);
+    const lead = startOfWeek(first);
+    const trail = startOfWeek(last);
+    trail.setDate(trail.getDate() + 6);
+    dom.period.innerHTML = '';
+    dom.period.appendChild(U.el('span', { class: 'cal__period-main',
+      text: `${MONTHS[month]} ${year}` }));
+    dom.period.appendChild(U.el('span', { class: 'cal__period-range',
+      text: `\u2014 ${lead.getDate()} ${MONTHS[lead.getMonth()].slice(0, 3)} – `
+        + `${trail.getDate()} ${MONTHS[trail.getMonth()].slice(0, 3)}` }));
+
     const gridStart = startOfWeek(first);
     const today = new Date();
 
@@ -183,9 +205,9 @@
           })
         );
       });
-      if (list.length > 3) {
-        holder.appendChild(U.el('span', { class: 'day__more', text: `+${list.length - 3} more` }));
-      }
+      /* Deliberately no "+N more" affordance: the cell opens the day, and a
+         label that cannot be clicked is worse than no label. The accessible
+         name already carries the true count. */
       cell.appendChild(holder);
 
       if (list.length) {
@@ -568,6 +590,12 @@
   /* ------------------------------------------------------------------ */
   /* Wiring                                                             */
   /* ------------------------------------------------------------------ */
+  /* Start on the view the user last chose. */
+  try {
+    const saved = window.localStorage.getItem('kronos_view');
+    if (saved === 'month' || saved === 'week' || saved === 'day') state.view = saved;
+  } catch (e) { /* private mode: stay on the default */ }
+
   dom.prev.addEventListener('click', () => move(-1));
   dom.next.addEventListener('click', () => move(1));
   dom.todayBtn.addEventListener('click', () => {
@@ -575,9 +603,21 @@
     loadEvents();
   });
 
+  if (dom.jump) {
+    dom.jump.addEventListener('change', () => {
+      if (!dom.jump.value) return;
+      const parts = dom.jump.value.split('-').map(Number);
+      state.cursor = new Date(parts[0], parts[1] - 1, parts[2]);
+      loadEvents();
+      U.toast(`Jumped to ${dom.jump.value}.`);
+    });
+  }
+
   U.$$('.cal__view').forEach((button) => {
     button.addEventListener('click', () => {
       state.view = button.dataset.view;
+      /* Remembered locally so a reload returns you to the view you were on. */
+      try { window.localStorage.setItem('kronos_view', state.view); } catch (e) { /* private mode */ }
       render();
       renderStats();
     });
@@ -626,6 +666,60 @@
 
   window.OPS.shell.registerPrimary('New event', () => {
     openEditor(null, new Date());
+  });
+
+  /* ------------------------------------------------------------------ */
+  /* Keyboard                                                           */
+  /* ------------------------------------------------------------------ */
+  /* Only when the focus is not in a field, so typing a title never pages
+     the calendar out from under you. */
+  function typing(target) {
+    if (!target) return false;
+    const tag = target.tagName;
+    return tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT'
+      || target.isContentEditable;
+  }
+
+  document.addEventListener('keydown', (event) => {
+    if (event.ctrlKey || event.metaKey || event.altKey) return;
+    if (typing(event.target)) return;
+    if (!dom.editor.hidden) return;
+
+    switch (event.key) {
+      case 'ArrowLeft': event.preventDefault(); move(-1); break;
+      case 'ArrowRight': event.preventDefault(); move(1); break;
+      case 't': case 'T':
+        event.preventDefault();
+        state.cursor = new Date();
+        loadEvents();
+        break;
+      case 'm': case 'M':
+        event.preventDefault();
+        state.view = 'month';
+        render();
+        U.$$('.cal__view').forEach((b) => b.setAttribute('aria-pressed',
+          String(b.dataset.view === 'month')));
+        break;
+      case 'w': case 'W':
+        event.preventDefault();
+        state.view = 'week';
+        render();
+        U.$$('.cal__view').forEach((b) => b.setAttribute('aria-pressed',
+          String(b.dataset.view === 'week')));
+        break;
+      case 'd': case 'D':
+        event.preventDefault();
+        state.view = 'day';
+        render();
+        U.$$('.cal__view').forEach((b) => b.setAttribute('aria-pressed',
+          String(b.dataset.view === 'day')));
+        break;
+      case 'n': case 'N':
+        event.preventDefault();
+        openEditor(null, state.cursor);
+        break;
+      default: break;
+    }
   });
 
   /* ------------------------------------------------------------------ */
