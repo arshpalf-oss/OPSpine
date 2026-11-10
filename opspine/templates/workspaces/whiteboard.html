@@ -162,6 +162,40 @@
   </section>
   </div>
 </div>
+
+  {# Workspace-owned context. Previously this lived in a global
+     right-hand panel; it belongs to this tool, so it renders here. #}
+  <div class="ws-aside" data-ws-aside>
+
+  <section class="tools__section">
+    <h2 class="tools__heading">Board</h2>
+    <dl class="tools__stats" id="wb-stats">
+      <div><dt>Notes</dt><dd>0</dd></div>
+      <div><dt>Links</dt><dd>0</dd></div>
+      <div><dt>Zoom</dt><dd>100%</dd></div>
+    </dl>
+  </section>
+  
+  <section class="tools__section">
+    <h2 class="tools__heading">Controls</h2>
+    <ul class="tools__keys">
+      <li><kbd>V</kbd><span>Select tool</span></li>
+      <li><kbd>N</kbd><span>Add a note</span></li>
+      <li><kbd>L</kbd><span>Link two notes</span></li>
+      <li><kbd>Del</kbd><span>Delete selection</span></li>
+      <li><kbd>Space</kbd><span>Pan the canvas</span></li>
+      <li><kbd>Ctrl S</kbd><span>Save the board</span></li>
+    </ul>
+  </section>
+  
+  <section class="tools__section">
+    <h2 class="tools__heading">Saving</h2>
+    <p class="tools__para">
+      Boards are stored in your local database. Changes stay in this browser tab
+      until you press Save.
+    </p>
+  </section>
+  </div>
 {% endblock %}
 
 

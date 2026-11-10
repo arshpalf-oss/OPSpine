@@ -96,6 +96,30 @@
   </section>
   </div>
 </div>
+
+  {# Workspace-owned context. Previously this lived in a global
+     right-hand panel; it belongs to this tool, so it renders here. #}
+  <div class="ws-aside" data-ws-aside>
+
+  <section class="tools__section">
+    <h2 class="tools__heading">State</h2>
+    <dl class="tools__stats" id="dash-tools-state"></dl>
+  </section>
+  
+  <section class="tools__section">
+    <h2 class="tools__heading">Local-only switch</h2>
+    <p class="tools__para" id="dash-mode-copy"></p>
+    <button class="btn btn--sm" id="dash-mode-toggle" type="button">Toggle mode</button>
+  </section>
+  
+  <section class="tools__section">
+    <h2 class="tools__heading">Note</h2>
+    <p class="tools__para">
+      Dash only lists actions OPSpine can actually perform. If a capability is
+      unavailable, the row says so instead of pretending.
+    </p>
+  </section>
+  </div>
 {% endblock %}
 
 

@@ -171,6 +171,37 @@
     </div>
   </form>
 </div>
+
+  {# Workspace-owned context. Previously this lived in a global
+     right-hand panel; it belongs to this tool, so it renders here. #}
+  <div class="ws-aside" data-ws-aside>
+
+  <section class="tools__section">
+    <h2 class="tools__heading">This month</h2>
+    <dl class="tools__stats" id="kronos-tools-stats">
+      <div><dt>Events</dt><dd>0</dd></div>
+      <div><dt>Done</dt><dd>0</dd></div>
+      <div><dt>Upcoming</dt><dd>0</dd></div>
+    </dl>
+  </section>
+  
+  <section class="tools__section">
+    <h2 class="tools__heading">What Kronos does</h2>
+    <p class="tools__para">
+      Events are stored in your local database. Kronos parses plain English for
+      dates and durations, and shows a conflict warning when a new event overlaps
+      an existing one.
+    </p>
+  </section>
+  
+  <section class="tools__section">
+    <h2 class="tools__heading">Honest limits</h2>
+    <p class="tools__para">
+      There is no background service, so OPSpine cannot notify you while it is
+      closed. Events are a record of your plan, not an alarm clock.
+    </p>
+  </section>
+  </div>
 {% endblock %}
 
 

@@ -134,6 +134,33 @@
   </section>
   </div>
 </div>
+
+  {# Workspace-owned context. Previously this lived in a global
+     right-hand panel; it belongs to this tool, so it renders here. #}
+  <div class="ws-aside" data-ws-aside>
+
+  <section class="tools__section">
+    <h2 class="tools__heading">Assistant</h2>
+    <div class="prov-card" id="quill-prov"></div>
+    <a class="tools__link" href="/settings">Configure in Settings →</a>
+  </section>
+  
+  <section class="tools__section">
+    <h2 class="tools__heading">About autosave</h2>
+    <p class="tools__para">
+      Quill saves a moment after you stop typing, and again when you leave the
+      page. The status line above the sheet always shows the last real save.
+    </p>
+  </section>
+  
+  <section class="tools__section">
+    <h2 class="tools__heading">Offline tools</h2>
+    <p class="tools__para">
+      The chips above the editor run deterministic local operations on your text.
+      “Rewrite with provider” only works with a configured model.
+    </p>
+  </section>
+  </div>
 {% endblock %}
 
 
