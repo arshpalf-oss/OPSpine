@@ -47,87 +47,12 @@
     if (persist) saveChrome({ sidebar_collapsed: collapsed ? 1 : 0 });
   }
 
-  function setToolsCollapsed(collapsed, persist = true) {
-    if (!document.getElementById('app-shell')) return;
-    shell.dataset.toolsCollapsed = collapsed ? 'true' : 'false';
-    const toggle = document.querySelector('.topbar__tools-toggle');
-    if (toggle) toggle.setAttribute('aria-expanded', String(!collapsed));
-    if (persist) saveChrome({ tools_collapsed: collapsed ? 1 : 0 });
-  }
-
-  /* Build the collapsed tools rail from the sections that are actually in the
-     panel, so every icon maps to something real. Expanding scrolls to it. */
-  const TOOLS_GLYPHS = {
-    info: '<circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/>',
-    keyboard: '<rect x="3" y="6" width="18" height="12" rx="2"/>'
-      + '<path d="M7 10h.01M11 10h.01M15 10h.01M7 14h10"/>',
-    lock: '<rect x="4" y="10" width="16" height="10" rx="2"/>'
-      + '<path d="M8 10V7a4 4 0 0 1 8 0v3"/>',
-    sparkle: '<path d="M12 4l1.8 4.2L18 10l-4.2 1.8L12 16l-1.8-4.2L6 10l4.2-1.8z"/>'
-      + '<path d="M18 15l.9 2.1L21 18l-2.1.9L18 21l-.9-2.1L15 18l2.1-.9z"/>',
-    clock: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
-    folder: '<path d="M4 7h5l2 2h9v10H4z"/>',
-    save: '<path d="M5 4h11l3 3v13H5z"/><path d="M8 4v6h8V4M8 20v-6h8v6"/>',
-    play: '<path d="M7 5l12 7-12 7z"/>',
-  };
-
-  function toolsGlyph(label) {
-    const text = label.toLowerCase();
-    const rules = [
-      [/shortcut|control|key/, 'keyboard'],
-      [/privacy|local-only|local only|machine/, 'lock'],
-      [/provider|assistant|ai\b|capability|status/, 'sparkle'],
-      [/recent|history|month/, 'clock'],
-      [/storage|library|files|format/, 'folder'],
-      [/sav|autosave/, 'save'],
-      [/quick start|start/, 'play'],
-    ];
-    for (const [pattern, glyph] of rules) {
-      if (pattern.test(text)) return glyph;
-    }
-    return 'info';
-  }
-
-  function buildToolsRail() {
-    const rail = document.getElementById('tools-rail');
-    const body = document.querySelector('.tools__body');
-    if (!rail || !body) return;
-
-    U.clear(rail);
-    Array.from(body.querySelectorAll('.tools__section')).forEach((section, index) => {
-      const heading = section.querySelector('.tools__heading');
-      const label = heading ? heading.textContent.trim() : `Section ${index + 1}`;
-      const path = TOOLS_GLYPHS[toolsGlyph(label)];
-
-      const button = document.createElement('button');
-      button.type = 'button';
-      button.className = 'tools__rail-btn';
-      button.title = label;
-      button.setAttribute('aria-label', `Show tools: ${label}`);
-      button.innerHTML =
-        '<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor"'
-        + ' stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"'
-        + ` aria-hidden="true">${path}</svg>`;
-      button.addEventListener('click', () => {
-        setToolsCollapsed(false);
-        // Wait for the grid transition before measuring the target.
-        window.setTimeout(() => {
-          section.scrollIntoView({ block: 'start', behavior: 'smooth' });
-        }, 220);
-      });
-      rail.appendChild(button);
-    });
-  }
-
   /* Apply settings returned by the server after a settings change, so the
      shell reflects what was actually stored rather than what was requested. */
   function applyChrome(settings) {
     if (!settings) return;
     if ('sidebar_collapsed' in settings) {
       setSidebarCollapsed(Boolean(Number(settings.sidebar_collapsed)), false);
-    }
-    if ('tools_collapsed' in settings) {
-      setToolsCollapsed(Boolean(Number(settings.tools_collapsed)), false);
     }
     if (settings.motion) {
       document.documentElement.dataset.motion = settings.motion;
@@ -142,12 +67,6 @@
     if (!document.getElementById('app-shell')) return;
     const collapsed = shell.dataset.sidebarCollapsed === 'true';
     setSidebarCollapsed(!collapsed);
-  }
-
-  function toggleTools() {
-    if (!document.getElementById('app-shell')) return;
-    const collapsed = shell.dataset.toolsCollapsed === 'true';
-    setToolsCollapsed(!collapsed);
   }
 
   /* ------------------------------------------------------------------ */
@@ -532,10 +451,6 @@
         event.preventDefault();
         toggleSidebar();
         break;
-      case 'toggle-tools':
-        event.preventDefault();
-        toggleTools();
-        break;
       case 'toggle-theme':
         event.preventDefault();
         toggleTheme();
@@ -654,8 +569,6 @@
       node.textContent = node.textContent.replace(/Ctrl/g, modLabel);
     });
 
-    buildToolsRail();
-
     /* Keyboard theme switch, alongside the toolbar button. */
     document.addEventListener('keydown', (event) => {
       if (!(event.ctrlKey || event.metaKey) || event.shiftKey || event.altKey) return;
@@ -675,11 +588,8 @@
     openPalette,
     openHelp,
     toggleSidebar,
-    toggleTools,
     setSidebarCollapsed,
-    setToolsCollapsed,
     applyChrome,
-    buildToolsRail,
     setTheme,
     toggleTheme,
     currentTheme,

@@ -155,7 +155,7 @@ body[data-workspace="scout"] .topbar__kbd {
   margin-top: 8px;
   border-radius: var(--radius-lg);
   border: 1px solid color-mix(in srgb, var(--ink-950) 34%, transparent);
-  background: color-mix(in srgb, var(--ink-950) 18%, transparent);
+  background: #2f3543;
   box-shadow: 0 24px 60px -28px rgba(18, 34, 60, 0.72);
   overflow: hidden;
 }
@@ -239,7 +239,7 @@ body[data-workspace="scout"] .topbar__kbd {
 .panel {
   border-radius: var(--radius-lg);
   border: 1px solid color-mix(in srgb, var(--ink-950) 30%, transparent);
-  background: color-mix(in srgb, var(--ink-950) 16%, transparent);
+  background: #2f3543;
   box-shadow: 0 20px 50px -30px rgba(16, 32, 56, 0.7);
   overflow: hidden;
 }
@@ -268,7 +268,7 @@ body[data-workspace="scout"] .topbar__kbd {
 }
 
 .panel__head .input {
-  background: color-mix(in srgb, var(--ink-950) 90%, transparent);
+  background: #2f3543;
   border-color: color-mix(in srgb, var(--ink-950) 50%, transparent);
   color: #14263c;
   font-size: 12.5px;
@@ -302,7 +302,7 @@ body[data-workspace="scout"] .topbar__kbd {
 }
 
 .session.is-active {
-  background: color-mix(in srgb, var(--ink-950) 90%, transparent);
+  background: #2f3543;
   border-color: color-mix(in srgb, var(--ink-950) 90%, transparent);
 }
 
@@ -411,18 +411,20 @@ body[data-workspace="scout"] .topbar__kbd {
   font-size: 10.5px;
   font-weight: 650;
   border: 1px solid color-mix(in srgb, var(--ink-950) 36%, transparent);
-  background: color-mix(in srgb, var(--ink-950) 18%, transparent);
+  background: #2f3543;
   color: #ffffff;
 }
 
 .badge--searched {
   border-color: rgba(180, 255, 220, 0.6);
-  background: rgba(30, 120, 90, 0.42);
+  background: #0b2b28;
+  color: #b9f5e2;
 }
 
 .badge--none {
   border-color: rgba(255, 220, 170, 0.6);
-  background: rgba(150, 90, 30, 0.4);
+  background: #33260f;
+  color: #ffdfae;
 }
 
 .detail__body {
@@ -608,7 +610,7 @@ body[data-workspace="scout"] .topbar__kbd {
   padding: 13px;
   border-radius: var(--radius);
   border: 1px solid color-mix(in srgb, var(--ink-950) 36%, transparent);
-  background: color-mix(in srgb, var(--ink-950) 16%, transparent);
+  background: #2f3543;
 }
 
 .note-form textarea,

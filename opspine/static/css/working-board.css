@@ -82,7 +82,7 @@ body[data-workspace="working-board"] .topbar {
   padding: 8px 11px;
   border-radius: var(--radius-sm);
   border: 1px solid rgba(255, 138, 61, 0.2);
-  background: rgba(20, 15, 10, 0.85);
+  background: #1b1610;
   color: #f7ece2;
   font-size: 12.5px;
   width: 190px;
@@ -172,7 +172,7 @@ body[data-workspace="working-board"] .topbar {
   min-width: 0;
   border-radius: var(--radius-lg);
   border: 1px solid rgba(255, 138, 61, 0.14);
-  background: rgba(16, 12, 8, 0.72);
+  background: #1b1610;
   overflow: hidden;
 }
 
@@ -253,7 +253,7 @@ body[data-workspace="working-board"] .topbar {
   padding: 10px 11px;
   border-radius: var(--radius);
   border: 1px solid color-mix(in srgb, var(--ink-950) 8%, transparent);
-  background: rgba(28, 21, 14, 0.92);
+  background: #1b1610;
   text-align: left;
   cursor: pointer;
   transition: border-color var(--dur-fast), transform var(--dur-fast),
@@ -455,7 +455,7 @@ body[data-workspace="working-board"] .topbar {
   padding: 3px 8px;
   border-radius: var(--radius-pill);
   border: 1px solid rgba(255, 138, 61, 0.32);
-  background: rgba(255, 138, 61, 0.1);
+  background: #1b1610;
   color: #ffb37a;
 }
 

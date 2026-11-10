@@ -20,6 +20,10 @@ body[data-workspace="abyss"] {
   --thread-max: 768px;
 
   display: grid;
+  /* Areas, not auto-placement: when the history rail is display:none it
+     leaves the grid flow entirely, and auto-placement would slide the
+     conversation column into the now-zero-width first track. */
+  grid-template-areas: "nav main tools";
   grid-template-columns: var(--nav-w) minmax(0, 1fr) var(--tools-w);
   height: 100vh;
   height: 100dvh;
@@ -55,6 +59,7 @@ body[data-workspace="abyss"] {
    Left rail — conversation history
    ========================================================================== */
 .chat-nav {
+  grid-area: nav;
   display: flex;
   flex-direction: column;
   min-width: 0;
@@ -345,6 +350,7 @@ body[data-workspace="abyss"] {
    Centre column
    ========================================================================== */
 .chat-main {
+  grid-area: main;
   display: flex;
   flex-direction: column;
   min-width: 0;
@@ -762,6 +768,7 @@ html[data-motion="still"] .spinner {
    Right rail — toolbox
    ========================================================================== */
 .chat-tools {
+  grid-area: tools;
   display: flex;
   min-width: 0;
   min-height: 0;
@@ -1065,6 +1072,7 @@ html[data-motion="still"] .spinner {
    preference and must not shove a panel over a phone screen). */
 @media (max-width: 1020px) {
   .chat {
+    grid-template-areas: "nav main";
     grid-template-columns: var(--nav-w) minmax(0, 1fr);
   }
 
@@ -1121,6 +1129,7 @@ html[data-motion="still"] .chat-scrim {
 /* Phones: history is a drawer, the thread gets the whole screen. */
 @media (max-width: 780px) {
   .chat {
+    grid-template-areas: "main";
     grid-template-columns: minmax(0, 1fr);
   }
 

@@ -3,6 +3,30 @@
 {% block title %}Scout{% endblock %}
 
 {% block workspace %}
+  {# Workspace-owned context. Previously this lived in a global
+     right-hand panel; it belongs to this tool, so it renders here. #}
+  <div class="ws-aside" data-ws-aside>
+
+  <section class="tools__section">
+    <h2 class="tools__heading">Research provider</h2>
+    <div class="prov-card" id="scout-prov"></div>
+    <a class="tools__link" href="/settings">Configure in Settings →</a>
+  </section>
+  
+  <section class="tools__section">
+    <h2 class="tools__heading">What Scout will not do</h2>
+    <ul class="tools__keys">
+      <li><span>Invent citations</span></li>
+      <li><span>Claim a source was read</span></li>
+      <li><span>Score truth without evidence</span></li>
+    </ul>
+    <p class="tools__para" style="margin-top:10px">
+      When no provider is available, Scout still records your notes and links.
+      It will say plainly that it could not search.
+    </p>
+  </section>
+  </div>
+
 <div class="scout" data-scout>
   {# Decorative sky: behind content, pointer-events none. #}
   <div class="sky" aria-hidden="true">
@@ -59,23 +83,4 @@
 </div>
 {% endblock %}
 
-{% block tools %}
-<section class="tools__section">
-  <h2 class="tools__heading">Research provider</h2>
-  <div class="prov-card" id="scout-prov"></div>
-  <a class="tools__link" href="/settings">Configure in Settings →</a>
-</section>
 
-<section class="tools__section">
-  <h2 class="tools__heading">What Scout will not do</h2>
-  <ul class="tools__keys">
-    <li><span>Invent citations</span></li>
-    <li><span>Claim a source was read</span></li>
-    <li><span>Score truth without evidence</span></li>
-  </ul>
-  <p class="tools__para" style="margin-top:10px">
-    When no provider is available, Scout still records your notes and links.
-    It will say plainly that it could not search.
-  </p>
-</section>
-{% endblock %}

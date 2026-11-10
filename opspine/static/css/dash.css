@@ -188,7 +188,7 @@ body[data-workspace="dash"] .topbar {
   max-width: 260px;
   padding: 6px 10px;
   border: 1px solid var(--d-line);
-  background: rgba(6, 10, 18, 0.8);
+  background: #132135;
   color: #d7e6ec;
   font-family: var(--d-mono);
   font-size: 11.5px;

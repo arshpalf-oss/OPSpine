@@ -3,6 +3,30 @@
 {% block title %}Forge{% endblock %}
 
 {% block workspace %}
+  {# Workspace-owned context. Previously this lived in a global
+     right-hand panel; it belongs to this tool, so it renders here. #}
+  <div class="ws-aside" data-ws-aside>
+
+  <section class="tools__section">
+    <h2 class="tools__heading">Library</h2>
+    <dl class="tools__stats">
+      <div><dt>Files stored</dt><dd>{{ counts.documents }}</dd></div>
+      <div><dt>Location</dt><dd>data/documents</dd></div>
+    </dl>
+    <a class="tools__link" href="/library">Open Library →</a>
+  </section>
+  
+  <section class="tools__section">
+    <h2 class="tools__heading">Format notes</h2>
+    <ul class="tools__keys">
+      <li><span>PPTX</span><kbd>headings → slides</kbd></li>
+      <li><span>XLSX</span><kbd>csv rows</kbd></li>
+      <li><span>PDF</span><kbd>sections</kbd></li>
+      <li><span>PNG</span><kbd>title + body</kbd></li>
+    </ul>
+  </section>
+  </div>
+
 <div class="forge" data-forge>
   <div class="forge__grid">
     {# ---------------- configuration ---------------- #}
@@ -133,23 +157,4 @@
 </div>
 {% endblock %}
 
-{% block tools %}
-<section class="tools__section">
-  <h2 class="tools__heading">Library</h2>
-  <dl class="tools__stats">
-    <div><dt>Files stored</dt><dd>{{ counts.documents }}</dd></div>
-    <div><dt>Location</dt><dd>data/documents</dd></div>
-  </dl>
-  <a class="tools__link" href="/library">Open Library →</a>
-</section>
 
-<section class="tools__section">
-  <h2 class="tools__heading">Format notes</h2>
-  <ul class="tools__keys">
-    <li><span>PPTX</span><kbd>headings → slides</kbd></li>
-    <li><span>XLSX</span><kbd>csv rows</kbd></li>
-    <li><span>PDF</span><kbd>sections</kbd></li>
-    <li><span>PNG</span><kbd>title + body</kbd></li>
-  </ul>
-</section>
-{% endblock %}

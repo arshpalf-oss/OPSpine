@@ -422,7 +422,7 @@ body[data-workspace="forge"] .topbar {
 .made__preview {
   border-radius: var(--radius);
   border: 1px solid color-mix(in srgb, var(--ink-950) 9%, transparent);
-  background: rgba(0, 0, 0, 0.4);
+  background: #12151c;
   padding: 14px;
   overflow: auto;
   max-height: 260px;
@@ -466,7 +466,7 @@ body[data-workspace="forge"] .topbar {
 .out__history {
   border-radius: var(--radius-lg);
   border: 1px solid color-mix(in srgb, var(--ink-950) 9%, transparent);
-  background: rgba(11, 12, 18, 0.7);
+  background: #12151c;
   padding: 16px;
 }
 
