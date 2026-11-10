@@ -32,6 +32,9 @@
     closeOut: document.getElementById('quill-close-out'),
     insert: document.getElementById('quill-insert'),
     append: document.getElementById('quill-append'),
+    count: document.getElementById('quill-count'),
+    exportTxt: document.getElementById('quill-export-txt'),
+    exportMd: document.getElementById('quill-export-md'),
   };
 
   const state = {
@@ -84,6 +87,14 @@
   }
 
   function renderDrafts() {
+    const query = dom.search.value.trim();
+    if (dom.count) {
+      dom.count.textContent = state.drafts.length
+        ? (query
+          ? `${state.drafts.length} match${state.drafts.length === 1 ? '' : 'es'} for “${query}”`
+          : `${state.drafts.length} draft${state.drafts.length === 1 ? '' : 's'}`)
+        : (query ? `No matches for “${query}”` : '');
+    }
     U.clear(dom.list);
     if (!state.drafts.length) {
       dom.list.appendChild(
@@ -119,7 +130,7 @@
             html: '<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 7h14M9 7V5h6v2M7 7l1 12h8l1-12"/></svg>',
             onClick: (event) => {
               event.stopPropagation();
-              deleteDraft(draft, true);
+              deleteDraft(draft);
             },
           }),
         ])
@@ -157,6 +168,7 @@
 
       setSaveState(`Saved ${U.relativeTime(data.draft.updated_at)}`, 'is-saved');
       updateStats();
+      syncExportButtons();
       renderDrafts();
       dom.editor.focus();
     } catch (err) {
@@ -212,6 +224,7 @@
     dom.del.disabled = true;
     setSaveState('No draft open', '');
     updateStats();
+    syncExportButtons();
     renderDrafts();
   }
 
@@ -221,6 +234,8 @@
       const data = await api.post('/api/quill/drafts', { title: 'Untitled draft' });
       await loadDrafts();
       await openDraft(data.draft.id);
+      /* openDraft focuses the body; a brand-new draft wants its title. */
+      dom.title.focus();
       dom.title.select();
       window.OPS.shell.refreshActivity();
     } catch (err) {
@@ -228,19 +243,12 @@
     }
   }
 
-  async function deleteDraft(draft, fromList) {
-    if (state.dirty && state.current && state.current.id === draft.id) {
-      const ok = await U.confirm({
-        title: 'Discard unsaved changes?',
-        message: 'This draft has changes that have not been saved. Deleting now loses them.',
-        confirmLabel: 'Delete anyway',
-      });
-      if (!ok) return;
-    }
-
+  async function deleteDraft(draft) {
+    const unsaved = state.dirty && state.current && state.current.id === draft.id;
     const ok = await U.confirm({
       title: 'Delete draft?',
-      message: `“${draft.title || 'Untitled draft'}” will be permanently removed from this machine.`,
+      message: `“${draft.title || 'Untitled draft'}” will be permanently removed from this machine.`
+        + (unsaved ? ' The unsaved changes in the editor will be lost too.' : ''),
       confirmLabel: 'Delete draft',
     });
     if (!ok) return;
@@ -254,6 +262,48 @@
     } catch (err) {
       U.error(err.message);
     }
+  }
+
+  /* ------------------------------------------------------------------ */
+  /* Export                                                             */
+  /* ------------------------------------------------------------------ */
+  function safeName(title) {
+    const base = (title || 'untitled').toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '')
+      .slice(0, 60);
+    return base || 'untitled';
+  }
+
+  function download(name, text, type) {
+    const blob = new Blob([text], { type });
+    const url = URL.createObjectURL(blob);
+    const link = U.el('a', { href: url, download: name });
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    /* Revoke on a later tick so the download has already started. */
+    setTimeout(() => URL.revokeObjectURL(url), 2000);
+    U.success(`${name} downloaded.`);
+  }
+
+  function exportDraft(format) {
+    if (!state.current) return;
+    const title = dom.title.value.trim() || 'Untitled draft';
+    const body = dom.editor.value.trim();
+    if (format === 'md') {
+      download(`${safeName(title)}.md`, `# ${title}\n\n${body}\n`, 'text/markdown;charset=utf-8');
+    } else {
+      download(`${safeName(title)}.txt`,
+        `${title}\n${'='.repeat(title.length)}\n\n${body}\n`,
+        'text/plain;charset=utf-8');
+    }
+  }
+
+  function syncExportButtons() {
+    const open = Boolean(state.current);
+    dom.exportTxt.disabled = !open;
+    dom.exportMd.disabled = !open;
   }
 
   /* ------------------------------------------------------------------ */
@@ -366,7 +416,7 @@
   dom.save.addEventListener('click', () => saveDraft({ force: true }));
 
   dom.del.addEventListener('click', () => {
-    if (state.current) deleteDraft(state.current, false);
+    if (state.current) deleteDraft(state.current);
   });
 
   dom.newBtn.addEventListener('click', createDraft);
@@ -376,7 +426,7 @@
     loadDrafts(dom.search.value.trim());
   }, 220));
 
-  U.$$('[data-tool]').forEach((button) => {
+  U.$$('[data-tool]', root).forEach((button) => {
     button.addEventListener('click', () => {
       runTool(button.dataset.tool, button.textContent.trim());
     });
@@ -390,6 +440,24 @@
 
   dom.closeOut.addEventListener('click', () => {
     dom.toolout.hidden = true;
+  });
+
+  dom.exportTxt.addEventListener('click', () => exportDraft('txt'));
+  dom.exportMd.addEventListener('click', () => exportDraft('md'));
+
+  /* Ctrl/Cmd+S saves; Escape closes the result drawer. Both stand down while
+     the confirm dialog is open so they cannot fight the dialog. */
+  document.addEventListener('keydown', (event) => {
+    if (document.querySelector('#confirm[data-open]')) return;
+    if ((event.metaKey || event.ctrlKey) && (event.key === 's' || event.key === 'S')) {
+      event.preventDefault();
+      if (state.current) saveDraft({ force: true });
+      return;
+    }
+    if (event.key === 'Escape' && !dom.toolout.hidden) {
+      dom.toolout.hidden = true;
+      dom.closeOut.focus();
+    }
   });
 
   dom.insert.addEventListener('click', () => {
@@ -436,6 +504,7 @@
   /* ------------------------------------------------------------------ */
   (async function init() {
     renderProviders();
+    syncExportButtons();
     clearEditor();
     await loadDrafts();
 

@@ -1031,3 +1031,53 @@ html:not([data-theme="dark"]) .theme-icon--moon {
 .ws-aside .tools__heading {
   margin-bottom: 8px;
 }
+
+/* --------------------------------------------------------------------------
+   Text prompt — shares the confirm shell, adds a field.
+   -------------------------------------------------------------------------- */
+#prompt .confirm {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+#prompt .confirm__message {
+  margin-bottom: 0;
+}
+
+#prompt .confirm__message[hidden] {
+  display: none;
+}
+
+#prompt .confirm__actions {
+  margin-top: 6px;
+}
+
+#prompt .input {
+  width: 100%;
+}
+
+/* Toasts can carry one action, normally Undo. */
+.toast__action {
+  margin-left: 4px;
+  padding: 3px 9px;
+  border-radius: 999px;
+  border: 1px solid var(--line-strong);
+  background: transparent;
+  color: var(--ink-900);
+  font-size: 11px;
+  font-weight: 650;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+.toast__action:hover {
+  background: var(--ink-100);
+  border-color: var(--ink-500);
+}
+
+.toast__action:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--bg), 0 0 0 4px var(--accent);
+}

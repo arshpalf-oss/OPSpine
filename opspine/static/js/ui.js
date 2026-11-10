@@ -107,7 +107,18 @@
   /* ---------- toasts ---------- */
   const toastHost = () => document.getElementById('toasts');
 
+  /* U.toast(message, kind, timeout) or U.toast({ message, kind, timeout,
+     action: { label, onClick } }). An action turns the toast into an undo
+     prompt, which keeps a destructive-looking change reversible. */
   U.toast = function (message, kind = 'info', timeout = 4200) {
+    let action = null;
+    if (message && typeof message === 'object') {
+      const options = message;
+      message = options.message;
+      kind = options.kind || 'info';
+      timeout = options.timeout || (options.action ? 8000 : 4200);
+      action = options.action || null;
+    }
     const host = toastHost();
     if (!host) return;
     const node = U.el('div', { class: `toast toast--${kind}`, role: 'status' }, [
@@ -118,12 +129,25 @@
     while (host.children.length >= 3) {
       host.removeChild(host.firstElementChild);
     }
-    host.appendChild(node);
     const remove = () => {
       node.style.transition = 'opacity 160ms ease';
       node.style.opacity = '0';
       setTimeout(() => node.remove(), 180);
     };
+    if (action && typeof action.onClick === 'function') {
+      const button = U.el('button', {
+        class: 'toast__action',
+        type: 'button',
+        text: action.label || 'Undo',
+      });
+      button.addEventListener('click', (event) => {
+        event.stopPropagation();
+        action.onClick();
+        remove();
+      });
+      node.appendChild(button);
+    }
+    host.appendChild(node);
     setTimeout(remove, timeout);
     node.addEventListener('click', remove);
   };
@@ -164,6 +188,52 @@
       const resolve = confirmResolver;
       confirmResolver = null;
       resolve(Boolean(result));
+    }
+  };
+
+  /* ---------- text prompt ---------- */
+  let promptResolver = null;
+
+  /* Resolves with the trimmed text, or null when cancelled. Falls back to
+     window.prompt only when the shared dialog is not on the page. */
+  U.prompt = function (options = {}) {
+    const overlay = document.getElementById('prompt');
+    const input = document.getElementById('prompt-input');
+    if (!overlay || !input) {
+      const answer = window.prompt(options.title || 'Enter a value', options.value || '');
+      return Promise.resolve(answer === null ? null : answer.trim());
+    }
+    document.getElementById('prompt-title').textContent = options.title || 'Enter a value';
+    const hint = document.getElementById('prompt-hint');
+    hint.textContent = options.message || '';
+    hint.hidden = !options.message;
+    document.getElementById('prompt-label').textContent = options.label || options.title || 'Value';
+    input.value = options.value || '';
+    input.maxLength = options.maxLength || 160;
+    input.placeholder = options.placeholder || '';
+    const accept = document.getElementById('prompt-accept');
+    accept.textContent = options.confirmLabel || 'Save';
+    accept.classList.toggle('btn--danger', Boolean(options.danger));
+
+    overlay.hidden = false;
+    overlay.dataset.open = 'true';
+    input.focus();
+    input.select();
+
+    return new Promise((resolve) => {
+      promptResolver = resolve;
+    });
+  };
+
+  U.closePrompt = function (value) {
+    const overlay = document.getElementById('prompt');
+    if (!overlay || overlay.hidden) return;
+    overlay.hidden = true;
+    delete overlay.dataset.open;
+    if (promptResolver) {
+      const resolve = promptResolver;
+      promptResolver = null;
+      resolve(value === null || value === undefined ? null : String(value).trim());
     }
   };
 
@@ -224,10 +294,10 @@
     };
   };
 
-  U.copy = async function (text) {
+  U.copy = async function (text, message = 'Copied to clipboard.') {
     try {
       await navigator.clipboard.writeText(text);
-      U.success('Copied to clipboard.');
+      U.success(message);
       return true;
     } catch (err) {
       U.error('The browser blocked clipboard access.');

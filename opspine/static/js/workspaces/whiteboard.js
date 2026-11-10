@@ -26,11 +26,15 @@
     zoomIn: document.getElementById('wb-zoom-in'),
     zoomOut: document.getElementById('wb-zoom-out'),
     zoomReset: document.getElementById('wb-zoom-reset'),
+    zoomFit: document.getElementById('wb-zoom-fit'),
+    renameBoard: document.getElementById('wb-rename-board'),
     editor: document.getElementById('wb-editor'),
     editorInput: document.getElementById('wb-editor-input'),
     editorDone: document.getElementById('wb-editor-done'),
     editorDelete: document.getElementById('wb-editor-delete'),
     stats: document.getElementById('wb-stats'),
+    saveState: document.getElementById('wb-save-state'),
+    undo: document.getElementById('wb-undo'),
   };
 
   const state = {
@@ -53,6 +57,17 @@
   /* ------------------------------------------------------------------ */
   function uid() {
     return `n${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`;
+  }
+
+  /* setPointerCapture is optional: it smooths dragging but is not
+     implemented in every engine, so a failure must not abort the gesture. */
+  function capturePointer(element, pointerId) {
+    if (!element || typeof element.setPointerCapture !== 'function') return;
+    try {
+      element.setPointerCapture(pointerId);
+    } catch (err) {
+      /* Dragging still works from pointermove on the stage. */
+    }
   }
 
   function nodeById(id) {
@@ -87,6 +102,56 @@
   function markDirty() {
     state.dirty = true;
     dom.save.classList.add('is-active');
+    syncSaveState();
+  }
+
+  /* The stage carries its own status so unsaved work is never invisible. */
+  function syncSaveState() {
+    if (!dom.saveState) return;
+    dom.saveState.textContent = state.dirty ? 'Unsaved changes' : 'Saved';
+    dom.saveState.classList.toggle('is-dirty', state.dirty);
+  }
+
+  /* ------------------------------------------------------------------ */
+  /* Undo — a bounded stack of board snapshots                          */
+  /* ------------------------------------------------------------------ */
+  const HISTORY_LIMIT = 30;
+  const history = [];
+
+  function snapshot() {
+    return JSON.stringify({ nodes: state.data.nodes, links: state.data.links });
+  }
+
+  function pushHistory() {
+    history.push(snapshot());
+    if (history.length > HISTORY_LIMIT) history.shift();
+    syncUndoButton();
+  }
+
+  function syncUndoButton() {
+    if (dom.undo) dom.undo.disabled = history.length === 0;
+  }
+
+  /* Restore the last snapshot. Editing state is cleared first so the
+     editor cannot write a stale note back over the restored board. */
+  function undo() {
+    if (!history.length) {
+      U.toast('Nothing left to undo.');
+      return;
+    }
+    const previous = JSON.parse(history.pop());
+    if (state.editingId) {
+      state.editingId = null;
+      dom.editor.hidden = true;
+    }
+    state.data.nodes = previous.nodes;
+    state.data.links = previous.links;
+    state.selected = null;
+    state.linkSource = null;
+    markDirty();
+    render();
+    syncUndoButton();
+    U.toast('Undone.');
   }
 
   /* ------------------------------------------------------------------ */
@@ -177,10 +242,39 @@
       path.setAttribute('stroke', 'rgba(196,161,255,0.55)');
       path.setAttribute('stroke-width', '1.6');
       path.setAttribute('stroke-dasharray', '5 4');
+      /* Links have to be removable from the board, not just addable. A wide
+         invisible hit path keeps the target comfortable to click. */
+      path.classList.add('link-line');
+      path.addEventListener('click', (event) => {
+        event.stopPropagation();
+        removeLink(link);
+      });
       dom.links.appendChild(path);
+
+      const hit = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+      hit.setAttribute('d', path.getAttribute('d'));
+      hit.setAttribute('fill', 'none');
+      hit.setAttribute('stroke', 'transparent');
+      hit.setAttribute('stroke-width', '14');
+      hit.setAttribute('class', 'link-hit');
+      hit.addEventListener('click', (event) => {
+        event.stopPropagation();
+        removeLink(link);
+      });
+      dom.links.appendChild(hit);
     });
     /* Keep the SVG viewsize in sync with the stage. */
     dom.links.setAttribute('viewBox', `0 0 ${width} ${height}`);
+  }
+
+  function removeLink(link) {
+    pushHistory();
+    state.data.links = state.data.links.filter(
+      (item) => !(item.from === link.from && item.to === link.to)
+    );
+    markDirty();
+    render();
+    U.success('Link removed.');
   }
 
   function renderStats() {
@@ -214,7 +308,7 @@
     const startBoard = toBoard(event);
     const origin = { x: node.x, y: node.y };
     state.dragging = { id: node.id, startBoard, origin, moved: false };
-    dom.stage.setPointerCapture(event.pointerId);
+    capturePointer(dom.stage, event.pointerId);
 
     const target = event.currentTarget;
     target.classList.add('is-dragging');
@@ -241,6 +335,7 @@
     if (exists) {
       U.error('Those notes are already connected.');
     } else {
+      pushHistory();
       state.data.links.push({ from: state.linkSource, to: node.id });
       markDirty();
       U.success('Notes connected.');
@@ -257,7 +352,7 @@
         origin: { ...state.data.viewport },
       };
       dom.stage.classList.add('is-panning');
-      dom.stage.setPointerCapture(event.pointerId);
+      capturePointer(dom.stage, event.pointerId);
       return;
     }
 
@@ -356,6 +451,7 @@
   /* Notes: add, edit, delete                                           */
   /* ------------------------------------------------------------------ */
   function addNode(x, y) {
+    pushHistory();
     const node = {
       id: uid(),
       text: '',
@@ -376,6 +472,7 @@
     const node = nodeById(id);
     if (!node) return;
     state.editingId = id;
+    state.editingSnapshot = snapshot();
     dom.editor.hidden = false;
     dom.editorInput.value = node.text;
     state.colour = node.color;
@@ -410,15 +507,25 @@
       if (node && !node.text && empty) {
         state.data.nodes = state.data.nodes.filter((n) => n.id !== node.id);
       }
+      if (node && node.text) {
+        /* Text changed through typing: one snapshot per editing session. */
+        if (state.editingSnapshot && state.editingSnapshot !== snapshot()) {
+          history.push(state.editingSnapshot);
+          if (history.length > HISTORY_LIMIT) history.shift();
+        }
+        syncUndoButton();
+      }
       markDirty();
     }
     state.editingId = null;
+    state.editingSnapshot = null;
     dom.editor.hidden = true;
     render();
   }
 
   function deleteNode(id) {
     const before = state.data.nodes.length;
+    pushHistory();
     state.data.nodes = state.data.nodes.filter((node) => node.id !== id);
     state.data.links = state.data.links.filter(
       (link) => link.from !== id && link.to !== id
@@ -491,6 +598,35 @@
     markDirty();
   });
 
+  /* Frame every note. With nothing on the board this is just a reset. */
+  dom.zoomFit.addEventListener('click', () => {
+    const nodes = state.data.nodes;
+    if (!nodes.length) {
+      state.data.viewport = { x: 0, y: 0, zoom: 1 };
+      render();
+      return;
+    }
+    const NODE_W = 184;
+    const NODE_H = 64;
+    const minX = Math.min(...nodes.map((n) => n.x));
+    const minY = Math.min(...nodes.map((n) => n.y));
+    const maxX = Math.max(...nodes.map((n) => n.x + NODE_W));
+    const maxY = Math.max(...nodes.map((n) => n.y + NODE_H));
+    const pad = 48;
+    const width = dom.stage.clientWidth - pad * 2;
+    const height = dom.stage.clientHeight - pad * 2;
+    const zoom = Math.min(1.4, Math.max(0.25,
+      Math.min(width / (maxX - minX), height / (maxY - minY))));
+    state.data.viewport = {
+      zoom: Number(zoom.toFixed(2)),
+      x: Math.round((dom.stage.clientWidth - (maxX - minX) * zoom) / 2 - minX * zoom),
+      y: Math.round((dom.stage.clientHeight - (maxY - minY) * zoom) / 2 - minY * zoom),
+    };
+    render();
+    markDirty();
+    U.toast(`Zoomed to fit ${nodes.length} note${nodes.length === 1 ? '' : 's'}.`);
+  });
+
   /* Ctrl + wheel zooms; plain wheel pans vertically. */
   dom.stage.addEventListener('wheel', (event) => {
     if (event.ctrlKey || event.metaKey) {
@@ -546,19 +682,28 @@
       state.dirty = false;
       state.selected = null;
       state.linkSource = null;
+      history.length = 0;
+      syncUndoButton();
       closeEditor();
       render();
+      syncSaveState();
     } catch (err) {
       U.error(err.message);
     }
   }
 
   async function createBoard() {
-    const name = window.prompt('Name this board', 'Untitled board');
+    const name = await U.prompt({
+      title: 'New board',
+      message: 'Boards hold their own notes and links.',
+      label: 'Board name',
+      value: `Board ${state.boards.length + 1}`,
+      confirmLabel: 'Create board',
+    });
     if (name === null) return;
     try {
       const data = await api.post('/api/whiteboard/boards', {
-        name: name.trim() || 'Untitled board',
+        name: name || 'Untitled board',
       });
       await loadBoards(data.board.id);
       await openBoard(data.board.id);
@@ -582,6 +727,7 @@
       });
       state.dirty = false;
       render();
+      syncSaveState();
       U.success('Board saved.');
       await loadBoards(state.board.id);
       window.OPS.shell.refreshActivity();
@@ -590,6 +736,31 @@
     } finally {
       dom.save.disabled = false;
       dom.save.textContent = 'Save';
+    }
+  }
+
+  async function renameBoard() {
+    if (!state.board) return;
+    const name = await U.prompt({
+      title: 'Rename board',
+      label: 'Board name',
+      value: state.board.name,
+      confirmLabel: 'Rename',
+    });
+    if (name === null || !name || name === state.board.name) return;
+    try {
+      await api.put(`/api/whiteboard/boards/${state.board.id}`, {
+        name,
+        data: state.data,
+      });
+      state.board.name = name;
+      state.dirty = false;
+      await loadBoards(state.board.id);
+      render();
+      U.success('Board renamed.');
+      window.OPS.shell.refreshActivity();
+    } catch (err) {
+      U.error(err.message);
     }
   }
 
@@ -622,6 +793,7 @@
   dom.boards.addEventListener('change', () => {
     const id = Number(dom.boards.value);
     if (!id) return;
+    if (state.board && id === state.board.id) return;
     if (state.dirty) {
       U.confirm({
         title: 'Unsaved board changes',
@@ -637,7 +809,18 @@
   });
 
   dom.newBoard.addEventListener('click', createBoard);
+  dom.renameBoard.addEventListener('click', renameBoard);
   dom.save.addEventListener('click', saveBoard);
+  dom.undo.addEventListener('click', undo);
+
+  /* Drop any pending unsaved work in favour of the dialog actions: they
+     are explicit, and every path back to a saved state is one click away. */
+  dom.save.addEventListener('keydown', (event) => {
+    if (event.key === 's' && (event.metaKey || event.ctrlKey)) {
+      event.preventDefault();
+      saveBoard();
+    }
+  });
   dom.deleteBoard.addEventListener('click', deleteBoard);
   dom.emptyAdd.addEventListener('click', () => setTool('note'));
 
@@ -656,6 +839,9 @@
     } else if ((event.metaKey || event.ctrlKey) && event.key === 's') {
       event.preventDefault();
       saveBoard();
+    } else if ((event.metaKey || event.ctrlKey) && event.key === 'z') {
+      event.preventDefault();
+      undo();
     } else if (event.key === 'Escape') {
       state.selected = null;
       state.linkSource = null;

@@ -539,6 +539,7 @@ body[data-workspace="working-board"] .topbar {
 
 .detail__actions {
   display: flex;
+  align-items: center;
   gap: 7px;
   flex-wrap: wrap;
   padding-top: 4px;
@@ -646,5 +647,88 @@ body[data-workspace="working-board"] .topbar {
 
   .detail__pair {
     grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* ---------------- per-card moves, panel status, dirty hint ---------------- */
+.tcard__moves {
+  display: flex;
+  gap: 4px;
+  padding: 0 2px 2px;
+  opacity: 0;
+  transition: opacity 120ms ease;
+}
+
+li:hover > .tcard__moves,
+.tcard__moves:focus-within {
+  opacity: 1;
+}
+
+.tcard__move {
+  flex: 1;
+  padding: 3px 6px;
+  border-radius: 6px;
+  border: 1px solid rgba(196, 161, 255, 0.2);
+  background: #201a2e;
+  color: #c9cddb;
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.tcard__move:hover {
+  border-color: rgba(196, 161, 255, 0.5);
+  color: #f0e9ff;
+}
+
+.wboard__move {
+  padding: 8px 13px;
+  border-radius: 8px;
+  border: 1px solid rgba(196, 161, 255, 0.28);
+  background: #211a33;
+  color: #e6ddff;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.wboard__move:hover:not([disabled]) {
+  border-color: rgba(196, 161, 255, 0.6);
+}
+
+.wboard__move[disabled] {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.wboard__status {
+  margin: 0 0 8px;
+  padding: 0 2px;
+  font-size: 11.5px;
+  color: #9aa4b6;
+  min-height: 0;
+}
+
+.wboard__status:empty {
+  display: none;
+}
+
+.detail__hint {
+  margin-right: auto;
+  font-size: 10.5px;
+  font-weight: 650;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #ffd166;
+}
+
+.detail__hint[hidden] {
+  display: none;
+}
+
+@media (hover: none) {
+  .tcard__moves {
+    opacity: 1;
   }
 }

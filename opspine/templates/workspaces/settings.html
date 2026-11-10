@@ -3,37 +3,6 @@
 {% block title %}Settings{% endblock %}
 
 {% block workspace %}
-  {# Workspace-owned context. Previously this lived in a global
-     right-hand panel; it belongs to this tool, so it renders here. #}
-  <div class="ws-aside" data-ws-aside>
-
-  <section class="tools__section">
-    <h2 class="tools__heading">Active capability</h2>
-    <dl class="tools__stats" id="set-capability">
-      <div><dt>Local-only</dt><dd>on</dd></div>
-      <div><dt>AI</dt><dd>none</dd></div>
-      <div><dt>Search</dt><dd>none</dd></div>
-    </dl>
-  </section>
-  
-  <section class="tools__section">
-    <h2 class="tools__heading">Privacy</h2>
-    <p class="tools__para">
-      Keys are stored in the local SQLite database. OPSpine has no analytics, no
-      crash reporting and no cloud sync. Outbound requests happen only when you
-      explicitly use a configured provider, and never while local-only is on.
-    </p>
-  </section>
-  
-  <section class="tools__section">
-    <h2 class="tools__heading">Shortcuts</h2>
-    <ul class="tools__keys">
-      <li><kbd>?</kbd><span>Shortcut sheet</span></li>
-      <li><kbd>Ctrl K</kbd><span>Command palette</span></li>
-      <li><kbd>Esc</kbd><span>Close panels</span></li>
-    </ul>
-  </section>
-  </div>
 
 <div class="settings" data-settings>
   <header class="settings__head">
@@ -70,6 +39,39 @@
     </label>
 
     <div class="panel__status" id="set-local-status"></div>
+  </section>
+
+  {# ---------- appearance ---------- #}
+  <section class="panel" aria-labelledby="set-theme">
+    <div class="panel__head">
+      <div>
+        <h3 class="panel__title" id="set-theme">Appearance</h3>
+        <p class="panel__hint">
+          Both themes are complete. The switch here is the same setting as the
+          theme button in every toolbar.
+        </p>
+      </div>
+      <span class="panel__badge" id="set-theme-badge">light</span>
+    </div>
+
+    <div class="segmented" id="set-theme-group" role="radiogroup" aria-label="Theme">
+      <button class="segmented__btn" type="button" role="radio" aria-checked="false"
+              data-theme-choice="light">Light</button>
+      <button class="segmented__btn" type="button" role="radio" aria-checked="false"
+              data-theme-choice="dark">Dark</button>
+    </div>
+
+    <label class="switchrow">
+      <span class="switchrow__copy">
+        <strong>Open the launcher instead of the last workspace</strong>
+        <em>
+          On: every visit starts at the Dashboard. Off: OPSpine resumes the room
+          you were last in.
+        </em>
+      </span>
+      <input type="checkbox" id="set-launch-toggle" hidden>
+      <span class="switch__track" aria-hidden="true"><span class="switch__thumb"></span></span>
+    </label>
   </section>
 
   {# ---------- providers ---------- #}
@@ -296,7 +298,7 @@
       </div>
     </dl>
 
-    <div class="dangerzone">
+    <div class="dangerzone" id="set-danger">
       <div>
         <strong>Delete all local data</strong>
         <em>
@@ -308,7 +310,57 @@
         Delete everything
       </button>
     </div>
+
+    <div class="dangerconfirm" id="set-reset-form" hidden>
+      <p class="dangerconfirm__copy">
+        Type <strong>DELETE</strong> to confirm. Everything listed above will be
+        removed from this machine.
+      </p>
+      <div class="dangerconfirm__row">
+        <input class="field__input" id="set-reset-input" type="text"
+               autocomplete="off" spellcheck="false" aria-label="Type DELETE to confirm">
+        <button class="btn" type="button" id="set-reset-cancel">Cancel</button>
+        <button class="btn btn--danger" type="button" id="set-reset-confirm" disabled>
+          Delete everything
+        </button>
+      </div>
+      <p class="dangerconfirm__error" id="set-reset-error" hidden></p>
+    </div>
   </section>
+
+
+
+  {# Workspace-owned context. Previously this lived in a global
+     right-hand panel; it belongs to this tool, so it renders here. #}
+  <div class="ws-aside" data-ws-aside>
+
+  <section class="tools__section">
+    <h2 class="tools__heading">Active capability</h2>
+    <dl class="tools__stats" id="set-capability">
+      <div><dt>Local-only</dt><dd>on</dd></div>
+      <div><dt>AI</dt><dd>none</dd></div>
+      <div><dt>Search</dt><dd>none</dd></div>
+    </dl>
+  </section>
+  
+  <section class="tools__section">
+    <h2 class="tools__heading">Privacy</h2>
+    <p class="tools__para">
+      Keys are stored in the local SQLite database. OPSpine has no analytics, no
+      crash reporting and no cloud sync. Outbound requests happen only when you
+      explicitly use a configured provider, and never while local-only is on.
+    </p>
+  </section>
+  
+  <section class="tools__section">
+    <h2 class="tools__heading">Shortcuts</h2>
+    <ul class="tools__keys">
+      <li><kbd>?</kbd><span>Shortcut sheet</span></li>
+      <li><kbd>Ctrl K</kbd><span>Command palette</span></li>
+      <li><kbd>Esc</kbd><span>Close panels</span></li>
+    </ul>
+  </section>
+  </div>
 </div>
 {% endblock %}
 

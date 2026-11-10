@@ -575,3 +575,48 @@ body[data-workspace="quill"] :focus-visible {
     width: calc(100% - 24px);
   }
 }
+
+/* ---------------- draft count, exports, shortcuts ---------------- */
+/* The rail needs to say how many drafts exist, and the footer needs a
+   visible boundary between export actions and destructive ones. */
+.drafts__count {
+  margin: -4px 13px 8px;
+  font-size: 11px;
+  letter-spacing: 0.01em;
+  color: #6c7f9f;
+  min-height: 14px;
+}
+
+.paper__actions-label {
+  font-size: 9.5px;
+  font-weight: 750;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #7c8dab;
+  margin-right: 2px;
+}
+
+.paper__actions-sep {
+  width: 1px;
+  height: 16px;
+  background: rgba(20, 40, 90, 0.16);
+  margin: 0 2px;
+}
+
+.paper__actions #quill-export-txt,
+.paper__actions #quill-export-md {
+  font-family: var(--font-mono);
+  letter-spacing: 0.02em;
+}
+
+.paper__actions .btn[disabled] {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+@media (max-width: 720px) {
+  .paper__actions-label,
+  .paper__actions-sep {
+    display: none;
+  }
+}

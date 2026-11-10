@@ -16,6 +16,9 @@
     tabs: U.$$('.libtab'),
     notice: document.getElementById('library-notice'),
     stats: document.getElementById('library-stats'),
+    summary: document.getElementById('library-summary'),
+    clear: document.getElementById('library-clear'),
+    tabsHost: document.getElementById('library-tabs'),
   };
 
   const state = {
@@ -49,7 +52,29 @@
     }
   }
 
+  function countAll() {
+    const d = state.data;
+    return d.documents.length + d.drafts.length + d.research.length
+      + d.conversations.length;
+  }
+
+  function renderSummary() {
+    if (!dom.summary) return;
+    const total = countAll();
+    if (state.query) {
+      dom.summary.textContent = total
+        ? `${total} record${total === 1 ? '' : 's'} match “${state.query}” across every section.`
+        : `Nothing matches “${state.query}”.`;
+    } else {
+      dom.summary.textContent = total
+        ? `${total} local record${total === 1 ? '' : 's'} in the library.`
+        : 'Nothing saved yet. Generate a file, write a draft or start a conversation.';
+    }
+    if (dom.clear) dom.clear.hidden = !state.query;
+  }
+
   function renderStats() {
+    renderSummary();
     U.clear(dom.stats);
     [
       ['Files', state.data.documents.length],
@@ -119,7 +144,7 @@
 
     const list = U.el('div', { class: 'files' });
     docs.forEach((doc) => {
-      const row = U.el('div', { class: 'file' }, [
+      const row = U.el('div', { class: 'file', dataset: { docId: String(doc.id) } }, [
         U.el('span', { class: 'file__type', text: doc.format.toUpperCase() }),
         U.el('div', { class: 'file__main' }, [
           U.el('span', { class: 'file__title', text: doc.title, title: doc.title }),
@@ -192,7 +217,11 @@
               U.el('span', { text: `edited ${U.relativeTime(draft.updated_at)}` }),
             ]),
           ]),
-          U.el('a', { class: 'record__open', href: `/quill?draft=${draft.id}` }, 'Open →'),
+          actionsFor({
+            openHref: `/quill?draft=${draft.id}`,
+            rename: () => renameDraft(draft),
+            remove: () => deleteDraft(draft),
+          }),
         ])
       );
     });
@@ -227,7 +256,10 @@
               U.el('span', { text: U.relativeTime(session.updated_at) }),
             ]),
           ]),
-          U.el('a', { class: 'record__open', href: `/scout?session=${session.id}` }, 'Open →'),
+          actionsFor({
+            openHref: `/scout?session=${session.id}`,
+            remove: () => deleteResearch(session),
+          }),
         ])
       );
     });
@@ -258,19 +290,133 @@
               U.el('span', { text: U.relativeTime(conversation.updated_at) }),
             ]),
           ]),
-          U.el('a', {
-            class: 'record__open',
-            href: `/abyss?conversation=${conversation.id}`,
-          }, 'Open →'),
+          actionsFor({
+            openHref: `/abyss?conversation=${conversation.id}`,
+            rename: () => renameConversation(conversation),
+            remove: () => deleteConversation(conversation),
+          }),
         ])
       );
     });
     dom.panel.appendChild(list);
   }
 
+  /* A record is openable and removable wherever it lives. Every delete has
+     to name the tool it will disappear from, because the Library cannot
+     undo a deletion in another workspace. */
+  function actionsFor({ openHref, rename, remove }) {
+    const tools = U.el('div', { class: 'record__tools' });
+    if (openHref) {
+      tools.appendChild(U.el('a', { class: 'record__open', href: openHref }, 'Open →'));
+    }
+    if (rename) {
+      tools.appendChild(U.el('button', {
+        class: 'record__btn',
+        type: 'button',
+        text: 'Rename',
+        onClick: rename,
+      }));
+    }
+    if (remove) {
+      tools.appendChild(U.el('button', {
+        class: 'record__btn record__btn--danger',
+        type: 'button',
+        text: 'Delete',
+        onClick: remove,
+      }));
+    }
+    return tools;
+  }
+
   /* ------------------------------------------------------------------ */
   /* Actions                                                            */
   /* ------------------------------------------------------------------ */
+  async function renameDraft(draft) {
+    const title = await U.prompt({
+      title: 'Rename draft',
+      label: 'Draft title',
+      value: draft.title || 'Untitled draft',
+      confirmLabel: 'Rename',
+    });
+    if (title === null || !title || title === draft.title) return;
+    try {
+      await api.put(`/api/quill/drafts/${draft.id}`, { title });
+      U.success('Draft renamed.');
+      await load(state.query);
+    } catch (err) {
+      U.error(err.message);
+    }
+  }
+
+  async function deleteDraft(draft) {
+    const ok = await U.confirm({
+      title: 'Delete this draft?',
+      message: `“${draft.title || 'Untitled draft'}” will be permanently removed from Quill.`,
+      confirmLabel: 'Delete draft',
+    });
+    if (!ok) return;
+    try {
+      await api.del(`/api/quill/drafts/${draft.id}`);
+      U.success('Draft deleted.');
+      await load(state.query);
+      window.OPS.shell.refreshActivity();
+    } catch (err) {
+      U.error(err.message);
+    }
+  }
+
+  async function deleteResearch(session) {
+    const ok = await U.confirm({
+      title: 'Delete this research session?',
+      message: `“${session.question}” and its ${session.note_count} note`
+        + `${session.note_count === 1 ? '' : 's'} will be removed from Scout.`,
+      confirmLabel: 'Delete session',
+    });
+    if (!ok) return;
+    try {
+      await api.del(`/api/scout/sessions/${session.id}`);
+      U.success('Research session deleted.');
+      await load(state.query);
+      window.OPS.shell.refreshActivity();
+    } catch (err) {
+      U.error(err.message);
+    }
+  }
+
+  async function renameConversation(conversation) {
+    const title = await U.prompt({
+      title: 'Rename conversation',
+      label: 'Conversation title',
+      value: conversation.title,
+      confirmLabel: 'Rename',
+    });
+    if (title === null || !title || title === conversation.title) return;
+    try {
+      await api.patch(`/api/abyss/conversations/${conversation.id}`, { title });
+      U.success('Conversation renamed.');
+      await load(state.query);
+    } catch (err) {
+      U.error(err.message);
+    }
+  }
+
+  async function deleteConversation(conversation) {
+    const ok = await U.confirm({
+      title: 'Delete this conversation?',
+      message: `“${conversation.title}” and its ${conversation.message_count} message`
+        + `${conversation.message_count === 1 ? '' : 's'} will be removed from Abyss.`,
+      confirmLabel: 'Delete conversation',
+    });
+    if (!ok) return;
+    try {
+      await api.del(`/api/abyss/conversations/${conversation.id}`);
+      U.success('Conversation deleted.');
+      await load(state.query);
+      window.OPS.shell.refreshActivity();
+    } catch (err) {
+      U.error(err.message);
+    }
+  }
   async function download(doc) {
     try {
       await api.download(
@@ -310,16 +456,52 @@
     load(state.query);
   }, 240));
 
-  dom.tabs.forEach((tab) => {
-    tab.addEventListener('click', () => {
-      state.tab = tab.dataset.tab;
-      dom.tabs.forEach((node) => {
-        const active = node === tab;
-        node.classList.toggle('is-active', active);
-        node.setAttribute('aria-selected', String(active));
-      });
-      render();
+  function setTab(name) {
+    if (!['documents', 'drafts', 'research', 'conversations'].includes(name)) return;
+    state.tab = name;
+    dom.tabs.forEach((node) => {
+      const active = node.dataset.tab === name;
+      node.classList.toggle('is-active', active);
+      node.setAttribute('aria-selected', String(active));
+      node.tabIndex = active ? 0 : -1;
     });
+    render();
+  }
+
+  dom.tabs.forEach((tab) => {
+    tab.addEventListener('click', () => setTab(tab.dataset.tab));
+  });
+
+  /* Arrow keys move between tabs, as a tablist is expected to do. */
+  dom.tabsHost.addEventListener('keydown', (event) => {
+    if (!['ArrowRight', 'ArrowLeft', 'Home', 'End'].includes(event.key)) return;
+    event.preventDefault();
+    const index = dom.tabs.findIndex((node) => node.dataset.tab === state.tab);
+    let next = index;
+    if (event.key === 'ArrowRight') next = (index + 1) % dom.tabs.length;
+    if (event.key === 'ArrowLeft') next = (index - 1 + dom.tabs.length) % dom.tabs.length;
+    if (event.key === 'Home') next = 0;
+    if (event.key === 'End') next = dom.tabs.length - 1;
+    setTab(dom.tabs[next].dataset.tab);
+    dom.tabs[next].focus();
+  });
+
+  dom.clear.addEventListener('click', () => {
+    dom.search.value = '';
+    state.query = '';
+    dom.search.focus();
+    load();
+  });
+
+  document.addEventListener('keydown', (event) => {
+    if (event.metaKey || event.ctrlKey || event.altKey) return;
+    const typing = ['INPUT', 'TEXTAREA', 'SELECT'].includes(event.target.tagName)
+      || event.target.isContentEditable;
+    if (event.key === '/' && !typing) {
+      event.preventDefault();
+      dom.search.focus();
+      dom.search.select();
+    }
   });
 
   window.OPS.shell.registerPrimary('Search library', () => dom.search.focus());
@@ -327,14 +509,19 @@
   (async function init() {
     await load();
     const params = new URLSearchParams(window.location.search);
+    /* ?tab=drafts and ?highlight=<doc id> both land on a real section. */
+    const wanted = params.get('tab');
+    if (wanted) setTab(wanted);
     if (params.get('highlight')) {
-      state.tab = 'documents';
-      dom.tabs.forEach((node) => {
-        const active = node.dataset.tab === 'documents';
-        node.classList.toggle('is-active', active);
-        node.setAttribute('aria-selected', String(active));
-      });
-      render();
+      setTab('documents');
+      const id = Number(params.get('highlight'));
+      const row = U.$$('.file', dom.panel).find(
+        (node) => Number(node.dataset.docId) === id
+      );
+      if (row) {
+        row.classList.add('is-highlight');
+        row.scrollIntoView({ block: 'nearest' });
+      }
     }
   })();
 })();

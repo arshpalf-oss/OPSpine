@@ -67,8 +67,22 @@ Requires Python 3.9 or newer.
 | `Ctrl 0`–`Ctrl 8` | Jump to a workspace |
 | `Ctrl Enter` | Run the primary action of the current room |
 | `Ctrl \` | Collapse or expand the sidebar |
+| `Ctrl T` | Switch light / dark theme |
 | `?` | Shortcut reference |
 | `Esc` | Close the palette, a dialog or a drawer |
+| `/` | Focus the search field in Dash, Library and Working Board |
+
+Each room also has its own keys. Dash lists them, and the shortcut sheet (`?`)
+shows the global set.
+
+### Themes
+
+Both themes exist and the choice is remembered. Two rooms follow the switch
+today: **Dashboard** and **Abyss**. The other nine — Scout, Forge, Quill,
+Kronos, Whiteboard, Dash, Working Board, Library and Settings — are still
+dark-only. They refuse the switch and say why, rather than half-applying it and
+leaving unreadable text. Finishing the light palette for those rooms is the
+next visual task, and it is the largest piece of work still outstanding.
 
 ---
 
@@ -77,13 +91,15 @@ Requires Python 3.9 or newer.
 These features need nothing external:
 
 - Generating all six document formats and downloading them
-- Writing, autosaving and managing drafts
+- Writing, autosaving and managing drafts, and exporting them as `.txt` or
+  `.md` (built in the browser, nothing uploaded)
 - Calendar events, including plain-English parsing
 - Tasks, statuses, priorities and due dates
-- Whiteboards with nodes and links
+- Whiteboards with movable nodes, removable links and undo
 - Research notes written by hand
 - Conversation history, search and export
 - Dash commands, the command palette and navigation
+- Library browsing, search, download and deletion of anything you have saved
 
 The **local text tools** in Abyss and Quill are deterministic functions —
 statistics, uppercase, lowercase, title case, sentence case, bullets,
@@ -159,7 +175,8 @@ data/
   API keys.
 - **Restore**: Settings → *Choose backup file*. The file is validated first and
   you see what it contains before anything is replaced.
-- **Delete**: Settings → *Delete everything* requires typing `DELETE`.
+- **Delete**: Settings → *Delete everything* asks you to type `DELETE` in the
+  panel before the button becomes usable.
 
 Deleting `data/` while the app is stopped is equivalent to a clean install.
 
@@ -173,13 +190,34 @@ Deleting `data/` while the app is stopped is equivalent to a clean install.
 
 ---
 
+## Building a portable copy
+
+```bash
+python build_zip.py            # writes dist/OPSpine.zip
+python build_zip.py --check    # also extracts it and boots the extracted copy
+```
+
+The archive contains the application and an empty `data/` folder. It never
+contains your database, logs, generated files or a virtualenv, so you can hand
+it to someone else or move it to another machine. `--check` extracts it into a
+temporary directory, starts the app against a throwaway data folder and
+confirms every route answers 200 before it reports success.
+
+The ZIP is not committed to the repository — `*.zip` is ignored, because a
+checked-in archive would go stale as soon as the code changed. Build it when
+you need it.
+
+Unzip, then run `./start.sh` (or `start.bat`) inside the folder.
+
+---
+
 ## Tests
 
 ```bash
 python -m unittest discover -s opspine/tests -t .
 ```
 
-44 tests covering schema creation, settings and secret handling, local-only
+63 tests covering schema creation, settings and secret handling, local-only
 enforcement, conversation and message persistence, all six document formats,
 path-traversal refusal, missing-file handling, drafts, calendar parsing and
 CRUD, tasks, boards, research notes, backup round-trips and every page route.
@@ -266,3 +304,11 @@ Stop the server, delete `data/`, start again.
   notifications or sync to an external calendar.
 - Motion presets are preference-level: they change durations and easing, and
   the system reduced-motion setting always wins.
+- **Light theme is only done in Dashboard and Abyss.** The other nine rooms
+  are still dark-only and refuse the switch instead of half-applying it.
+- **No pixel-level visual QA.** The build was verified by exercising every page
+  in a real DOM and by contrast arithmetic, not by looking at screenshots.
+- **Abyss has no conversation memory yet.** Each message is answered on its
+  own; the history is stored but not sent back to the model. The next piece of
+  work is a single assistant layer that reads history and can call the tools
+  above.
