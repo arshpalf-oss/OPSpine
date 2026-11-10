@@ -147,7 +147,7 @@
       button.setAttribute('aria-disabled', String(locked));
       button.disabled = locked;
       button.title = locked
-        ? 'This workspace is still dark-only. Switch in Abyss or the Dashboard.'
+        ? 'This workspace is still dark-only. Switch light/dark in the Dashboard or Abyss.'
         : '';
     });
     if (dom.themeBadge) {
