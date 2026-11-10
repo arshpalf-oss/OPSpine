@@ -143,8 +143,18 @@ class TestSettings(BaseCase):
     def test_unconverted_workspace_stays_dark(self):
         """The switch must never render a room that isn't converted yet."""
         self.client.post("/api/settings", json={"theme": "light"})
-        html = self.client.get("/abyss").get_data(as_text=True)
+        html = self.client.get("/scout").get_data(as_text=True)
         self.assertIn('data-theme-ready="false"', html)
+        self.assertIn('data-theme="dark"', html)
+
+    def test_abyss_is_theme_ready(self):
+        """Abyss ships both themes, so it must honour the stored theme."""
+        self.client.post("/api/settings", json={"theme": "light"})
+        html = self.client.get("/abyss").get_data(as_text=True)
+        self.assertIn('data-theme-ready="true"', html)
+        self.assertIn('data-theme="light"', html)
+        self.client.post("/api/settings", json={"theme": "dark"})
+        html = self.client.get("/abyss").get_data(as_text=True)
         self.assertIn('data-theme="dark"', html)
 
     def test_launcher_is_theme_ready(self):
@@ -634,11 +644,19 @@ class TestPages(BaseCase):
         self.assertIn('class="launcher"', response.get_data(as_text=True))
 
     def test_workspaces_keep_the_app_shell(self):
-        for key in ("abyss", "kronos", "forge", "settings"):
+        for key in ("kronos", "forge", "settings"):
             with self.subTest(key=key):
                 html = self.client.get(f"/{key}").get_data(as_text=True)
                 self.assertIn('id="app-shell"', html)
                 self.assertIn('class="sidebar', html)
+
+    def test_abyss_is_its_own_chat_chrome(self):
+        """Abyss owns its layout: two sidebars, no global workspace chrome."""
+        html = self.client.get("/abyss").get_data(as_text=True)
+        self.assertEqual(html.count("<aside"), 2)
+        self.assertIn('id="chat"', html)
+        self.assertNotIn('id="app-shell"', html)
+        self.assertNotIn('class="sidebar sidebar--left"', html)
 
     def test_launcher_lists_every_workspace_but_itself(self):
         html = self.client.get("/dashboard").get_data(as_text=True)
