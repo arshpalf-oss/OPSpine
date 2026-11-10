@@ -11,6 +11,7 @@
       <h2>Drafts</h2>
       <button class="btn btn--sm" id="quill-new" type="button">New draft</button>
     </div>
+    <p class="drafts__count" id="quill-count" role="status" aria-live="polite"></p>
     <div class="drafts__search">
       <input type="search" class="input input--sm" id="quill-search"
              placeholder="Search drafts" aria-label="Search drafts" autocomplete="off">
@@ -67,7 +68,14 @@
     <footer class="paper__foot">
       <div class="paper__stats" id="quill-stats">0 words · 0 characters</div>
       <div class="paper__actions">
-        <button class="btn btn--sm" id="quill-save" type="button" disabled>Save now</button>
+        <span class="paper__actions-label">Export</span>
+        <button class="btn btn--sm" id="quill-export-txt" type="button" disabled
+                title="Download this draft as a plain text file">.txt</button>
+        <button class="btn btn--sm" id="quill-export-md" type="button" disabled
+                title="Download this draft as a Markdown file">.md</button>
+        <span class="paper__actions-sep" aria-hidden="true"></span>
+        <button class="btn btn--sm" id="quill-save" type="button" disabled
+                title="Save immediately (Ctrl or Cmd + S)">Save now</button>
         <button class="btn btn--sm btn--danger" id="quill-delete" type="button" disabled>Delete</button>
       </div>
     </footer>
