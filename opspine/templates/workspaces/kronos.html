@@ -29,6 +29,10 @@
       Kronos parses dates and times offline, then shows you what it understood
       before anything is saved. No background alarms — events do not notify you
       while OPSpine is closed.
+      <span class="nl__keys">
+        <kbd>T</kbd> today · <kbd>←</kbd><kbd>→</kbd> move ·
+        <kbd>M</kbd><kbd>W</kbd><kbd>D</kbd> view · <kbd>N</kbd> new event
+      </span>
     </p>
 
     <div class="parse" id="kronos-parse" hidden>
@@ -72,10 +76,18 @@
 
       <h4 class="cal__period" id="cal-period" aria-live="polite"></h4>
 
+      <label class="cal__jump">
+        <span class="visually-hidden">Jump to date</span>
+        <input class="cal__jump-input" id="cal-jump" type="date" aria-label="Jump to date">
+      </label>
+
       <div class="cal__views" role="group" aria-label="Calendar view">
-        <button class="cal__view" data-view="month" type="button">Month</button>
-        <button class="cal__view" data-view="week" type="button">Week</button>
-        <button class="cal__view" data-view="day" type="button">Day</button>
+        <button class="cal__view" data-view="month" type="button"
+                aria-pressed="true">Month</button>
+        <button class="cal__view" data-view="week" type="button"
+                aria-pressed="false">Week</button>
+        <button class="cal__view" data-view="day" type="button"
+                aria-pressed="false">Day</button>
       </div>
     </div>
 
