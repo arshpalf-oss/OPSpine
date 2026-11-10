@@ -18,7 +18,6 @@
     search: document.getElementById('scout-search'),
     sessions: document.getElementById('scout-sessions'),
     detail: document.getElementById('scout-detail'),
-    prov: document.getElementById('scout-prov'),
   };
 
   const state = {
@@ -45,18 +44,6 @@
       document.createTextNode(' ' + cap.message)
     );
 
-    U.clear(dom.prov);
-    const rows = [
-      ['Provider', cap.search_available ? cap.provider : 'Not configured'],
-      ['Local-only', cap.local_only ? 'On' : 'Off'],
-      ['Live search', cap.search_available ? 'Available' : 'Unavailable'],
-    ];
-    rows.forEach(([label, value]) => {
-      dom.prov.appendChild(U.el('div', { class: 'prov-card__row' }, [
-        U.el('span', { text: label }),
-        U.el('span', { text: value }),
-      ]));
-    });
   }
 
   /* ------------------------------------------------------------------ */

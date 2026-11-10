@@ -24,7 +24,6 @@
     save: document.getElementById('quill-save'),
     del: document.getElementById('quill-delete'),
     ai: document.getElementById('quill-ai'),
-    prov: document.getElementById('quill-prov'),
     toolout: document.getElementById('quill-toolout'),
     tooloutLabel: document.getElementById('quill-toolout-label'),
     tooloutBody: document.getElementById('quill-toolout-body'),
@@ -388,19 +387,10 @@
   /* ------------------------------------------------------------------ */
   /* Provider panel                                                     */
   /* ------------------------------------------------------------------ */
+  /* The provider card that used to sit in the removed reference panel is
+     gone; the Rewrite chip's own state is now the whole story. */
   function renderProviders() {
     const p = state.providers;
-    U.clear(dom.prov);
-    [
-      ['Mode', p.local_only ? 'Local-only' : 'Network enabled'],
-      ['AI provider', p.ai_available ? p.ai_provider : 'Not configured'],
-    ].forEach(([label, value]) => {
-      dom.prov.appendChild(U.el('div', { class: 'prov-card__row' }, [
-        U.el('span', { text: label }),
-        U.el('span', { text: value }),
-      ]));
-    });
-
     dom.ai.disabled = !p.ai_available;
     dom.ai.title = p.ai_available
       ? `Send this draft to ${p.ai_provider} for a rewrite`

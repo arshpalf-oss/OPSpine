@@ -2,6 +2,15 @@
 
 {% block title %}Dash{% endblock %}
 
+{% block sidebar %}
+{# Recent actions: what actually happened on this machine, newest first. #}
+<div class="ws-side" data-ws-side>
+  <div class="ws-side__head">
+    <h2 class="ws-side__title">Recent actions</h2>
+  </div>
+  <ul class="ws-side__list" id="dash-recent"></ul>
+</div>
+{% endblock %}
 {% block workspace %}
 
 <div class="dashconsole" data-dash>
@@ -51,14 +60,11 @@
     </div>
   </section>
 
-  <section class="dashcol" aria-labelledby="dash-recent-h">
+  <section class="dashcol" aria-labelledby="dash-keys-h">
     <div class="dashcol__card">
-      <h3 id="dash-recent-h">Recent actions</h3>
-      <ul class="dashrecent" id="dash-recent"></ul>
-    </div>
+      <h3 id="dash-keys-h">Keyboard</h3>
 
     <div class="dashcol__card">
-      <h3>Keyboard</h3>
       <ul class="dashkeys">
         <li><kbd>/</kbd><span>Focus the command filter</span></li>
         <li><kbd>Ctrl K</kbd><span>Command palette</span></li>
@@ -74,52 +80,8 @@
 
   {# Workspace-owned context. Previously this lived in a global
      right-hand panel; it belongs to this tool, so it renders here. #}
-  <div class="ws-aside" data-ws-aside>
 
-  <section class="tools__section">
-    <h2 class="tools__heading">State</h2>
-    <dl class="tools__stats" id="dash-tools-state"></dl>
-  </section>
-  
-  <section class="tools__section">
-    <h2 class="tools__heading">Local-only switch</h2>
-    <p class="tools__para" id="dash-mode-copy"></p>
-    <button class="btn btn--sm" id="dash-mode-toggle" type="button">Toggle mode</button>
-  </section>
-  
-  <section class="tools__section">
-    <h2 class="tools__heading">Note</h2>
-    <p class="tools__para">
-      Dash only lists actions OPSpine can actually perform. If a capability is
-      unavailable, the row says so instead of pretending.
-    </p>
-  </section>
-  </div>
 </div>
-
-  {# Workspace-owned context. Previously this lived in a global
-     right-hand panel; it belongs to this tool, so it renders here. #}
-  <div class="ws-aside" data-ws-aside>
-
-  <section class="tools__section">
-    <h2 class="tools__heading">State</h2>
-    <dl class="tools__stats" id="dash-tools-state"></dl>
-  </section>
-  
-  <section class="tools__section">
-    <h2 class="tools__heading">Local-only switch</h2>
-    <p class="tools__para" id="dash-mode-copy"></p>
-    <button class="btn btn--sm" id="dash-mode-toggle" type="button">Toggle mode</button>
-  </section>
-  
-  <section class="tools__section">
-    <h2 class="tools__heading">Note</h2>
-    <p class="tools__para">
-      Dash only lists actions OPSpine can actually perform. If a capability is
-      unavailable, the row says so instead of pretending.
-    </p>
-  </section>
-  </div>
 {% endblock %}
 
 

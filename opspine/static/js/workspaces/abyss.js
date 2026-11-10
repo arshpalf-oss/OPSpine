@@ -34,15 +34,10 @@
     subtitle: document.getElementById('abyss-subtitle'),
     modeLabel: document.getElementById('abyss-mode-label'),
     provCard: document.getElementById('abyss-prov-card'),
-    toolSelect: document.getElementById('tool-select'),
-    toolInput: document.getElementById('tool-input'),
-    toolRun: document.getElementById('tool-run'),
-    toolOutput: document.getElementById('tool-output'),
-    toolOutLabel: document.getElementById('tool-out-label'),
-    toolOutBody: document.getElementById('tool-out-body'),
-    toolCopy: document.getElementById('tool-copy'),
-    toolNote: document.getElementById('tool-note'),
-    toolList: document.getElementById('abyss-tool-list'),
+    slashMenu: document.getElementById('slash-menu'),
+    slashList: document.getElementById('slash-list'),
+    slashLabel: document.getElementById('slash-label'),
+    apps: document.getElementById('abyss-apps'),
     navCollapse: document.getElementById('nav-collapse'),
     navOpen: document.getElementById('nav-open'),
     toolsToggle: document.getElementById('tools-toggle'),
@@ -54,9 +49,10 @@
     conversations: [],
     current: null,
     providers: shellState.boot.providers,
-    tools: [],
     busy: false,
-    lastToolResult: '',
+    /* Slash-command menu state. */
+    slashMatches: [],
+    slashIndex: 0,
   };
 
   /* ------------------------------------------------------------------ */
@@ -472,68 +468,175 @@
   }
 
   /* ------------------------------------------------------------------ */
-  /* Local tools                                                        */
+  /* Slash commands — the offline text tools, inline in the composer    */
   /* ------------------------------------------------------------------ */
-  async function loadTools() {
-    try {
-      const data = await api.get('/api/abyss/tools');
-      state.tools = data.tools;
-      U.clear(dom.toolSelect);
-      data.tools.forEach((tool) => {
-        dom.toolSelect.appendChild(U.el('option', { value: tool.id, text: tool.label }));
-      });
-      dom.toolNote.textContent = data.note;
-      U.clear(dom.toolList);
-      data.tools.slice(0, 6).forEach((tool) => {
-        dom.toolList.appendChild(U.el('li', {}, [
-          U.el('span', { text: tool.label }),
-          U.el('kbd', { text: 'offline' }),
-        ]));
-      });
-    } catch (err) {
-      dom.toolNote.textContent = `Local tools unavailable: ${err.message}`;
-    }
+  /* Each entry runs a deterministic local tool against whatever is in the
+     composer. They used to live in the right-hand toolbox; acting on the
+     draft in place is the point, so they belong in the composer. */
+  const SLASH_COMMANDS = [
+    { cmd: 'sort',      tool: 'sort_lines',    hint: 'Sort the lines in the draft' },
+    { cmd: 'dedupe',    tool: 'dedupe_lines',  hint: 'Remove duplicate lines' },
+    { cmd: 'count',     tool: 'stats',         hint: 'Word, character and sentence counts' },
+    { cmd: 'bullets',   tool: 'bullets',       hint: 'Turn the draft into bullet points' },
+    { cmd: 'summary',   tool: 'summary',       hint: 'Extractive summary of the draft' },
+    { cmd: 'terms',     tool: 'key_terms',     hint: 'Pull out key terms' },
+    { cmd: 'slug',      tool: 'slug',          hint: 'URL slug from the draft' },
+    { cmd: 'upper',     tool: 'uppercase',     hint: 'Uppercase the draft' },
+    { cmd: 'lower',     tool: 'lowercase',     hint: 'Lowercase the draft' },
+    { cmd: 'title',     tool: 'title_case',    hint: 'Title-case the draft' },
+    { cmd: 'sentence',  tool: 'sentence_case', hint: 'Sentence-case the draft' },
+    { cmd: 'strip',     tool: 'strip_blank',   hint: 'Collapse blank lines' },
+  ];
+
+  const SLASH_ACTIONS = [
+    { cmd: 'help', hint: 'List every slash command', action: 'help' },
+    { cmd: 'clear', hint: 'Clear the composer', action: 'clear' },
+  ];
+
+  const ALL_SLASH = SLASH_COMMANDS.concat(SLASH_ACTIONS);
+
+  function renderApps() {
+    if (!dom.apps) return;
+    const apps = (shellState.boot.workspaces || []).filter(
+      (item) => item.key !== 'abyss' && item.chrome !== 'launcher'
+    );
+    U.clear(dom.apps);
+    apps.forEach((item) => {
+      dom.apps.appendChild(U.el('li', {}, [
+        U.el('a', { class: 'app-link', href: item.path }, [
+          U.el('span', { class: 'app-link__name', text: item.name }),
+          U.el('span', { class: 'app-link__tag', text: item.tagline }),
+        ]),
+      ]));
+    });
   }
 
-  async function runTool() {
-    const tool = dom.toolSelect.value;
-    const text = dom.toolInput.value;
-    if (!text.trim()) {
-      U.error('Paste some text first.');
-      dom.toolInput.focus();
+  /* A draft that opens with "/word" is a command; everything after it is the
+     text it works on. Ordinary prose containing "/" never triggers the menu. */
+  function slashQuery() {
+    const match = /^\s*\/([a-z]*)/.exec(dom.input.value);
+    return match ? match[1] : null;
+  }
+
+  function closeSlash() {
+    dom.slashMenu.hidden = true;
+    state.slashIndex = 0;
+    state.slashMatches = [];
+  }
+
+  function renderSlash() {
+    const query = slashQuery();
+    if (query === null) {
+      closeSlash();
+      return;
+    }
+    const term = query.toLowerCase();
+    const matches = ALL_SLASH.filter((entry) => entry.cmd.startsWith(term));
+    state.slashMatches = matches;
+
+    if (!matches.length) {
+      U.clear(dom.slashList);
+      dom.slashList.appendChild(
+        U.el('li', { class: 'slash__empty', text: `No command starts with “${term}”.` })
+      );
+      dom.slashMenu.hidden = false;
       return;
     }
 
-    dom.toolRun.disabled = true;
-    dom.toolRun.textContent = 'Running…';
-    try {
-      const data = await api.post('/api/abyss/tools/run', { tool, text });
-      const label = (state.tools.find((t) => t.id === tool) || {}).label || tool;
-      dom.toolOutLabel.textContent = `Local tool · ${label}`;
-      dom.toolOutput.hidden = false;
+    if (state.slashIndex >= matches.length) state.slashIndex = 0;
+    U.clear(dom.slashList);
+    matches.forEach((entry, index) => {
+      dom.slashList.appendChild(U.el('li', { role: 'presentation' }, [
+        U.el('button', {
+          class: `slash__item${index === state.slashIndex ? ' is-active' : ''}`,
+          type: 'button',
+          role: 'option',
+          'aria-selected': String(index === state.slashIndex),
+          onClick: () => runSlash(entry),
+        }, [
+          U.el('span', { class: 'slash__cmd', text: `/${entry.cmd}` }),
+          U.el('span', { class: 'slash__hint', text: entry.hint }),
+        ]),
+      ]));
+    });
+    dom.slashMenu.hidden = false;
+  }
 
-      if (data.result.kind === 'stats') {
-        const lines = Object.entries(data.result.result)
+  /* The draft without its /command token: the command is syntax, not text,
+     so it must never end up inside the sorted/counted output. */
+  function slashDraft() {
+    return dom.input.value.replace(/^\s*\/[a-z]+\s*/, '');
+  }
+
+  /* The result replaces the whole draft, so what you see is exactly the text
+     you can now send, copy or keep editing. */
+  function setDraft(text) {
+    dom.input.value = text;
+    const position = text.length;
+    dom.input.setSelectionRange(position, position);
+    autoGrow();
+  }
+
+  async function runSlash(entry) {
+    closeSlash();
+
+    /* A command with no text would replace the draft with an empty result, so
+       say what is missing and keep whatever you typed. */
+    if (entry.action !== 'clear' && entry.action !== 'help' && !slashDraft().trim()) {
+      U.error(`/${entry.cmd} needs some text — type or paste a draft, then run it.`);
+      dom.input.focus();
+      return;
+    }
+
+    if (entry.action === 'clear') {
+      setDraft('');
+      dom.input.focus();
+      return;
+    }
+    if (entry.action === 'help') {
+      const lines = SLASH_COMMANDS.map((item) => `/${item.cmd.padEnd(9)} ${item.hint}`);
+      setDraft(lines.join('\n'));
+      U.toast('Slash commands listed in the composer.');
+      dom.input.focus();
+      return;
+    }
+
+    const draft = slashDraft().trim();
+    if (!draft) {
+      U.error('Nothing to work on yet — write a line, then use the command.');
+      dom.input.focus();
+      return;
+    }
+
+    try {
+      const data = await api.post('/api/abyss/tools/run', {
+        tool: entry.tool, text: draft,
+      });
+      const result = data.result;
+      let text;
+      if (result.kind === 'stats') {
+        text = Object.entries(result.result)
           .map(([key, value]) => `${key.replace(/_/g, ' ')}: ${value}`)
           .join('\n');
-        dom.toolOutBody.textContent = lines;
-        state.lastToolResult = lines;
-      } else if (data.result.kind === 'terms') {
-        const terms = data.result.result.join(', ');
-        dom.toolOutBody.textContent = terms;
-        state.lastToolResult = terms;
+      } else if (result.kind === 'terms') {
+        text = result.result.join(', ');
       } else {
-        dom.toolOutBody.textContent = data.result.result;
-        state.lastToolResult = data.result.result;
+        text = String(result.result);
       }
+      setDraft(text);
+      U.success(`/${entry.cmd} ran offline on your draft.`);
       window.OPS.shell.refreshActivity();
     } catch (err) {
-      dom.toolOutput.hidden = true;
       U.error(err.message);
-    } finally {
-      dom.toolRun.disabled = false;
-      dom.toolRun.textContent = 'Run tool';
     }
+    dom.input.focus();
+  }
+
+  function moveSlash(delta) {
+    if (!state.slashMatches.length) return;
+    state.slashIndex = (state.slashIndex + delta + state.slashMatches.length)
+      % state.slashMatches.length;
+    renderSlash();
   }
 
   /* ------------------------------------------------------------------ */
@@ -546,10 +649,11 @@
 
   dom.input.addEventListener('input', autoGrow);
   dom.input.addEventListener('keydown', (event) => {
-    if (event.key === 'Enter' && !event.shiftKey) {
-      event.preventDefault();
-      send();
-    }
+    if (event.key !== 'Enter' || event.shiftKey) return;
+    /* The slash menu owns Enter while it has matches. */
+    if (!dom.slashMenu.hidden) return;
+    event.preventDefault();
+    send();
   });
 
   dom.search.addEventListener('input', U.debounce(() => {
@@ -596,9 +700,31 @@
     }
   });
 
-  dom.toolRun.addEventListener('click', runTool);
-  dom.toolCopy.addEventListener('click', () => {
-    if (state.lastToolResult) U.copy(state.lastToolResult);
+  /* The slash menu follows the composer. Arrow keys move through it, Enter
+     runs the highlighted command instead of sending, Escape dismisses it. */
+  dom.input.addEventListener('input', renderSlash);
+  dom.input.addEventListener('click', renderSlash);
+  dom.input.addEventListener('blur', () => {
+    /* A click on a menu item must land before the menu closes. */
+    window.setTimeout(closeSlash, 140);
+  });
+
+  dom.input.addEventListener('keydown', (event) => {
+    if (dom.slashMenu.hidden) return;
+    if (event.key === 'ArrowDown') {
+      event.preventDefault();
+      moveSlash(1);
+    } else if (event.key === 'ArrowUp') {
+      event.preventDefault();
+      moveSlash(-1);
+    } else if (event.key === 'Enter' && !event.shiftKey && state.slashMatches.length) {
+      event.preventDefault();
+      const entry = state.slashMatches[state.slashIndex] || state.slashMatches[0];
+      runSlash(entry);
+    } else if (event.key === 'Escape') {
+      event.preventDefault();
+      closeSlash();
+    }
   });
 
   dom.useAi.addEventListener('change', () => {
@@ -608,13 +734,7 @@
     }
   });
 
-  window.OPS.shell.registerPrimary('Send message', () => {
-    if (document.activeElement === dom.toolInput) {
-      runTool();
-      return;
-    }
-    send();
-  });
+  window.OPS.shell.registerPrimary('Send message', () => send());
 
   /* ------------------------------------------------------------------ */
   /* Startup                                                            */
@@ -635,7 +755,7 @@
   async function init() {
     normaliseDrawers();
     renderStatus();
-    await loadTools();
+    renderApps();
 
     const params = new URLSearchParams(window.location.search);
     await loadConversations();

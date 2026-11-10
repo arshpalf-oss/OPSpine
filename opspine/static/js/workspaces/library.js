@@ -15,7 +15,6 @@
     search: document.getElementById('library-search'),
     tabs: U.$$('.libtab'),
     notice: document.getElementById('library-notice'),
-    stats: document.getElementById('library-stats'),
     summary: document.getElementById('library-summary'),
     clear: document.getElementById('library-clear'),
     tabsHost: document.getElementById('library-tabs'),
@@ -75,6 +74,7 @@
 
   function renderStats() {
     renderSummary();
+    if (!dom.stats) return;
     U.clear(dom.stats);
     [
       ['Files', state.data.documents.length],

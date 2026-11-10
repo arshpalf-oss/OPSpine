@@ -2,6 +2,15 @@
 
 {% block title %}Settings{% endblock %}
 
+{% block sidebar %}
+{# Jump links to the panels below — Settings is long, so it needs an index. #}
+<div class="ws-side" data-ws-side>
+  <div class="ws-side__head">
+    <h2 class="ws-side__title">Sections</h2>
+  </div>
+  <ul class="ws-side__list" id="set-index"></ul>
+</div>
+{% endblock %}
 {% block workspace %}
 
 <div class="settings" data-settings>
@@ -332,68 +341,8 @@
 
   {# Workspace-owned context. Previously this lived in a global
      right-hand panel; it belongs to this tool, so it renders here. #}
-  <div class="ws-aside" data-ws-aside>
 
-  <section class="tools__section">
-    <h2 class="tools__heading">Active capability</h2>
-    <dl class="tools__stats" id="set-capability">
-      <div><dt>Local-only</dt><dd>on</dd></div>
-      <div><dt>AI</dt><dd>none</dd></div>
-      <div><dt>Search</dt><dd>none</dd></div>
-    </dl>
-  </section>
-  
-  <section class="tools__section">
-    <h2 class="tools__heading">Privacy</h2>
-    <p class="tools__para">
-      Keys are stored in the local SQLite database. OPSpine has no analytics, no
-      crash reporting and no cloud sync. Outbound requests happen only when you
-      explicitly use a configured provider, and never while local-only is on.
-    </p>
-  </section>
-  
-  <section class="tools__section">
-    <h2 class="tools__heading">Shortcuts</h2>
-    <ul class="tools__keys">
-      <li><kbd>?</kbd><span>Shortcut sheet</span></li>
-      <li><kbd>Ctrl K</kbd><span>Command palette</span></li>
-      <li><kbd>Esc</kbd><span>Close panels</span></li>
-    </ul>
-  </section>
-  </div>
 </div>
-
-  {# Workspace-owned context. Previously this lived in a global
-     right-hand panel; it belongs to this tool, so it renders here. #}
-  <div class="ws-aside" data-ws-aside>
-
-  <section class="tools__section">
-    <h2 class="tools__heading">Active capability</h2>
-    <dl class="tools__stats" id="set-capability">
-      <div><dt>Local-only</dt><dd>on</dd></div>
-      <div><dt>AI</dt><dd>none</dd></div>
-      <div><dt>Search</dt><dd>none</dd></div>
-    </dl>
-  </section>
-  
-  <section class="tools__section">
-    <h2 class="tools__heading">Privacy</h2>
-    <p class="tools__para">
-      Keys are stored in the local SQLite database. OPSpine has no analytics, no
-      crash reporting and no cloud sync. Outbound requests happen only when you
-      explicitly use a configured provider, and never while local-only is on.
-    </p>
-  </section>
-  
-  <section class="tools__section">
-    <h2 class="tools__heading">Shortcuts</h2>
-    <ul class="tools__keys">
-      <li><kbd>?</kbd><span>Shortcut sheet</span></li>
-      <li><kbd>Ctrl K</kbd><span>Command palette</span></li>
-      <li><kbd>Esc</kbd><span>Close panels</span></li>
-    </ul>
-  </section>
-  </div>
 {% endblock %}
 
 

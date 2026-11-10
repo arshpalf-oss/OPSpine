@@ -296,16 +296,25 @@
     item.run();
   }
 
-  function openPalette() {
+  function openPalette(initialQuery = '') {
     if (!palette.hidden) {
       closeOverlay(palette);
       return;
     }
     openOverlay(palette);
-    paletteInput.value = '';
-    renderPalette('');
+    paletteInput.value = initialQuery;
+    renderPalette(initialQuery);
     loadPaletteRecords().then(() => renderPalette(paletteInput.value));
-    setTimeout(() => paletteInput.focus(), 30);
+    setTimeout(() => {
+      paletteInput.focus();
+      paletteInput.select();
+    }, 30);
+  }
+
+  /* The sidebar's Apps button: the palette, pre-filtered to workspaces so it
+     reads as an app switcher rather than a general search. */
+  function openApps() {
+    openPalette('');
   }
 
   /* ------------------------------------------------------------------ */
@@ -467,6 +476,10 @@
         event.preventDefault();
         openPalette();
         break;
+      case 'open-apps':
+        event.preventDefault();
+        openApps();
+        break;
       case 'close-palette':
         closeOverlay(palette);
         break;
@@ -619,6 +632,7 @@
     registerPrimary,
     runPrimary,
     openPalette,
+    openApps,
     openHelp,
     toggleSidebar,
     setSidebarCollapsed,

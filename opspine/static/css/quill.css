@@ -55,7 +55,9 @@ body[data-workspace="quill"] :focus-visible {
 
 .quill {
   display: grid;
-  grid-template-columns: 236px minmax(0, 1fr);
+  /* One column: the draft list now lives in the workspace sidebar, so the
+     paper owns the whole surface. */
+  grid-template-columns: minmax(0, 1fr);
   gap: 18px;
   height: 100%;
   min-height: 0;

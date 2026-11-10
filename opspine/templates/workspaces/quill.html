@@ -2,23 +2,25 @@
 
 {% block title %}Quill{% endblock %}
 
+{% block sidebar %}
+{# The draft list IS the Quill sidebar: this is where your writing lives. #}
+<div class="ws-side" data-ws-side>
+  <div class="ws-side__head">
+    <h2 class="ws-side__title">Drafts</h2>
+    <button class="btn btn--sm" id="quill-new" type="button">New</button>
+  </div>
+  <p class="drafts__count" id="quill-count" role="status" aria-live="polite"></p>
+  <div class="ws-side__search">
+    <input type="search" class="input input--sm" id="quill-search"
+           placeholder="Search drafts" aria-label="Search drafts" autocomplete="off">
+  </div>
+  <ul class="ws-side__list" id="quill-list"></ul>
+</div>
+{% endblock %}
+
 {% block workspace %}
 
 <div class="quill" data-quill>
-  {# Drafts rail #}
-  <aside class="drafts" aria-label="Drafts">
-    <div class="drafts__head">
-      <h2>Drafts</h2>
-      <button class="btn btn--sm" id="quill-new" type="button">New draft</button>
-    </div>
-    <p class="drafts__count" id="quill-count" role="status" aria-live="polite"></p>
-    <div class="drafts__search">
-      <input type="search" class="input input--sm" id="quill-search"
-             placeholder="Search drafts" aria-label="Search drafts" autocomplete="off">
-    </div>
-    <ul class="drafts__list" id="quill-list"></ul>
-  </aside>
-
   {# Editor #}
   <section class="paper" aria-label="Editor">
     <div class="paper__toolbar">
@@ -107,60 +109,7 @@
 
 
 
-  {# Workspace-owned context. Previously this lived in a global
-     right-hand panel; it belongs to this tool, so it renders here. #}
-  <div class="ws-aside" data-ws-aside>
-
-  <section class="tools__section">
-    <h2 class="tools__heading">Assistant</h2>
-    <div class="prov-card" id="quill-prov"></div>
-    <a class="tools__link" href="/settings">Configure in Settings →</a>
-  </section>
-  
-  <section class="tools__section">
-    <h2 class="tools__heading">About autosave</h2>
-    <p class="tools__para">
-      Quill saves a moment after you stop typing, and again when you leave the
-      page. The status line above the sheet always shows the last real save.
-    </p>
-  </section>
-  
-  <section class="tools__section">
-    <h2 class="tools__heading">Offline tools</h2>
-    <p class="tools__para">
-      The chips above the editor run deterministic local operations on your text.
-      “Rewrite with provider” only works with a configured model.
-    </p>
-  </section>
-  </div>
 </div>
-
-  {# Workspace-owned context. Previously this lived in a global
-     right-hand panel; it belongs to this tool, so it renders here. #}
-  <div class="ws-aside" data-ws-aside>
-
-  <section class="tools__section">
-    <h2 class="tools__heading">Assistant</h2>
-    <div class="prov-card" id="quill-prov"></div>
-    <a class="tools__link" href="/settings">Configure in Settings →</a>
-  </section>
-  
-  <section class="tools__section">
-    <h2 class="tools__heading">About autosave</h2>
-    <p class="tools__para">
-      Quill saves a moment after you stop typing, and again when you leave the
-      page. The status line above the sheet always shows the last real save.
-    </p>
-  </section>
-  
-  <section class="tools__section">
-    <h2 class="tools__heading">Offline tools</h2>
-    <p class="tools__para">
-      The chips above the editor run deterministic local operations on your text.
-      “Rewrite with provider” only works with a configured model.
-    </p>
-  </section>
-  </div>
 {% endblock %}
 
 

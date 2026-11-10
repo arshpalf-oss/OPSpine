@@ -144,9 +144,16 @@
     </div>
 
     <div class="chat-compose">
+      {# Slash menu: /sort, /count and friends, run inline on the draft. #}
+      <div class="slash" id="slash-menu" role="listbox" aria-label="Commands"
+           hidden>
+        <p class="slash__label" id="slash-label">Commands</p>
+        <ul class="slash__list" id="slash-list" role="presentation"></ul>
+      </div>
+
       <form class="chat-box" id="abyss-form" autocomplete="off">
-        <textarea id="abyss-input" rows="1" placeholder="Message Abyss"
-                  aria-label="Message"></textarea>
+        <textarea id="abyss-input" rows="1" placeholder="Message Abyss, or type / for commands"
+                  aria-label="Message" aria-describedby="abyss-hint"></textarea>
         <button class="chat-send" type="submit" id="abyss-send" aria-label="Send message">
           <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor"
                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -154,7 +161,7 @@
         </button>
       </form>
       <p class="chat-hint" id="abyss-hint">
-        Local-only mode is on. Local tools run offline.
+        Type <kbd>/</kbd> for offline commands. <kbd>/help</kbd> lists them all.
       </p>
     </div>
   </div>
@@ -168,12 +175,19 @@
   <aside class="chat-tools" id="chat-tools" aria-label="Toolbox">
     <div class="chat-tools__rail" id="tools-rail-body">
       {# Collapsed state: icon-only buttons. #}
-      <button class="rail-btn" type="button" data-tool-section="tools"
-              title="Local tools" aria-label="Show local tools">
+      <a class="rail-btn" href="/dashboard" title="All apps" aria-label="All apps">
+        <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor"
+             stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="3" width="7" height="7" rx="1.6"/>
+          <rect x="14" y="3" width="7" height="7" rx="1.6"/>
+          <rect x="3" y="14" width="7" height="7" rx="1.6"/>
+          <rect x="14" y="14" width="7" height="7" rx="1.6"/></svg>
+      </a>
+      <button class="rail-btn" type="button" data-tool-section="apps"
+              title="Apps" aria-label="Show the other apps">
         <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor"
              stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M14.7 6.3a3.5 3.5 0 004.6 4.6l-8.4 8.4a2.5 2.5 0 01-3.5-3.5z"/>
-          <path d="M6 6l3 3"/></svg>
+          <path d="M4 7h16M4 12h16M4 17h10"/></svg>
       </button>
       <button class="rail-btn" type="button" data-tool-section="status"
               title="Provider status" aria-label="Show provider status">
@@ -206,40 +220,16 @@
       </header>
 
       <div class="chat-tools__scroll">
-        {# ---- Local tools ---- #}
-        <section class="tool-block" id="tool-section-tools">
+        {# ---- Apps: the other OPSpine tools, one click away ----
+           The basic text operations that used to live here are now slash
+           commands in the composer (/sort, /count, /bullets…), where they act
+           on the draft you are already writing. #}
+        <section class="tool-block" id="tool-section-apps">
           <div class="tool-block__head">
-            <span class="tool-block__badge">Offline</span>
-            <h3>Local tools</h3>
-            <p>Deterministic text operations. Not a language model.</p>
+            <h3>Apps</h3>
+            <p>The same data, one click away.</p>
           </div>
-
-          <label class="tool-field">
-            <span>Tool</span>
-            <select class="tool-input" id="tool-select"></select>
-          </label>
-
-          <label class="tool-field">
-            <span>Text</span>
-            <textarea class="tool-input" id="tool-input" rows="5"
-                      placeholder="Paste the text to process…"></textarea>
-          </label>
-
-          <button class="tool-run" id="tool-run" type="button">Run tool</button>
-
-          <div class="tool-out" id="tool-output" hidden>
-            <div class="tool-out__head">
-              <span id="tool-out-label"></span>
-              <button class="chat-icon" id="tool-copy" type="button" aria-label="Copy result">
-                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor"
-                     stroke-width="1.8"><rect x="9" y="9" width="11" height="11" rx="2"/>
-                  <path d="M5 15V5a2 2 0 012-2h10"/></svg>
-              </button>
-            </div>
-            <pre id="tool-out-body"></pre>
-          </div>
-
-          <p class="tool-note" id="tool-note"></p>
+          <ul class="apps-rail" id="abyss-apps"></ul>
         </section>
 
         {# ---- Provider status ---- #}

@@ -15,7 +15,6 @@
             in_progress: document.getElementById('col-in_progress'),
             done: document.getElementById('col-done') },
     counts: document.getElementById('wboard-counts'),
-    stats: document.getElementById('wboard-stats'),
     search: document.getElementById('wboard-search'),
     add: document.getElementById('wboard-add'),
     detailEmpty: document.getElementById('wboard-detail-empty'),
@@ -33,6 +32,13 @@
     save: document.getElementById('wboard-save'),
     move: document.getElementById('wboard-move'),
     statusLine: document.getElementById('wboard-status-line'),
+    filters: document.getElementById('wboard-filters'),
+    filterCounts: {
+      all: document.getElementById('wf-all'),
+      todo: document.getElementById('wf-todo'),
+      in_progress: document.getElementById('wf-in_progress'),
+      done: document.getElementById('wf-done'),
+    },
     dirty: document.getElementById('wboard-dirty'),
   };
 
@@ -45,6 +51,8 @@
     /* What the open form looked like when it was loaded, so the panel can
        say whether there is anything unsaved. */
     pristine: '',
+    /* Sidebar filter; 'all' shows every task. */
+    filter: 'all',
   };
 
   const STATUS_LABEL = { todo: 'To do', in_progress: 'In progress', done: 'Done' };
@@ -74,6 +82,24 @@
       if (!grouped.length) return;
       grouped.forEach((task) => host.appendChild(taskCard(task)));
     });
+
+    /* The sidebar filter dims the columns it excludes instead of hiding them,
+       so the board never looks empty while tasks still exist. */
+    U.$$('.column', root).forEach((column) => {
+      column.classList.toggle(
+        'is-dimmed',
+        state.filter !== 'all' && column.dataset.status !== state.filter
+      );
+    });
+
+    if (dom.filterCounts) {
+      dom.filterCounts.all.textContent = String(state.counts.total || 0);
+      ['todo', 'in_progress', 'done'].forEach((key) => {
+        if (dom.filterCounts[key]) {
+          dom.filterCounts[key].textContent = String(state.counts[key] || 0);
+        }
+      });
+    }
 
     ['todo', 'in_progress', 'done'].forEach((status) => {
       const counter = root.querySelector(`[data-count="${status}"]`);
@@ -207,6 +233,7 @@
   }
 
   function renderStats() {
+    if (!dom.stats) return;
     U.clear(dom.stats);
     [
       ['Total', state.counts.total],
@@ -439,6 +466,20 @@
       field.addEventListener(type, syncDirty);
     });
   });
+
+  if (dom.filters) {
+    dom.filters.addEventListener('click', (event) => {
+      const button = event.target.closest('.ws-filter');
+      if (!button) return;
+      state.filter = button.dataset.filter;
+      U.$$('.ws-filter', dom.filters).forEach((node) => {
+        const active = node === button;
+        node.classList.toggle('is-active', active);
+        node.setAttribute('aria-pressed', String(active));
+      });
+      render();
+    });
+  }
 
   dom.form.addEventListener('submit', save);
   dom.add.addEventListener('click', openNew);

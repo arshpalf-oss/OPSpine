@@ -650,15 +650,24 @@ class TestPages(BaseCase):
                 self.assertIn('id="app-shell"', html)
                 self.assertIn('class="sidebar', html)
 
-    def test_every_workspace_has_exactly_one_navigation_bar(self):
-        """One nav rail, one surface. A second bar was the reported bug."""
+    def test_every_workspace_has_its_own_sidebar(self):
+        """Each tool is its own app: one sidebar, holding its own content.
+
+        The global OPSpine nav used to be that column. A tool room that shows a
+        nav it does not use is the reported bug.
+        """
         for key in ("scout", "forge", "quill", "kronos", "whiteboard",
                     "dash", "working-board", "library", "settings"):
             with self.subTest(key=key):
                 html = self.client.get(f"/{key}").get_data(as_text=True)
-                self.assertEqual(html.count('<nav'), 1, "expected one <nav>")
                 self.assertEqual(html.count('class="sidebar sidebar--left"'), 1)
                 self.assertEqual(html.count('id="sidebar"'), 1)
+                # One sidebar, filled with this tool's own material.
+                self.assertEqual(html.count("data-ws-side"), 1,
+                                 "sidebar is empty — that is a blank column")
+                # No global navigation of any kind.
+                self.assertEqual(html.count("<nav"), 0, "stray <nav> in a tool")
+                self.assertNotIn('class="nav__item', html)
 
     def test_no_global_tools_panel_anywhere(self):
         """The right-hand tools panel is gone; its content lives per workspace."""
@@ -701,36 +710,52 @@ class TestPages(BaseCase):
         self.assertEqual(documents.split_rows("a\tb\tc\n1\t2\t3"),
                          [["a", "b", "c"], ["1", "2", "3"]])
 
-    def test_workspace_reference_is_nested_inside_its_tool(self):
-        """The reference column belongs to the tool, not to the shell.
+    def test_sidebar_shows_tool_content_not_documentation(self):
+        """A column of prose about the tool is not a control.
 
-        It used to render as a bare band above the workspace because it sat
-        outside the tool's root element.
+        The reference columns listed shortcuts, autosave behaviour and counts —
+        text you cannot act on. Each tool now fills the sidebar with its own
+        list: chats, files, boards, tasks, sections.
         """
-        roots = {
-            "scout": "scout", "quill": "quill", "kronos": "kronos",
-            "whiteboard": "wb", "dash": "dashconsole",
-            "working-board": "wboard", "library": "library",
-            "settings": "settings", "forge": "forge",
+        expected = {
+            "scout": "Sessions", "quill": "Drafts", "whiteboard": "Boards",
+            "working-board": "Filters", "forge": "Generated",
+            "dash": "Recent actions", "library": "Sections",
+            "settings": "Sections", "kronos": "This month",
         }
-        for key, root in roots.items():
+        for key, title in expected.items():
             with self.subTest(key=key):
                 html = self.client.get(f"/{key}").get_data(as_text=True)
-                aside_at = html.find('class="ws-aside"')
-                root_at = html.find(f'class="{root}"')
-                self.assertGreater(aside_at, 0, "reference column missing")
-                self.assertGreater(root_at, 0, f"root .{root} missing")
-                self.assertGreater(aside_at, root_at,
-                                   "reference column must come after the root opens")
+                self.assertIn(title, html)
+                # The old reference column is gone, and with it the prose.
+                self.assertNotIn("ws-aside", html)
+                self.assertNotIn("tools__heading", html)
 
-    def test_workspace_context_moved_into_the_workspace(self):
-        """Nothing that was reachable became unreachable."""
-        for key in ("scout", "forge", "quill", "kronos", "whiteboard",
-                    "dash", "working-board", "library", "settings"):
-            with self.subTest(key=key):
-                html = self.client.get(f"/{key}").get_data(as_text=True)
-                self.assertIn("ws-aside", html)
-                self.assertIn("tools__heading", html)
+                # Scoped to the sidebar: the only column that has to earn its
+                # place. (The help sheet is a separate, working overlay.)
+                starts = html.index('id="workspace-aside"')
+                sidebar = html[starts:html.index('</div>', html.index("ws-side", starts))]
+                for prose in ("Shortcuts", "Honest limits", "How it works",
+                              "About autosave", "OFFLINE TOOLS", "What Kronos does"):
+                    self.assertNotIn(prose, sidebar,
+                                     f"{prose} is documentation, not a control")
+
+    def test_abyss_offers_tools_as_slash_commands(self):
+        """Basic text tools belong in the composer, not in a panel."""
+        html = self.client.get("/abyss").get_data(as_text=True)
+        self.assertIn('id="slash-menu"', html)
+        self.assertNotIn('id="tool-select"', html)
+        self.assertNotIn("Local tools", html)
+        js = (REPO_ROOT / "opspine/static/js/workspaces/abyss.js").read_text()
+        self.assertIn("SLASH_COMMANDS", js)
+        # Every slash command must name a tool the server actually has.
+        from opspine.services.localtext import TOOLS
+        import re
+        pairs = re.findall(r"cmd: '(\w+)'[^}]*?tool: '(\w+)'", js)
+        self.assertTrue(pairs)
+        for cmd, tool in pairs:
+            with self.subTest(cmd=cmd):
+                self.assertIn(tool, TOOLS)
 
     def test_no_backdrop_filter_in_any_sheet(self):
         """Blur over a parent with no background smears the page grey."""

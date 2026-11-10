@@ -2,21 +2,25 @@
 
 {% block title %}Whiteboard{% endblock %}
 
+{% block sidebar %}
+{# Your boards live here. The toolbar keeps New/Rename for editing, but the
+   list itself belongs where every other app keeps its files. #}
+<div class="ws-side" data-ws-side>
+  <div class="ws-side__head">
+    <h2 class="ws-side__title">Boards</h2>
+    <button class="btn btn--sm" id="wb-new-board" type="button">New</button>
+  </div>
+  <ul class="ws-side__list" id="wb-board-list"></ul>
+</div>
+{% endblock %}
+
 {% block workspace %}
 
 <div class="wb" data-whiteboard>
   {# Floating toolbar — never overlaps the toolbar row, stays above the canvas. #}
   <div class="wb__bar" role="toolbar" aria-label="Board tools">
     <div class="wb__group">
-      <label class="wb__board-select">
-        <span class="visually-hidden">Board</span>
-        <select id="wb-boards" class="wb__select" aria-label="Select board"></select>
-      </label>
-      <button class="wb__btn" id="wb-new-board" type="button" title="Create a board">
-        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor"
-             stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
-        New
-      </button>
+      <span class="wb__board-name" id="wb-board-name">Board</span>
       <button class="wb__btn" id="wb-rename-board" type="button" title="Rename this board">
         <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor"
              stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
@@ -126,76 +130,7 @@
 
 
 
-  {# Workspace-owned context. Previously this lived in a global
-     right-hand panel; it belongs to this tool, so it renders here. #}
-  <div class="ws-aside" data-ws-aside>
-
-  <section class="tools__section">
-    <h2 class="tools__heading">Board</h2>
-    <dl class="tools__stats" id="wb-stats">
-      <div><dt>Notes</dt><dd>0</dd></div>
-      <div><dt>Links</dt><dd>0</dd></div>
-      <div><dt>Zoom</dt><dd>100%</dd></div>
-    </dl>
-  </section>
-  
-  <section class="tools__section">
-    <h2 class="tools__heading">Controls</h2>
-    <ul class="tools__keys">
-      <li><kbd>V</kbd><span>Select tool</span></li>
-      <li><kbd>N</kbd><span>Add a note</span></li>
-      <li><kbd>L</kbd><span>Link two notes</span></li>
-      <li><kbd>Del</kbd><span>Delete selection</span></li>
-      <li><kbd>Space</kbd><span>Pan the canvas</span></li>
-      <li><kbd>Ctrl S</kbd><span>Save the board</span></li>
-      <li><kbd>Ctrl ↵</kbd><span>Finish editing a note</span></li>
-      <li><kbd>Ctrl Z</kbd><span>Undo the last change</span></li>
-    </ul>
-  </section>
-  
-  <section class="tools__section">
-    <h2 class="tools__heading">Saving</h2>
-    <p class="tools__para">
-      Boards are stored in your local database. Changes stay in this browser tab
-      until you press Save.
-    </p>
-  </section>
-  </div>
 </div>
-
-  {# Workspace-owned context. Previously this lived in a global
-     right-hand panel; it belongs to this tool, so it renders here. #}
-  <div class="ws-aside" data-ws-aside>
-
-  <section class="tools__section">
-    <h2 class="tools__heading">Board</h2>
-    <dl class="tools__stats" id="wb-stats">
-      <div><dt>Notes</dt><dd>0</dd></div>
-      <div><dt>Links</dt><dd>0</dd></div>
-      <div><dt>Zoom</dt><dd>100%</dd></div>
-    </dl>
-  </section>
-  
-  <section class="tools__section">
-    <h2 class="tools__heading">Controls</h2>
-    <ul class="tools__keys">
-      <li><kbd>V</kbd><span>Select tool</span></li>
-      <li><kbd>N</kbd><span>Add a note</span></li>
-      <li><kbd>L</kbd><span>Link two notes</span></li>
-      <li><kbd>Del</kbd><span>Delete selection</span></li>
-      <li><kbd>Space</kbd><span>Pan the canvas</span></li>
-      <li><kbd>Ctrl S</kbd><span>Save the board</span></li>
-    </ul>
-  </section>
-  
-  <section class="tools__section">
-    <h2 class="tools__heading">Saving</h2>
-    <p class="tools__para">
-      Boards are stored in your local database. Changes stay in this browser tab
-      until you press Save.
-    </p>
-  </section>
-  </div>
 {% endblock %}
 
 

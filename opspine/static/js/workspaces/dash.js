@@ -18,9 +18,6 @@
     filters: document.getElementById('dash-filters'),
     counters: document.getElementById('dash-counters'),
     recent: document.getElementById('dash-recent'),
-    toolsState: document.getElementById('dash-tools-state'),
-    modeCopy: document.getElementById('dash-mode-copy'),
-    modeToggle: document.getElementById('dash-mode-toggle'),
     count: document.getElementById('dash-count'),
   };
 
@@ -468,27 +465,6 @@
     });
   }
 
-  function renderToolsState() {
-    const p = state.providers;
-    U.clear(dom.toolsState);
-    [
-      ['Local-only', p.local_only ? 'on' : 'off'],
-      ['AI provider', p.ai_available ? p.ai_provider : 'none'],
-      ['Search provider', p.search_available ? p.search_provider : 'none'],
-      ['Database', 'local'],
-    ].forEach(([label, value]) => {
-      dom.toolsState.appendChild(U.el('div', {}, [
-        U.el('dt', { text: label }),
-        U.el('dd', { text: value }),
-      ]));
-    });
-
-    dom.modeCopy.textContent = p.local_only
-      ? 'Local-only mode is on. The server refuses every outbound provider request.'
-      : 'Network access is enabled. Only configured providers will be contacted.';
-    dom.modeToggle.textContent = p.local_only ? 'Enable network' : 'Enable local-only';
-  }
-
   /* ------------------------------------------------------------------ */
   /* Refresh                                                            */
   /* ------------------------------------------------------------------ */
@@ -523,20 +499,6 @@
     renderTable();
   });
 
-  dom.modeToggle.addEventListener('click', async () => {
-    const next = !state.settings.local_only;
-    try {
-      await api.post('/api/settings', { local_only: next });
-      state.settings.local_only = next;
-      state.providers = (await api.get('/api/providers')).providers;
-      U.success(next ? 'Local-only mode is on.' : 'Network access enabled.');
-      renderToolsState();
-      renderTable();
-    } catch (err) {
-      U.error(err.message);
-    }
-  });
-
   document.addEventListener('keydown', (event) => {
     if (event.metaKey || event.ctrlKey || event.altKey) return;
     const typing = ['INPUT', 'TEXTAREA', 'SELECT'].includes(
@@ -560,6 +522,5 @@
   renderCounters();
   renderTable();
   renderRecent();
-  renderToolsState();
   refresh();
 })();

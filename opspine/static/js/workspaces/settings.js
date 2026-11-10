@@ -19,7 +19,6 @@
     providerAi: document.getElementById('set-provider-ai'),
     providerSearch: document.getElementById('set-provider-search'),
     motionGrid: document.getElementById('set-motion-grid'),
-    capability: document.getElementById('set-capability'),
     exportBtn: document.getElementById('set-export'),
     importFile: document.getElementById('set-import-file'),
     importPreview: document.getElementById('set-import-preview'),
@@ -37,7 +36,32 @@
     resetCancel: document.getElementById('set-reset-cancel'),
     resetConfirm: document.getElementById('set-reset-confirm'),
     resetError: document.getElementById('set-reset-error'),
+    index: document.getElementById('set-index'),
   };
+
+  /* The sidebar index is generated from the panels that actually exist, so it
+     can never point at a section someone removed. */
+  function renderIndex() {
+    if (!dom.index) return;
+    U.clear(dom.index);
+    U.$$('.panel', root).forEach((panel) => {
+      const heading = panel.querySelector('.panel__title');
+      if (!heading || !heading.id) return;
+      dom.index.appendChild(U.el('li', {}, [
+        U.el('a', {
+          class: 'ws-index__link',
+          href: `#${heading.id}`,
+          text: heading.textContent,
+          onClick: (event) => {
+            event.preventDefault();
+            panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            panel.classList.add('is-targeted');
+            window.setTimeout(() => panel.classList.remove('is-targeted'), 1200);
+          },
+        }),
+      ]));
+    });
+  }
 
   const state = { settings: null, providers: null, pending: null };
 
@@ -95,17 +119,8 @@
       ]));
     });
 
-    U.clear(dom.capability);
-    [
-      ['Local-only', p.local_only ? 'on' : 'off'],
-      ['AI', p.ai_available ? p.ai_provider : 'none'],
-      ['Search', p.search_available ? p.search_provider : 'none'],
-    ].forEach(([label, value]) => {
-      dom.capability.appendChild(U.el('div', {}, [
-        U.el('dt', { text: label }),
-        U.el('dd', { text: value }),
-      ]));
-    });
+    /* The same three facts are already chips above; there is no second
+       panel repeating them. */
   }
 
   function renderSecrets() {
@@ -165,6 +180,7 @@
     dom.providerSearch.value = state.settings.provider_search || 'none';
     renderTheme();
     renderLaunch();
+    renderIndex();
     renderLocalOnly();
     renderStatus();
     renderSecrets();

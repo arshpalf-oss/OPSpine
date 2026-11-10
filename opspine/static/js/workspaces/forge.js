@@ -27,6 +27,7 @@
     sample: document.getElementById('forge-sample'),
     stage: document.getElementById('forge-stage'),
     history: document.getElementById('forge-history'),
+    recent: document.getElementById('forge-recent'),
     note: document.getElementById('forge-note'),
     bodyCount: document.getElementById('forge-body-count'),
     clear: document.getElementById('forge-clear'),
@@ -398,6 +399,7 @@
   async function loadHistory() {
     try {
       const data = await api.get('/api/forge/documents');
+      renderRecent(data.documents);
       U.clear(dom.history);
       if (!data.documents.length) {
         dom.history.appendChild(
@@ -429,6 +431,33 @@
       U.clear(dom.history);
       dom.history.appendChild(U.el('li', { class: 'out__empty', text: err.message }));
     }
+  }
+
+  /* The sidebar shows the newest files with a one-click download; the full
+     history stays in the main column. */
+  function renderRecent(documents) {
+    if (!dom.recent) return;
+    U.clear(dom.recent);
+    if (!documents.length) {
+      dom.recent.appendChild(U.el('li', {
+        class: 'ws-side__empty',
+        text: 'Nothing generated yet. Your files will appear here.',
+      }));
+      return;
+    }
+    documents.slice(0, 6).forEach((document) => {
+      dom.recent.appendChild(U.el('li', {}, [
+        U.el('button', {
+          class: 'ws-file',
+          type: 'button',
+          onClick: () => download(document),
+          title: `Download ${document.title}`,
+        }, [
+          U.el('span', { class: 'ws-file__type', text: document.format.toUpperCase() }),
+          U.el('span', { class: 'ws-file__name', text: document.title }),
+        ]),
+      ]));
+    });
   }
 
   /* ------------------------------------------------------------------ */
