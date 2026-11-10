@@ -1,160 +1,289 @@
-{% extends 'layout.html' %}
-{% from 'partials/icons.html' import icon as ws_icon %}
+{% extends 'base.html' %}
 
-{% block title %}Dashboard{% endblock %}
+{% block title %}OPSpine{% endblock %}
 
-{% block workspace %}
-<div class="dash">
-  <header class="dash__hero">
-    <p class="dash__kicker">
-      <span class="dash__dot" aria-hidden="true"></span>
-      {% if local_only %}Local-only mode{% else %}Network access enabled{% endif %}
-      <span class="dash__sep">·</span>
-      <span data-today></span>
-    </p>
-    <h2 class="dash__title">
-      {% if settings.display_name %}Welcome back, {{ settings.display_name }}.{% else %}Welcome to OPSpine.{% endif %}
-    </h2>
-    <p class="dash__lede">
-      Nine specialist workspaces, one local database, no account. Everything you make
-      stays in <code>data/</code> on this machine.
-    </p>
+{% block styles %}
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/shell.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/launcher.css') }}">
+{% endblock %}
 
-    <div class="dash__search">
-      <button class="dash__search-btn" data-action="open-palette" type="button">
-        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor"
-             stroke-width="1.8" stroke-linecap="round" aria-hidden="true">
+{% block shell %}
+<div class="launcher" id="launcher">
+
+  {# ------------------------------------------------------------------ #}
+  {# Nav — hairline bar, no sidebar. This is the only chrome.          #}
+  {# ------------------------------------------------------------------ #}
+  <header class="l-nav">
+    <a class="l-brand" href="/">
+      <span class="l-brand__mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24" width="19" height="19" fill="none"
+             stroke="currentColor" stroke-width="1.7" stroke-linejoin="round">
+          <path d="M12 3l7.5 7.5L12 18 4.5 10.5z"/>
+          <path d="M12 7.5l3.5 3.5L12 14.5 8.5 11z"/>
+        </svg>
+      </span>
+      OPSpine
+      <span class="l-brand__tm" aria-hidden="true">™</span>
+    </a>
+
+    <nav class="l-nav__links" aria-label="Launcher sections">
+      <a href="#workspaces">Workspaces</a>
+      <a href="#activity">Activity</a>
+      <a href="#system">System</a>
+    </nav>
+
+    <div class="l-nav__actions">
+      <button class="l-btn l-btn--ghost" data-action="open-palette" type="button">
+        <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor"
+             stroke-width="1.9" stroke-linecap="round" aria-hidden="true">
           <circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
-        <span>Search workspaces, drafts, files, events…</span>
-        <kbd>Ctrl K</kbd>
+        Search
+        <kbd>{{ 'Cmd' if false else 'Ctrl' }} K</kbd>
+      </button>
+      <button class="l-btn l-btn--ghost l-btn--icon" data-action="toggle-theme"
+              aria-label="Switch light or dark theme" title="Switch theme (Ctrl+T)">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor"
+             stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"
+             class="theme-icon theme-icon--sun">
+          <circle cx="12" cy="12" r="4"/><path d="M12 3v2M12 19v2M3 12h2M19 12h2M5.6 5.6l1.4 1.4M17 17l1.4 1.4M18.4 5.6L17 7M7 17l-1.4 1.4"/>
+        </svg>
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor"
+             stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"
+             class="theme-icon theme-icon--moon">
+          <path d="M20 14.5A8 8 0 019.5 4a8 8 0 1010.5 10.5z"/>
+        </svg>
+      </button>
+      <button class="l-btn l-btn--ink" data-action="open-help" type="button">
+        Shortcuts
       </button>
     </div>
   </header>
 
-  <section class="dash__section" aria-labelledby="dash-workspaces">
-    <div class="section-title">
-      <h2 id="dash-workspaces">Workspaces</h2>
-      <span class="section-title__meta">Press Ctrl 0–8 to jump directly</span>
-    </div>
+  {# ------------------------------------------------------------------ #}
+  {# Hero                                                               #}
+  {# ------------------------------------------------------------------ #}
+  <section class="l-hero">
+    <div class="paper-grid" aria-hidden="true"></div>
 
-    <div class="cards">
-      {% for item in workspaces %}
-        {% if item.group != 'launcher' %}
-          <a class="card" href="{{ item.path }}" style="--card-accent: {{ item.accent }}">
-            <span class="card__icon" aria-hidden="true">{{ ws_icon(item.key, 20) }}</span>
-            <span class="card__head">
-              <span class="card__name">{{ item.name }}</span>
-              {% if item.shortcut %}<kbd class="card__key">{{ item.shortcut }}</kbd>{% endif %}
-            </span>
-            <span class="card__tag">{{ item.tagline }}</span>
-            <span class="card__desc">{{ item.description }}</span>
-            <span class="card__open">Open workspace</span>
-          </a>
-        {% endif %}
-      {% endfor %}
-    </div>
-  </section>
+    {# Decorative particle field: the reference animates this. #}
+    <canvas class="l-hero__field" id="launcher-field" aria-hidden="true"></canvas>
 
-  <section class="dash__section" aria-labelledby="dash-recent">
-    <div class="section-title">
-      <h2 id="dash-recent">Recent activity</h2>
-      {% if recent_activity %}
-        <span class="section-title__meta">{{ counts.actions_total }} action{{ '' if counts.actions_total == 1 else 's' }} recorded</span>
-      {% endif %}
-    </div>
+    <div class="l-hero__inner">
+      <p class="l-eyebrow">
+        <span class="l-rule" aria-hidden="true"></span>
+        The local-first workspace
+      </p>
 
-    {% if recent_activity %}
-      <ul class="recent">
-        {% for item in recent_activity %}
-          <li class="recent__row">
-            <span class="recent__ws">{{ item.workspace_label }}</span>
-            <a class="recent__label" href="{{ item.target or '/' ~ item.workspace }}">{{ item.label }}</a>
-            <time class="recent__time">{{ item.created_at | relative_time }}</time>
-          </li>
-        {% endfor %}
-      </ul>
-    {% else %}
-      <div class="empty-first">
-        <div class="empty-first__art" aria-hidden="true">
-          <span></span><span></span><span></span>
-        </div>
-        <p class="empty-first__title">Nothing here yet — and that is accurate.</p>
-        <p class="empty-first__body">
-          OPSpine does not invent history. As soon as you create a document, draft,
-          event or conversation, it appears here and in the tools panel.
+      <h1 class="l-display">
+        <span class="l-display__line">Ten rooms.</span>
+        <span class="l-display__line l-display__line--muted">One machine.</span>
+      </h1>
+
+      <div class="l-hero__foot">
+        <p class="l-lede">
+          Everything you make stays in a folder on your computer. No account,
+          no cloud, no key required — open a room and start.
         </p>
-        <div class="empty-first__actions">
-          <a class="btn btn--primary" href="/forge">Make your first file</a>
-          <a class="btn" href="/abyss">Open Abyss</a>
+
+        <div class="l-hero__cta">
+          <a class="l-btn l-btn--ink l-btn--lg" href="/abyss">
+            Open Abyss
+            <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor"
+                 stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                 aria-hidden="true"><path d="M5 12h13M13 6l6 6-6 6"/></svg>
+          </a>
+          <a class="l-btn l-btn--outline l-btn--lg" href="#workspaces">All workspaces</a>
         </div>
       </div>
-    {% endif %}
+    </div>
   </section>
 
-  <section class="dash__section" aria-labelledby="dash-motion">
-    <div class="section-title">
-      <h2 id="dash-motion">Motion</h2>
-      <span class="section-title__meta">Applies across every workspace</span>
+  {# ------------------------------------------------------------------ #}
+  {# Metrics strip — real numbers only                                  #}
+  {# ------------------------------------------------------------------ #}
+  <section class="l-metrics" id="system" aria-label="What is on this machine">
+    <div class="l-metrics__head">
+      <p class="l-eyebrow"><span class="l-rule" aria-hidden="true"></span>This machine</p>
+      <span class="l-metrics__live">
+        <span class="l-dot{% if local_only %} l-dot--good{% endif %}" aria-hidden="true"></span>
+        {{ 'Local-only' if local_only else 'Network enabled' }}
+      </span>
     </div>
-    <div class="motion" role="group" aria-label="Motion preset">
-      {% for key, label, note in [
-        ('liquid', 'Liquid', 'Fluid, balanced'),
-        ('calm', 'Calm', 'Slower, gentler'),
-        ('cinematic', 'Cinematic', 'Deeper, longer'),
-        ('still', 'Still', 'No animation')
-      ] %}
-        <button class="motion__option{% if settings.motion == key %} is-active{% endif %}"
-                data-motion-option="{{ key }}" type="button"
-                aria-pressed="{{ 'true' if settings.motion == key else 'false' }}">
-          <span class="motion__name">{{ label }}</span>
-          <span class="motion__note">{{ note }}</span>
-        </button>
+
+    <dl class="l-metrics__row" id="launcher-metrics">
+      <div>
+        <dt>Conversations</dt>
+        <dd data-count="conversations">{{ counts.conversations }}</dd>
+      </div>
+      <div>
+        <dt>Drafts</dt>
+        <dd data-count="drafts">{{ counts.drafts }}</dd>
+      </div>
+      <div>
+        <dt>Events</dt>
+        <dd data-count="events">{{ counts.events }}</dd>
+      </div>
+      <div>
+        <dt>Tasks</dt>
+        <dd data-count="tasks">{{ counts.tasks }}</dd>
+      </div>
+      <div>
+        <dt>Files</dt>
+        <dd data-count="documents">{{ counts.documents }}</dd>
+      </div>
+      <div>
+        <dt>Boards</dt>
+        <dd data-count="boards">{{ counts.boards }}</dd>
+      </div>
+    </dl>
+  </section>
+
+  {# ------------------------------------------------------------------ #}
+  {# Workspaces — numbered index, hairline rows                         #}
+  {# ------------------------------------------------------------------ #}
+  <section class="l-section" id="workspaces">
+    <header class="l-section__head">
+      <div>
+        <p class="l-eyebrow"><span class="l-rule" aria-hidden="true"></span>Workspaces</p>
+        <h2 class="l-h2">Pick a room.<br><span class="l-muted">Each one is its own app.</span></h2>
+      </div>
+      <p class="l-section__note">
+        <kbd>Ctrl</kbd> + <kbd>0</kbd>–<kbd>8</kbd> jumps straight in.
+      </p>
+    </header>
+
+    <ol class="l-index">
+      {% for item in workspaces if item.key != 'dashboard' %}
+        <li class="l-index__item" style="--item-accent: {{ item.accent }}">
+          <a class="l-row" href="{{ item.path }}" data-launch="{{ item.key }}">
+            <span class="l-row__num" aria-hidden="true">{{ '%02d' % loop.index }}</span>
+
+            <span class="l-row__icon" aria-hidden="true">{{ ws_icon(item.key, 20) }}</span>
+
+            <span class="l-row__main">
+              <span class="l-row__name">{{ item.name }}</span>
+              <span class="l-row__desc">{{ item.description }}</span>
+            </span>
+
+            <span class="l-row__meta">
+              {% if item.shortcut %}
+                <kbd class="l-row__key">{{ item.shortcut }}</kbd>
+              {% else %}
+                <span class="l-row__key l-row__key--none" aria-hidden="true">—</span>
+              {% endif %}
+              <span class="l-row__go" aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor"
+                     stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M5 12h13M13 6l6 6-6 6"/></svg>
+              </span>
+            </span>
+          </a>
+        </li>
       {% endfor %}
+    </ol>
+  </section>
+
+  {# ------------------------------------------------------------------ #}
+  {# Dark panel: recent activity                                        #}
+  {# ------------------------------------------------------------------ #}
+  <section class="l-panel" id="activity">
+    <div class="l-panel__grid" aria-hidden="true"></div>
+
+    <div class="l-panel__inner">
+      <header class="l-panel__head">
+        <div>
+          <p class="l-eyebrow l-eyebrow--inv">
+            <span class="l-rule" aria-hidden="true"></span>Recent
+          </p>
+          <h2 class="l-h2 l-h2--inv">
+            What you actually did.<br>
+            <span class="l-muted-inv">Nothing invented here.</span>
+          </h2>
+        </div>
+        <button class="l-btn l-btn--inv-ghost" type="button" id="launcher-clear-activity">
+          Clear history
+        </button>
+      </header>
+
+      <div class="l-panel__body">
+        <div class="l-activity">
+          <h3 class="l-panel__label">Latest actions</h3>
+          <ol class="l-activity__list" id="launcher-activity">
+            {% for item in recent_activity %}
+              <li>
+                <a href="{{ item.target or '/' ~ item.workspace }}">
+                  <span class="l-activity__ws">{{ item.workspace_label }}</span>
+                  <span class="l-activity__what">{{ item.label }}</span>
+                  <time>{{ item.created_at | relative_time }}</time>
+                </a>
+              </li>
+            {% else %}
+              <li class="l-activity__empty">
+                Nothing yet. Open a room and whatever you create will appear here —
+                with a real timestamp.
+              </li>
+            {% endfor %}
+          </ol>
+        </div>
+
+        <div class="l-panel__side">
+          <h3 class="l-panel__label">Status</h3>
+          <dl class="l-panel__stats">
+            <div>
+              <dt>Mode</dt>
+              <dd>{{ 'Local-only' if local_only else 'Network enabled' }}</dd>
+            </div>
+            <div>
+              <dt>AI provider</dt>
+              <dd>{{ provider_status.ai_provider if provider_status.ai_available else 'None' }}</dd>
+            </div>
+            <div>
+              <dt>Research</dt>
+              <dd>{{ provider_status.search_provider if provider_status.search_available else 'None' }}</dd>
+            </div>
+          </dl>
+
+          <a class="l-panel__link" href="/settings">
+            Configure providers
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor"
+                 stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                 aria-hidden="true"><path d="M5 12h13M13 6l6 6-6 6"/></svg>
+          </a>
+        </div>
+      </div>
     </div>
   </section>
+
+  {# ------------------------------------------------------------------ #}
+  {# Footer                                                             #}
+  {# ------------------------------------------------------------------ #}
+  <footer class="l-foot">
+    <div class="l-foot__brand">
+      <span class="l-brand__mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24" width="17" height="17" fill="none"
+             stroke="currentColor" stroke-width="1.7" stroke-linejoin="round">
+          <path d="M12 3l7.5 7.5L12 18 4.5 10.5z"/>
+          <path d="M12 7.5l3.5 3.5L12 14.5 8.5 11z"/>
+        </svg>
+      </span>
+      OPSpine
+    </div>
+
+    <p class="l-foot__note">
+      Your data lives in <code>data/</code> next to the app. Nothing leaves this machine
+      unless you configure a provider and ask for it.
+    </p>
+
+    <nav class="l-foot__links" aria-label="Footer">
+      <a href="/library">Library</a>
+      <a href="/settings">Settings</a>
+      <button type="button" data-action="open-help">Shortcuts</button>
+    </nav>
+  </footer>
 </div>
 {% endblock %}
 
-{% block tools %}
-<section class="tools__section">
-  <h2 class="tools__heading">This machine</h2>
-  <dl class="tools__stats">
-    <div><dt>Conversations</dt><dd>{{ counts.conversations }}</dd></div>
-    <div><dt>Documents</dt><dd>{{ counts.documents }}</dd></div>
-    <div><dt>Drafts</dt><dd>{{ counts.drafts }}</dd></div>
-    <div><dt>Events</dt><dd>{{ counts.events }}</dd></div>
-    <div><dt>Tasks</dt><dd>{{ counts.tasks }}</dd></div>
-    <div><dt>Research</dt><dd>{{ counts.research }}</dd></div>
-    <div><dt>Boards</dt><dd>{{ counts.boards }}</dd></div>
-  </dl>
-</section>
-
-<section class="tools__section">
-  <h2 class="tools__heading">Providers</h2>
-  <ul class="prov-list">
-    <li>
-      <span>Assistant</span>
-      <span class="prov-state {{ 'is-on' if provider_status.ai_available else 'is-off' }}">
-        {{ provider_status.ai_provider if provider_status.ai_available else 'Not configured' }}
-      </span>
-    </li>
-    <li>
-      <span>Research</span>
-      <span class="prov-state {{ 'is-on' if provider_status.search_available else 'is-off' }}">
-        {{ provider_status.search_provider if provider_status.search_available else 'Not configured' }}
-      </span>
-    </li>
-  </ul>
-  <a class="tools__link" href="/settings">Configure providers →</a>
-</section>
-
-<section class="tools__section">
-  <h2 class="tools__heading">Quick start</h2>
-  <ul class="quicklist">
-    <li><a href="/forge">Generate a real file</a></li>
-    <li><a href="/quill?new=1">Start writing</a></li>
-    <li><a href="/kronos">Schedule something</a></li>
-    <li><a href="/dash">Browse all commands</a></li>
-  </ul>
-</section>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/shell.js') }}"></script>
+<script src="{{ url_for('static', filename='js/workspaces/launcher.js') }}"></script>
 {% endblock %}

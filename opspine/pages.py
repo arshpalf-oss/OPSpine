@@ -28,7 +28,24 @@ def _shell_context(workspace: dict) -> dict:
 
 @bp.get("/")
 def index():
-    return redirect(url_for("pages.workspace", key="dashboard"))
+    """The launcher is the front door.
+
+    When the user has pinned a workspace ("resume" launch mode) a bare `/`
+    goes straight there, but `/dashboard` always shows the launcher so it is
+    never more than one click away.
+    """
+    from flask import make_response
+
+    values = settings.public_settings()
+    pinned = values.get("last_workspace") or ""
+    if values.get("launch_mode") == "resume" and pinned.startswith("/"):
+        target = get(pinned.lstrip("/"))
+        if target and target["key"] != "dashboard":
+            return redirect(url_for("pages.workspace", key=target["key"]))
+
+    # Otherwise render the launcher directly so `/` is not a redirect hop.
+    found = get("dashboard")
+    return make_response(render_template(found["template"], **_shell_context(found)), 200)
 
 
 @bp.get("/<key>")
@@ -38,4 +55,6 @@ def workspace(key: str):
         from flask import abort
 
         abort(404)
+    if found["key"] != "dashboard":
+        settings.set_value("last_workspace", found["path"])
     return render_template(found["template"], **_shell_context(found))

@@ -18,6 +18,9 @@ from .. import db
 BOOL_KEYS = {"local_only"}
 INT_KEYS = {"sidebar_collapsed", "tools_collapsed"}
 MOTION_CHOICES = ("liquid", "calm", "cinematic", "still")
+THEME_CHOICES = ("light", "dark")
+LAUNCH_CHOICES = ("launcher", "resume")
+NAV_CHOICES = ("expanded", "collapsed")
 AI_PROVIDER_CHOICES = ("none", "gemini", "groq", "openrouter")
 SEARCH_PROVIDER_CHOICES = ("none", "brave", "tavily")
 

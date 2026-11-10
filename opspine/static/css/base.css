@@ -4,41 +4,48 @@
    ========================================================================== */
 
 :root {
-  /* Neutral scale tuned for a dark desktop application. */
-  --ink-000: #05070d;
-  --ink-050: #080b14;
-  --ink-100: #0c1019;
-  --ink-150: #10141f;
-  --ink-200: #151a27;
-  --ink-250: #1b2130;
-  --ink-300: #232a3b;
-  --ink-400: #333c52;
-  --ink-500: #4a556e;
-  --ink-600: #6b7690;
-  --ink-700: #939db5;
-  --ink-800: #b8c1d6;
-  --ink-900: #dde3f0;
-  --ink-950: #f2f5fc;
+  /* ---------- ink ramp -------------------------------------------------
+     Dark-mode-first naming kept for compatibility, but the *values* are the
+     light palette: --ink-950 is the strongest ink, --ink-000 the paper.
+     Every workspace reads --ink-* / --line*, so flipping the ramp here flips
+     all eleven workspaces at once. --ink-N is a *role*, not a brightness.
+     -------------------------------------------------------------------- */
+  --ink-000: #ffffff;
+  --ink-050: #faf9f7;
+  --ink-100: #f4f3f0;
+  --ink-150: #eeedea;
+  --ink-200: #e6e4e0;
+  --ink-250: #dcdad5;
+  --ink-300: #cdcac4;
+  --ink-400: #a9a5a0;
+  --ink-500: #86827d;
+  --ink-600: #6b6763;
+  --ink-700: #4e4a46;
+  --ink-800: #33302d;
+  --ink-900: #1a1917;
+  --ink-950: #0f0f0e;
 
-  --line-soft: rgba(255, 255, 255, 0.07);
-  --line: rgba(255, 255, 255, 0.11);
-  --line-strong: rgba(255, 255, 255, 0.19);
+  --line-soft: rgba(15, 15, 14, 0.08);
+  --line: rgba(15, 15, 14, 0.14);
+  --line-strong: rgba(15, 15, 14, 0.26);
 
-  /* The accent is overridden per workspace from the body[data-accent]. */
-  --accent: #8faeff;
-  --accent-ink: #0a0e1a;
-  --accent-soft: color-mix(in srgb, var(--accent) 18%, transparent);
-  --accent-line: color-mix(in srgb, var(--accent) 38%, transparent);
+  /* Per-workspace accents are set on body[data-accent]; these are fallbacks. */
+  --accent: #16150f;
+  --accent-ink: #ffffff;
+  --accent-soft: color-mix(in srgb, var(--accent) 9%, transparent);
+  --accent-line: color-mix(in srgb, var(--accent) 28%, transparent);
 
-  --danger: #ff6b6b;
-  --danger-ink: #2a0707;
-  --warn: #ffc861;
-  --good: #5eead4;
+  --danger: #b4231f;
+  --danger-ink: #ffffff;
+  --warn: #9a6212;
+  --good: #1f7a4d;
 
-  --bg: var(--ink-050);
-  --surface: rgba(21, 26, 39, 0.72);
-  --surface-solid: var(--ink-150);
-  --surface-raised: rgba(35, 42, 59, 0.66);
+  --bg: var(--ink-100);
+  --surface: var(--ink-050);
+  --surface-solid: var(--ink-000);
+  --surface-raised: var(--ink-000);
+  --surface-ink: #121110;
+  --on-ink: #f7f6f3;
 
   --radius-xs: 6px;
   --radius-sm: 9px;
@@ -46,25 +53,69 @@
   --radius-lg: 18px;
   --radius-pill: 999px;
 
-  --sidebar-w: 244px;
+  --sidebar-w: 248px;
   --sidebar-w-collapsed: 68px;
-  --tools-w: 276px;
-  --topbar-h: 62px;
+  --tools-w: 288px;
+  --topbar-h: 60px;
 
   --font-sans: "Inter", "Segoe UI", -apple-system, BlinkMacSystemFont, "Helvetica Neue",
     Arial, sans-serif;
   --font-mono: "JetBrains Mono", "SF Mono", "Cascadia Code", Consolas, monospace;
 
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
-  --shadow: 0 8px 24px -8px rgba(0, 0, 0, 0.55);
-  --shadow-lg: 0 24px 60px -18px rgba(0, 0, 0, 0.72);
-
-  --ease: cubic-bezier(0.32, 0.72, 0, 1);
+  --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
   --dur-fast: 120ms;
-  --dur: 200ms;
-  --dur-slow: 380ms;
+  --dur: 220ms;
+  --dur-slow: 420ms;
+  --focus: 0 0 0 3px color-mix(in srgb, var(--accent) 26%, transparent);
+}
 
-  --focus: 0 0 0 2px var(--ink-050), 0 0 0 4px var(--accent);
+/* ---------- dark theme: the previous palette --------------------------- */
+[data-theme="dark"] {
+  --ink-000: #05060a;
+  --ink-050: #080a10;
+  --ink-100: #0b0d12;
+  --ink-150: #10131a;
+  --ink-200: #151922;
+  --ink-250: #1b202b;
+  --ink-300: #232935;
+  --ink-400: #333b4a;
+  --ink-500: #4a5364;
+  --ink-600: #6b7486;
+  --ink-700: #939db0;
+  --ink-800: #b8c0cf;
+  --ink-900: #dde2ec;
+  --ink-950: #f3f6fb;
+
+  --line-soft: rgba(255, 255, 255, 0.07);
+  --line: rgba(255, 255, 255, 0.12);
+  --line-strong: rgba(255, 255, 255, 0.2);
+
+  --accent: #f2f4f8;
+  --accent-ink: #0b0d12;
+  --accent-soft: color-mix(in srgb, var(--accent) 12%, transparent);
+  --accent-line: color-mix(in srgb, var(--accent) 32%, transparent);
+
+  --danger: #f87171;
+  --danger-ink: #2a0707;
+  --warn: #fbbf24;
+  --good: #4ade80;
+
+  --bg: var(--ink-050);
+  --surface: rgba(21, 26, 39, 0.72);
+  --surface-solid: var(--ink-150);
+  --surface-raised: rgba(35, 42, 59, 0.66);
+  --surface-ink: #f4f5f8;
+  --on-ink: #0b0d12;
+}
+
+/* kbd and selection need to flip with the ramp. */
+:root kbd {
+  background: color-mix(in srgb, var(--ink-950) 4%, transparent);
+}
+
+[data-theme="dark"] kbd {
+  background: rgba(255, 255, 255, 0.04);
 }
 
 /* Motion presets, applied from <html data-motion="…">. */
@@ -72,16 +123,30 @@ html[data-motion="still"] {
   --dur-fast: 0ms;
   --dur: 0ms;
   --dur-slow: 0ms;
+  --ease: linear;
+  --ease-out: linear;
 }
 html[data-motion="calm"] {
-  --dur-fast: 150ms;
-  --dur: 280ms;
-  --dur-slow: 520ms;
+  --dur-fast: 90ms;
+  --dur: 150ms;
+  --dur-slow: 240ms;
+  --ease: cubic-bezier(0.4, 0, 0.2, 1);
 }
 html[data-motion="cinematic"] {
-  --dur-fast: 140ms;
-  --dur: 260ms;
-  --dur-slow: 620ms;
+  --dur-fast: 180ms;
+  --dur: 380ms;
+  --dur-slow: 720ms;
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --dur-fast: 0ms;
+    --dur: 0ms;
+    --dur-slow: 0ms;
+    --ease: linear;
+    --ease-out: linear;
+  }
 }
 
 /* ---------- reset ---------- */
@@ -111,7 +176,7 @@ body {
   font-family: var(--font-sans);
   font-size: 14px;
   line-height: 1.55;
-  color: var(--ink-900);
+  color: var(--ink-950);
   background: var(--bg);
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
@@ -167,7 +232,7 @@ kbd {
 }
 
 ::selection {
-  background: color-mix(in srgb, var(--accent) 34%, transparent);
+  background: color-mix(in srgb, var(--ink-950) 16%, transparent);
   color: var(--ink-950);
 }
 
