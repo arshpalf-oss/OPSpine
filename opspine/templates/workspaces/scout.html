@@ -2,6 +2,23 @@
 
 {% block title %}Scout{% endblock %}
 
+{% block sidebar %}
+{# Your research sessions live here — the Scout equivalent of a conversation
+   history. Pick one and its detail opens beside it. #}
+<div class="ws-side" data-ws-side>
+  <div class="ws-side__head">
+    <h2 class="ws-side__title">Sessions</h2>
+    <span class="ws-side__count sessions__count" id="scout-count"
+          aria-live="polite"></span>
+  </div>
+  <div class="ws-side__search">
+    <input type="search" class="input input--sm" id="scout-search"
+           placeholder="Search questions" aria-label="Search sessions" autocomplete="off">
+  </div>
+  <ul class="ws-side__list sessions" id="scout-sessions"></ul>
+</div>
+{% endblock %}
+
 {% block workspace %}
 
 <div class="scout" data-scout>
@@ -40,49 +57,12 @@
     </header>
 
     <div class="scout__grid">
-      {# Sessions #}
-      <section class="panel panel--sessions" aria-labelledby="scout-sessions-h">
-        <div class="panel__head">
-          <h3 id="scout-sessions-h">Sessions</h3>
-          <input type="search" class="input input--sm" id="scout-search"
-                 placeholder="Search questions" aria-label="Search sessions" autocomplete="off">
-        </div>
-        <p class="sessions__count" id="scout-count" aria-live="polite"></p>
-        <ul class="sessions" id="scout-sessions"></ul>
-      </section>
-
       {# Results + notes #}
       <section class="panel panel--workspace" aria-labelledby="scout-workspace-h">
         <h3 id="scout-workspace-h" class="visually-hidden">Session detail</h3>
         <div id="scout-detail"></div>
       </section>
     </div>
-  </div>
-
-
-
-  {# Workspace-owned context. Previously this lived in a global
-     right-hand panel; it belongs to this tool, so it renders here. #}
-  <div class="ws-aside" data-ws-aside>
-
-  <section class="tools__section">
-    <h2 class="tools__heading">Research provider</h2>
-    <div class="prov-card" id="scout-prov"></div>
-    <a class="tools__link" href="/settings">Configure in Settings →</a>
-  </section>
-  
-  <section class="tools__section">
-    <h2 class="tools__heading">What Scout will not do</h2>
-    <ul class="tools__keys">
-      <li><span>Invent citations</span></li>
-      <li><span>Claim a source was read</span></li>
-      <li><span>Score truth without evidence</span></li>
-    </ul>
-    <p class="tools__para" style="margin-top:10px">
-      When no provider is available, Scout still records your notes and links.
-      It will say plainly that it could not search.
-    </p>
-  </section>
   </div>
 </div>
 

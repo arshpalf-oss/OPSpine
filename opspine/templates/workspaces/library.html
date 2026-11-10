@@ -2,6 +2,34 @@
 
 {% block title %}Library{% endblock %}
 
+{% block sidebar %}
+{# The library's sections are its navigation: one vertical list. #}
+<div class="ws-side" data-ws-side>
+  <div class="ws-side__head">
+    <h2 class="ws-side__title">Sections</h2>
+  </div>
+  <div class="ws-side__list library__tabs" role="tablist"
+       aria-label="Library sections" id="library-tabs">
+    <button class="libtab is-active" role="tab" data-tab="documents" type="button"
+            aria-selected="true" aria-controls="library-panel">
+      Files <span class="libtab__count" data-tab-count="documents">0</span>
+    </button>
+    <button class="libtab" role="tab" data-tab="drafts" type="button" aria-selected="false"
+            aria-controls="library-panel">
+      Drafts <span class="libtab__count" data-tab-count="drafts">0</span>
+    </button>
+    <button class="libtab" role="tab" data-tab="research" type="button" aria-selected="false"
+            aria-controls="library-panel">
+      Research <span class="libtab__count" data-tab-count="research">0</span>
+    </button>
+    <button class="libtab" role="tab" data-tab="conversations" type="button"
+            aria-selected="false" aria-controls="library-panel">
+      Conversations <span class="libtab__count" data-tab-count="conversations">0</span>
+    </button>
+  </div>
+</div>
+{% endblock %}
+
 {% block workspace %}
 
 <div class="library" data-library>
@@ -30,61 +58,12 @@
 
   <p class="library__summary" id="library-summary" role="status" aria-live="polite"></p>
 
-  <div class="library__tabs" role="tablist" aria-label="Library sections" id="library-tabs">
-    <button class="libtab is-active" role="tab" data-tab="documents" type="button"
-            aria-selected="true" aria-controls="library-panel">
-      Files <span class="libtab__count" data-tab-count="documents">0</span>
-    </button>
-    <button class="libtab" role="tab" data-tab="drafts" type="button" aria-selected="false"
-            aria-controls="library-panel">
-      Drafts <span class="libtab__count" data-tab-count="drafts">0</span>
-    </button>
-    <button class="libtab" role="tab" data-tab="research" type="button" aria-selected="false"
-            aria-controls="library-panel">
-      Research <span class="libtab__count" data-tab-count="research">0</span>
-    </button>
-    <button class="libtab" role="tab" data-tab="conversations" type="button"
-            aria-selected="false" aria-controls="library-panel">
-      Conversations <span class="libtab__count" data-tab-count="conversations">0</span>
-    </button>
-  </div>
-
   <p class="library__notice" id="library-notice" hidden></p>
 
   <section class="library__panel" id="library-panel" aria-live="polite"></section>
 
 
 
-  {# Workspace-owned context. Previously this lived in a global
-     right-hand panel; it belongs to this tool, so it renders here. #}
-  <div class="ws-aside" data-ws-aside>
-
-  <section class="tools__section">
-    <h2 class="tools__heading">Storage</h2>
-    <dl class="tools__stats" id="library-stats">
-      <div><dt>Files</dt><dd>0</dd></div>
-      <div><dt>Drafts</dt><dd>0</dd></div>
-      <div><dt>Research</dt><dd>0</dd></div>
-      <div><dt>Chats</dt><dd>0</dd></div>
-    </dl>
-  </section>
-  
-  <section class="tools__section">
-    <h2 class="tools__heading">Where files live</h2>
-    <p class="tools__para">
-      Generated documents are stored in <code>data/documents</code> inside the
-      OPSpine folder. Metadata is in <code>data/opspine.db</code>.
-    </p>
-  </section>
-  
-  <section class="tools__section">
-    <h2 class="tools__heading">Missing files</h2>
-    <p class="tools__para">
-      If a file is deleted outside OPSpine, the record stays but is marked
-      “missing” so you are never shown a download that cannot work.
-    </p>
-  </section>
-  </div>
 </div>
 
   {# Workspace-owned context. Previously this lived in a global

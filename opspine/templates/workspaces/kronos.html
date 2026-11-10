@@ -2,6 +2,23 @@
 
 {% block title %}Kronos{% endblock %}
 
+{% block sidebar %}
+{# What this month actually contains, and what is coming up next. #}
+<div class="ws-side" data-ws-side>
+  <div class="ws-side__head">
+    <h2 class="ws-side__title">This month</h2>
+  </div>
+  <dl class="ws-side__stats" id="kronos-tools-stats">
+    <div><dt>Events</dt><dd>0</dd></div>
+    <div><dt>Done</dt><dd>0</dd></div>
+    <div><dt>Upcoming</dt><dd>0</dd></div>
+  </dl>
+
+  <h2 class="ws-side__title ws-side__title--gap">Next up</h2>
+  <ul class="ws-side__list" id="kronos-next"></ul>
+</div>
+{% endblock %}
+
 {% block workspace %}
 
 <div class="kronos" data-kronos>
@@ -98,34 +115,7 @@
 
   {# Workspace-owned context. Previously this lived in a global
      right-hand panel; it belongs to this tool, so it renders here. #}
-  <div class="ws-aside" data-ws-aside>
-
-  <section class="tools__section">
-    <h2 class="tools__heading">This month</h2>
-    <dl class="tools__stats" id="kronos-tools-stats">
-      <div><dt>Events</dt><dd>0</dd></div>
-      <div><dt>Done</dt><dd>0</dd></div>
-      <div><dt>Upcoming</dt><dd>0</dd></div>
-    </dl>
-  </section>
-  
-  <section class="tools__section">
-    <h2 class="tools__heading">What Kronos does</h2>
-    <p class="tools__para">
-      Events are stored in your local database. Kronos parses plain English for
-      dates and durations, and shows a conflict warning when a new event overlaps
-      an existing one.
-    </p>
-  </section>
-  
-  <section class="tools__section">
-    <h2 class="tools__heading">Honest limits</h2>
-    <p class="tools__para">
-      There is no background service, so OPSpine cannot notify you while it is
-      closed. Events are a record of your plan, not an alarm clock.
-    </p>
-  </section>
-  </div>
+</div>
 </div>
 
 {# Event editor dialog #}

@@ -19,9 +19,16 @@
      data-sidebar-collapsed="{{ 'true' if settings.sidebar_collapsed else 'false' }}">
 
   {# ------------------------------------------------------------------ #}
-  {# Navigation rail                                                     #}
+  {# Workspace sidebar                                                    #}
   {# ------------------------------------------------------------------ #}
-  <aside class="sidebar sidebar--left" id="sidebar" aria-label="Workspace navigation">
+  {#
+    Each tool owns its left column. It is not a copy of a global menu: the
+    workspaces block their own `sidebar` content, so Quill lists drafts,
+    Scout lists sessions, Whiteboard lists boards. The header carries the
+    brand, the switcher and the collapse control; the body is the tool's.
+  #}
+  <aside class="sidebar sidebar--left" id="sidebar"
+         aria-label="{{ workspace.name }} navigation">
     <div class="sidebar__head">
       <a class="brand" href="/dashboard" aria-label="OPSpine dashboard">
         <span class="brand__mark" aria-hidden="true">
@@ -31,65 +38,39 @@
             <path d="M12 7.5l3.5 3.5L12 14.5 8.5 11z"/>
           </svg>
         </span>
-        <span class="brand__text">OPSpine</span>
+        <span class="brand__text">{{ workspace.name }}</span>
       </a>
       <button class="icon-btn sidebar__collapse" data-action="toggle-sidebar"
-              type="button" aria-label="Collapse navigation" aria-expanded="true"
-              aria-controls="sidebar" title="Collapse navigation (Ctrl \)">
+              type="button" aria-label="Collapse sidebar" aria-expanded="true"
+              aria-controls="sidebar" title="Collapse sidebar (Ctrl \)">
         <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor"
              stroke-width="1.9" stroke-linecap="round"><path d="M15 6l-6 6 6 6"/></svg>
       </button>
     </div>
 
-    <nav class="nav" aria-label="Workspaces">
-      {% set groups = [
-        ('START', ['dashboard']),
-        ('CREATE', ['abyss', 'scout', 'forge', 'quill']),
-        ('ORGANISE', ['kronos', 'whiteboard', 'dash', 'working-board']),
-        ('SYSTEM', ['library', 'settings'])
-      ] %}
-      {% for label, keys in groups %}
-        {% set items = workspaces | selectattr('key', 'in', keys) | list %}
-        {% if items %}
-          <p class="nav__label">{{ label }}</p>
-          <ul class="nav__list">
-            {% for item in items %}
-              <li>
-                <a class="nav__item{% if item.key == workspace.key %} is-current{% endif %}"
-                   href="{{ item.path }}"
-                   {% if item.key == workspace.key %}aria-current="page"{% endif %}>
-                  <span class="nav__icon" aria-hidden="true">
-                    {{ ws_icon(item.key, 18) }}
-                  </span>
-                  <span class="nav__text">
-                    <span class="nav__name">{{ item.name }}</span>
-                    <span class="nav__tag">{{ item.tagline }}</span>
-                  </span>
-                  {% if item.shortcut %}
-                    <kbd class="nav__key">Ctrl {{ item.shortcut }}</kbd>
-                  {% endif %}
-                </a>
-              </li>
-            {% endfor %}
-          </ul>
-        {% endif %}
-      {% endfor %}
-    </nav>
+    <div class="sidebar__body" id="workspace-aside">
+      {% block sidebar %}{% endblock %}
+    </div>
 
     <div class="sidebar__foot">
+      <button class="sidebar__palette" data-action="open-apps" type="button">
+        <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor"
+             stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"
+             aria-hidden="true">
+          <rect x="3" y="3" width="7" height="7" rx="1.6"/>
+          <rect x="14" y="3" width="7" height="7" rx="1.6"/>
+          <rect x="3" y="14" width="7" height="7" rx="1.6"/>
+          <rect x="14" y="14" width="7" height="7" rx="1.6"/>
+        </svg>
+        <span>Apps</span>
+        <kbd class="nav__key">Ctrl K</kbd>
+      </button>
       <div class="status-chip{% if local_only %} status-chip--local{% endif %}">
         <span class="status-chip__dot" aria-hidden="true"></span>
         <span class="status-chip__text">
           {{ 'Local-only' if local_only else 'Network enabled' }}
         </span>
       </div>
-      <button class="sidebar__palette" data-action="open-palette" type="button">
-        <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor"
-             stroke-width="1.8" stroke-linecap="round" aria-hidden="true">
-          <circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
-        <span>Commands</span>
-        <kbd class="nav__key">Ctrl K</kbd>
-      </button>
     </div>
   </aside>
 

@@ -732,3 +732,10 @@ li:hover > .tcard__moves,
     opacity: 1;
   }
 }
+
+/* The sidebar filter narrows attention without hiding work. */
+.column.is-dimmed {
+  opacity: 0.38;
+  filter: saturate(0.4);
+  transition: opacity var(--dur-fast) var(--ease);
+}

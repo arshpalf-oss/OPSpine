@@ -826,12 +826,7 @@ body[data-workspace="forge"] .topbar {
 }
 
 /* Forge's reference column sits at the end of its own surface. */
-.forge .ws-aside {
-  max-width: 1240px;
-  margin: 22px auto 0;
-  background: rgb(12, 13, 18);
-  border-color: color-mix(in srgb, var(--ink-950) 9%, transparent);
-}
+
 
 @media (max-width: 1080px) {
   .forge__grid {

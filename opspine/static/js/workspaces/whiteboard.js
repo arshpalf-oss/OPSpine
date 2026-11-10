@@ -12,7 +12,8 @@
   if (!root) return;
 
   const dom = {
-    boards: document.getElementById('wb-boards'),
+    boardList: document.getElementById('wb-board-list'),
+    boardName: document.getElementById('wb-board-name'),
     newBoard: document.getElementById('wb-new-board'),
     deleteBoard: document.getElementById('wb-delete-board'),
     save: document.getElementById('wb-save'),
@@ -32,7 +33,6 @@
     editorInput: document.getElementById('wb-editor-input'),
     editorDone: document.getElementById('wb-editor-done'),
     editorDelete: document.getElementById('wb-editor-delete'),
-    stats: document.getElementById('wb-stats'),
     saveState: document.getElementById('wb-save-state'),
     undo: document.getElementById('wb-undo'),
   };
@@ -278,6 +278,10 @@
   }
 
   function renderStats() {
+    if (dom.zoomLabel) {
+      dom.zoomLabel.textContent = `${Math.round(state.data.viewport.zoom * 100)}%`;
+    }
+    if (!dom.stats) return;
     U.clear(dom.stats);
     [
       ['Notes', state.data.nodes.length],
@@ -647,27 +651,68 @@
     try {
       const data = await api.get('/api/whiteboard/boards');
       state.boards = data.boards;
-      U.clear(dom.boards);
-
+      renderBoardList();
       if (!state.boards.length) {
-        dom.boards.appendChild(U.el('option', { value: '', text: 'No boards yet' }));
         dom.deleteBoard.disabled = true;
         return;
       }
-      state.boards.forEach((board) => {
-        dom.boards.appendChild(
-          U.el('option', {
-            value: String(board.id),
-            text: `${board.name} (${board.node_count})`,
-          })
-        );
-      });
       dom.deleteBoard.disabled = false;
       const target = selectId || (state.board && state.board.id) || state.boards[0].id;
-      dom.boards.value = String(target);
+      highlightBoard(target);
     } catch (err) {
       U.error(err.message);
     }
+  }
+
+  /* The sidebar list is the only board switcher; the toolbar just shows the
+     open board's name. */
+  function renderBoardList() {
+    if (!dom.boardList) return;
+    U.clear(dom.boardList);
+    if (!state.boards.length) {
+      dom.boardList.appendChild(U.el('li', {
+        class: 'ws-side__empty',
+        text: 'No boards yet. Press New to make one.',
+      }));
+      return;
+    }
+    state.boards.forEach((board) => {
+      const active = state.board && state.board.id === board.id;
+      dom.boardList.appendChild(U.el('li', {}, [
+        U.el('button', {
+          class: `ws-board${active ? ' is-active' : ''}`,
+          type: 'button',
+          dataset: { boardId: String(board.id) },
+          onClick: () => chooseBoard(board.id),
+        }, [
+          U.el('span', { class: 'ws-board__name', text: board.name }),
+          U.el('span', {
+            class: 'ws-board__meta',
+            text: `${board.node_count} note${board.node_count === 1 ? '' : 's'}`,
+          }),
+        ]),
+      ]));
+    });
+  }
+
+  function highlightBoard(id) {
+    if (!dom.boardList) return;
+    U.$$('.ws-board', dom.boardList).forEach((node) => {
+      node.classList.toggle('is-active', Number(node.dataset.boardId) === Number(id));
+    });
+  }
+
+  function chooseBoard(id) {
+    if (state.board && id === state.board.id) return;
+    if (state.dirty) {
+      U.confirm({
+        title: 'Unsaved board changes',
+        message: 'This board has unsaved changes. Open another board and lose them?',
+        confirmLabel: 'Discard changes',
+      }).then((ok) => { if (ok) openBoard(id); });
+      return;
+    }
+    openBoard(id);
   }
 
   async function openBoard(id) {
@@ -687,6 +732,8 @@
       closeEditor();
       render();
       syncSaveState();
+      if (dom.boardName) dom.boardName.textContent = state.board.name;
+      renderBoardList();
     } catch (err) {
       U.error(err.message);
     }
@@ -790,24 +837,6 @@
   /* ------------------------------------------------------------------ */
   /* Wiring                                                             */
   /* ------------------------------------------------------------------ */
-  dom.boards.addEventListener('change', () => {
-    const id = Number(dom.boards.value);
-    if (!id) return;
-    if (state.board && id === state.board.id) return;
-    if (state.dirty) {
-      U.confirm({
-        title: 'Unsaved board changes',
-        message: 'This board has unsaved changes. Open another board and lose them?',
-        confirmLabel: 'Discard changes',
-      }).then((ok) => {
-        if (ok) openBoard(id);
-        else dom.boards.value = String(state.board.id);
-      });
-      return;
-    }
-    openBoard(id);
-  });
-
   dom.newBoard.addEventListener('click', createBoard);
   dom.renameBoard.addEventListener('click', renameBoard);
   dom.save.addEventListener('click', saveBoard);
