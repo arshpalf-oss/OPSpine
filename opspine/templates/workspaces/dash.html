@@ -29,12 +29,15 @@
                autocomplete="off">
       </div>
     </div>
+    <p class="cmdpanel__count" id="dash-count" role="status" aria-live="polite"></p>
+    </div>
 
     <div class="cmdfilters" role="group" aria-label="Command categories" id="dash-filters">
       <button class="cmdfilter is-active" data-cat="all" type="button">All</button>
       <button class="cmdfilter" data-cat="navigate" type="button">Navigate</button>
       <button class="cmdfilter" data-cat="create" type="button">Create</button>
       <button class="cmdfilter" data-cat="system" type="button">System</button>
+      <button class="cmdfilter" data-cat="recent" type="button">Ran this session</button>
     </div>
 
     <div class="cmdtable" role="table" aria-label="Commands">
@@ -57,6 +60,7 @@
     <div class="dashcol__card">
       <h3>Keyboard</h3>
       <ul class="dashkeys">
+        <li><kbd>/</kbd><span>Focus the command filter</span></li>
         <li><kbd>Ctrl K</kbd><span>Command palette</span></li>
         <li><kbd>Ctrl 0–8</kbd><span>Jump to workspace</span></li>
         <li><kbd>Ctrl ↵</kbd><span>Primary action</span></li>

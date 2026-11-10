@@ -21,6 +21,7 @@
     toolsState: document.getElementById('dash-tools-state'),
     modeCopy: document.getElementById('dash-mode-copy'),
     modeToggle: document.getElementById('dash-mode-toggle'),
+    count: document.getElementById('dash-count'),
   };
 
   const state = {
@@ -30,6 +31,9 @@
     activity: [],
     providers: boot.providers,
     settings: boot.settings,
+    /* Names of commands run since this page loaded. Nothing is persisted:
+       the label says "this session" because that is all it can know. */
+    ran: new Set(),
   };
 
   const mod = shell.modLabel;
@@ -183,12 +187,18 @@
       },
       {
         cat: 'create',
-        name: 'Create a task from text',
-        desc: 'Prompts for a title, then saves it',
+        name: 'Add a task right here',
+        desc: 'Asks for a title, then saves it to the Working Board',
         keys: [],
         run: async () => {
-          const title = window.prompt('Task title');
-          if (!title || !title.trim()) return;
+          const title = await U.prompt({
+            title: 'New task',
+            message: 'Saved to the Working Board as a normal-priority to-do.',
+            label: 'Task title',
+            placeholder: 'What needs doing?',
+            confirmLabel: 'Add task',
+          });
+          if (!title) return;
           try {
             await api.post('/api/tasks/', {
               title: title.trim(),
@@ -203,10 +213,54 @@
         },
       },
 
+      {
+        cat: 'create',
+        name: 'Start a draft with a title',
+        desc: 'Creates the draft in Quill immediately',
+        keys: [],
+        run: async () => {
+          const title = await U.prompt({
+            title: 'New draft',
+            label: 'Draft title',
+            placeholder: 'What are you writing?',
+            confirmLabel: 'Create draft',
+          });
+          if (!title) return;
+          try {
+            const data = await api.post('/api/quill/drafts', { title });
+            U.success(`“${data.draft.title}” created. Opening Quill…`);
+            await refresh();
+            setTimeout(() => { window.location.href = `/quill?draft=${data.draft.id}`; }, 500);
+          } catch (err) {
+            U.error(err.message);
+          }
+        },
+      },
+      {
+        cat: 'create',
+        name: 'Make a new blank board',
+        desc: 'Creates a Whiteboard board named from the current time',
+        keys: [],
+        run: async () => {
+          const stamp = new Date().toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+          try {
+            const data = await api.post('/api/whiteboard/boards', {
+              name: `Board ${stamp}`,
+            });
+            U.success(`“${data.board.name}” created. Opening Whiteboard…`);
+            await refresh();
+            setTimeout(() => { window.location.href = '/whiteboard'; }, 500);
+          } catch (err) {
+            U.error(err.message);
+          }
+        },
+      },
+
       /* System */
       {
         cat: 'system',
         name: 'Toggle local-only mode',
+        key: 'custom-mode',
         desc: () => (state.settings.local_only
           ? 'Currently on — blocks all outbound requests'
           : 'Currently off — configured providers may be called'),
@@ -264,6 +318,7 @@
         name: 'Show keyboard shortcuts',
         desc: 'Opens the shared shortcut sheet',
         keys: ['?'],
+        key: 'custom-help',
         run: () => shell.openHelp(),
       },
       {
@@ -271,6 +326,8 @@
         name: 'Open the command palette',
         desc: 'Search everything in one field',
         keys: [mod, 'K'],
+        /* Handled by the shell's own key listener, not by this row. */
+        key: 'custom-palette',
         run: () => shell.openPalette(),
       },
       {
@@ -278,6 +335,7 @@
         name: 'Toggle navigation',
         desc: 'Collapse or expand the sidebar',
         keys: [mod, '\\'],
+        key: 'custom-sidebar',
         run: () => shell.toggleSidebar(),
       },
     ];
@@ -319,17 +377,25 @@
     const term = state.query.trim().toLowerCase();
     const all = commands();
     const visible = all.filter((command) => {
-      if (state.category !== 'all' && command.cat !== state.category) return false;
+      if (state.category === 'recent' && !state.ran.has(command.id)) return false;
+      if (state.category !== 'all' && state.category !== 'recent'
+        && command.cat !== state.category) return false;
       if (!term) return true;
       return `${command.name} ${command.desc} ${command.cat}`.toLowerCase().includes(term);
     });
 
+    if (dom.count) {
+      dom.count.textContent = visible.length === all.length
+        ? `${all.length} commands, every one executable`
+        : `${visible.length} of ${all.length} commands shown`;
+    }
+
     U.clear(dom.rows);
     if (!visible.length) {
       dom.rows.appendChild(
-        U.el('div', { class: 'cmdtable__empty' }, [
-          `No command matches “${state.query}”. Clear the filter to see all ${all.length}.`,
-        ])
+        U.el('div', { class: 'cmdtable__empty' }, state.category === 'recent'
+          ? 'Nothing has been run yet this session. Run a command and it appears here.'
+          : `No command matches “${state.query}”. Clear the filter to see all ${all.length}.`)
       );
       return;
     }
@@ -356,12 +422,24 @@
             onClick: async (event) => {
               const button = event.currentTarget;
               button.disabled = true;
-              button.textContent = 'run';
+              button.textContent = '…';
               try {
                 await command.run();
+                state.ran.add(command.id);
+                button.textContent = 'ran';
+                button.classList.add('is-ran');
+                window.setTimeout(() => {
+                  if (button.isConnected) {
+                    button.textContent = 'run';
+                    button.classList.remove('is-ran');
+                  }
+                }, 1400);
+                if (state.category === 'recent') renderTable();
+              } catch (err) {
+                U.error(err.message);
+                button.textContent = 'run';
               } finally {
                 button.disabled = false;
-                button.textContent = 'run';
               }
             },
           }, 'run'),
@@ -456,6 +534,18 @@
       renderTable();
     } catch (err) {
       U.error(err.message);
+    }
+  });
+
+  document.addEventListener('keydown', (event) => {
+    if (event.metaKey || event.ctrlKey || event.altKey) return;
+    const typing = ['INPUT', 'TEXTAREA', 'SELECT'].includes(
+      (event.target.tagName || '')
+    ) || event.target.isContentEditable;
+    if (event.key === '/' && !typing) {
+      event.preventDefault();
+      dom.search.focus();
+      dom.search.select();
     }
   });
 
