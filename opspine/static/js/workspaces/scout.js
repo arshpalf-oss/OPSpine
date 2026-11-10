@@ -86,6 +86,17 @@
   }
 
   function renderSessions() {
+    const count = document.getElementById('scout-count');
+    const query = dom.search.value.trim();
+    if (count) {
+      if (!state.sessions.length) {
+        count.textContent = query ? `No matches for “${query}”` : '';
+      } else {
+        count.textContent = query
+          ? `${state.sessions.length} match${state.sessions.length === 1 ? '' : 'es'} for “${query}”`
+          : `${state.sessions.length} session${state.sessions.length === 1 ? '' : 's'}`;
+      }
+    }
     U.clear(dom.sessions);
     if (!state.sessions.length) {
       dom.sessions.appendChild(
@@ -102,7 +113,7 @@
     state.sessions.forEach((session) => {
       const active = state.current && state.current.id === session.id;
       dom.sessions.appendChild(
-        U.el('li', { class: `session${active ? ' is-active' : ''}` }, [
+        U.el('li', { class: `session session--row${active ? ' is-active' : ''}` }, [
           U.el('button', {
             class: 'session__open',
             type: 'button',
@@ -215,18 +226,38 @@
         U.el('span', { text: 'from provider' }),
       ]),
       session.results.length
-        ? U.el('div', { class: 'results' }, session.results.map((result) => (
-            U.el('a', {
-              class: 'result',
-              href: result.url,
-              target: '_blank',
-              rel: 'noopener noreferrer',
-            }, [
-              U.el('p', { class: 'result__title', text: result.title || result.url }),
-              result.snippet ? U.el('p', { class: 'result__snippet', text: result.snippet }) : null,
-              U.el('p', { class: 'result__foot' }, [
-                U.el('span', { class: 'result__url', text: result.url }),
-                U.el('span', { class: 'result__prov', text: result.provider }),
+        ? U.el('div', { class: 'results' }, session.results.map((result, index) => (
+            U.el('div', { class: 'result', role: 'group',
+              'aria-label': `Source ${index + 1}` }, [
+              U.el('a', {
+                class: 'result__link',
+                href: result.url,
+                target: '_blank',
+                rel: 'noopener noreferrer',
+              }, [
+                U.el('p', { class: 'result__title', text: result.title || result.url }),
+                result.snippet ? U.el('p', { class: 'result__snippet', text: result.snippet }) : null,
+                U.el('p', { class: 'result__foot' }, [
+                  U.el('span', { class: 'result__url', text: result.url }),
+                  U.el('span', { class: 'result__prov', text: result.provider }),
+                ]),
+              ]),
+              U.el('div', { class: 'result__tools' }, [
+                U.el('button', {
+                  class: 'result__btn', type: 'button',
+                  text: 'Copy link',
+                  'aria-label': `Copy link to ${result.title || result.url}`,
+                  onClick: () => U.copy(result.url, 'Link copied.'),
+                }),
+                U.el('button', {
+                  class: 'result__btn', type: 'button',
+                  text: 'Copy citation',
+                  'aria-label': `Copy citation for ${result.title || result.url}`,
+                  onClick: () => U.copy(
+                    `${result.title || result.url} — ${result.url} (${result.provider})`,
+                    'Citation copied.'
+                  ),
+                }),
               ]),
             ])
           )))
@@ -339,8 +370,21 @@
     form.appendChild(
       U.el('div', { class: 'note-form__row' }, [
         U.el('button', { class: 'btn btn--sm', type: 'submit' }, 'Save'),
+        U.el('span', { class: 'note-form__hint',
+          text: `${U.mod()} ↵ to save` }),
       ])
     );
+
+    [form.querySelector('#note-body'), urlInput].forEach((field) => {
+      field.addEventListener('keydown', (event) => {
+        if ((event.ctrlKey || event.metaKey) && event.key === 'Enter') {
+          event.preventDefault();
+          form.requestSubmit
+            ? form.requestSubmit()
+            : form.dispatchEvent(new Event('submit', { cancelable: true }));
+        }
+      });
+    });
 
     form.addEventListener('submit', async (event) => {
       event.preventDefault();
@@ -456,6 +500,14 @@
   dom.search.addEventListener('input', U.debounce(() => {
     loadSessions(dom.search.value.trim());
   }, 220));
+
+  dom.search.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') {
+      dom.search.value = '';
+      loadSessions('');
+      dom.search.blur();
+    }
+  });
 
   window.OPS.shell.registerPrimary('New research session', () => {
     dom.question.focus();

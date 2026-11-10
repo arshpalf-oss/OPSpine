@@ -224,10 +224,10 @@
     };
   };
 
-  U.copy = async function (text) {
+  U.copy = async function (text, message = 'Copied to clipboard.') {
     try {
       await navigator.clipboard.writeText(text);
-      U.success('Copied to clipboard.');
+      U.success(message);
       return true;
     } catch (err) {
       U.error('The browser blocked clipboard access.');
