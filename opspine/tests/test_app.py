@@ -669,6 +669,50 @@ class TestPages(BaseCase):
                 self.assertNotIn('id="tools-panel"', html)
                 self.assertNotIn('id="tools-rail"', html)
 
+    def test_forge_preview_parsing_matches_the_generator(self):
+        """The live preview must not drift from what the server actually builds.
+
+        It re-implements split_sections/split_rows in JS, so this pins the two
+        together: if one side changes, this fails.
+        """
+        from opspine.services import documents
+
+        cases = {
+            "headings": "Overview:\nText.\n\nKey points:\n- one\n- two\n\nNext:\nDo.",
+            "hashes": "# First\nbody\n# Second\nmore",
+            "plain": "just one line\nand another",
+            "commas": "a,b,c\n1,2,3",
+            "pipes": "a|b|c\n1|2|3",
+            "tabs": "a\tb\tc\n1\t2\t3",
+            "empty": "",
+        }
+        # The JS contract: sections are {heading, lines} in document order.
+        self.assertEqual(
+            documents.split_sections(cases["headings"]),
+            [
+                {"heading": "Overview", "lines": ["Text."]},
+                {"heading": "Key points", "lines": ["- one", "- two"]},
+                {"heading": "Next", "lines": ["Do."]},
+            ],
+        )
+        self.assertEqual(
+            documents.split_sections(cases["hashes"]),
+            [{"heading": "First", "lines": ["body"]},
+             {"heading": "Second", "lines": ["more"]}],
+        )
+        self.assertEqual(
+            documents.split_sections(cases["plain"]),
+            [{"heading": "", "lines": ["just one line", "and another"]}],
+        )
+        self.assertEqual(documents.split_sections(cases["empty"]),
+                         [{"heading": "", "lines": []}])
+        self.assertEqual(documents.split_rows(cases["commas"]),
+                         [["a", "b", "c"], ["1", "2", "3"]])
+        self.assertEqual(documents.split_rows(cases["pipes"]),
+                         [["a", "b", "c"], ["1", "2", "3"]])
+        self.assertEqual(documents.split_rows(cases["tabs"]),
+                         [["a", "b", "c"], ["1", "2", "3"]])
+
     def test_workspace_context_moved_into_the_workspace(self):
         """Nothing that was reachable became unreachable."""
         for key in ("scout", "forge", "quill", "kronos", "whiteboard",

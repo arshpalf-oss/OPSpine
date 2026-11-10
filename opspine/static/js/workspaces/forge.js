@@ -28,6 +28,11 @@
     stage: document.getElementById('forge-stage'),
     history: document.getElementById('forge-history'),
     note: document.getElementById('forge-note'),
+    bodyCount: document.getElementById('forge-body-count'),
+    clear: document.getElementById('forge-clear'),
+    prevLabel: document.getElementById('forge-prev-label'),
+    prevMeta: document.getElementById('forge-prev-meta'),
+    prevBody: document.getElementById('forge-prev-body'),
   };
 
   const COPY = {
@@ -92,11 +97,211 @@
     U.$$('[data-opt]', dom.opts).forEach((field) => {
       field.hidden = !copy.opts.includes(field.dataset.opt);
     });
+    renderPreview();
   }
 
   root.querySelectorAll('input[name="format"]').forEach((input) => {
     input.addEventListener('change', () => applyFormat(input.value));
   });
+
+  /* Everything that changes what the file will contain re-renders the preview. */
+  [dom.title, dom.body, dom.author, dom.subtitle, dom.width, dom.height, dom.accent]
+    .forEach((node) => {
+      if (!node) return;
+      node.addEventListener('input', refreshPreview);
+      node.addEventListener('change', refreshPreview);
+    });
+
+  /* ------------------------------------------------------------------ */
+  /* Live preview                                                       */
+  /* ------------------------------------------------------------------ */
+  /* These mirror services/documents.py exactly. If the parsing rules there
+     change, the preview has to change with them — it is a window onto the
+     generator, not a decoration. */
+
+  function splitSections(body) {
+    const sections = [];
+    let current = null;
+    (body || '').split('\n').forEach((raw) => {
+      const line = raw.replace(/\s+$/, '');
+      const stripped = line.trim();
+      let heading = null;
+      if (stripped.startsWith('#')) {
+        heading = stripped.replace(/^#+/, '').trim();
+      } else if (stripped.endsWith(':') && stripped.length <= 80
+                 && !stripped.startsWith('-')) {
+        heading = stripped.slice(0, -1).trim();
+      }
+      if (heading) {
+        current = { heading, lines: [] };
+        sections.push(current);
+      } else if (stripped) {
+        if (current === null) {
+          current = { heading: '', lines: [] };
+          sections.push(current);
+        }
+        current.lines.push(stripped);
+      }
+    });
+    return sections.length ? sections : [{ heading: '', lines: [] }];
+  }
+
+  function splitRows(body) {
+    return (body || '').split('\n')
+      .map((ln) => ln.trim())
+      .filter(Boolean)
+      .map((line) => {
+        if (line.includes('|')) return line.replace(/^\|+|\|+$/g, '').split('|').map((c) => c.trim());
+        if (line.includes('\t')) return line.split('\t').map((c) => c.trim());
+        return line.split(',').map((c) => c.trim());
+      });
+  }
+
+  const countWords = (text) => (text.trim() ? text.trim().split(/\s+/).length : 0);
+
+  function renderPreview() {
+    const body = dom.body.value;
+    const format = currentFormat;
+    const title = dom.title.value.trim();
+
+    dom.prevBody.textContent = '';
+    dom.prevLabel.textContent = `Preview · ${format.toUpperCase()}`;
+
+    if (!body.trim()) {
+      dom.prevMeta.textContent = '';
+      dom.prevBody.appendChild(U.el('p', {
+        class: 'prev__empty',
+        text: 'Start typing and this shows the structure Forge will build.',
+      }));
+      return;
+    }
+
+    if (format === 'pptx') {
+      const sections = splitSections(body).filter((s) => s.heading || s.lines.length);
+      dom.prevMeta.textContent = `${sections.length + 1} slides`;
+      const deck = U.el('div', { class: 'prev__slides' });
+      deck.appendChild(U.el('article', { class: 'prev__slide prev__slide--cover' }, [
+        U.el('span', { class: 'prev__slide-no', text: 'Cover' }),
+        U.el('h4', { class: 'prev__slide-title', text: title || 'Untitled' }),
+        dom.subtitle.value.trim()
+          ? U.el('p', { class: 'prev__slide-sub', text: dom.subtitle.value.trim() }) : null,
+      ]));
+      sections.forEach((section, i) => {
+        const shown = section.lines.slice(0, 9);
+        const card = U.el('article', { class: 'prev__slide' }, [
+          U.el('span', { class: 'prev__slide-no', text: String(i + 1) }),
+          U.el('h4', { class: 'prev__slide-title', text: section.heading || title || 'Untitled' }),
+        ]);
+        if (shown.length) {
+          const list = U.el('ul', { class: 'prev__bullets' });
+          shown.forEach((line) => {
+            list.appendChild(U.el('li', {
+              text: line.replace(/^[-*•\s]+/, '').slice(0, 220),
+            }));
+          });
+          card.appendChild(list);
+        }
+        if (section.lines.length > 9) {
+          card.appendChild(U.el('p', {
+            class: 'prev__warn',
+            text: `+${section.lines.length - 9} more lines — slides hold nine`,
+          }));
+        }
+        deck.appendChild(card);
+      });
+      dom.prevBody.appendChild(deck);
+      return;
+    }
+
+    if (format === 'xlsx') {
+      const rows = splitRows(body);
+      const cols = Math.max(...rows.map((r) => r.length));
+      dom.prevMeta.textContent = `${rows.length} rows × ${cols} columns`;
+      const table = U.el('table', { class: 'prev__table' });
+      rows.slice(0, 12).forEach((row, r) => {
+        const tr = U.el('tr', {});
+        for (let c = 0; c < cols; c += 1) {
+          const cell = U.el(r === 0 ? 'th' : 'td', { text: row[c] ?? '' });
+          tr.appendChild(cell);
+        }
+        table.appendChild(tr);
+      });
+      dom.prevBody.appendChild(table);
+      if (rows.length > 12) {
+        dom.prevBody.appendChild(U.el('p', {
+          class: 'prev__warn', text: `+${rows.length - 12} more rows`,
+        }));
+      }
+      return;
+    }
+
+    if (format === 'png') {
+      const w = Number(dom.width.value) || 1280;
+      const h = Number(dom.height.value) || 720;
+      dom.prevMeta.textContent = `${w} × ${h}`;
+      const canvas = U.el('div', { class: 'prev__canvas' });
+      canvas.style.aspectRatio = `${w} / ${h}`;
+      canvas.style.borderColor = dom.accent.value;
+      canvas.appendChild(U.el('h4', {
+        class: 'prev__canvas-title', text: title || 'Untitled',
+      }));
+      body.split('\n').filter((l) => l.trim()).slice(0, 8).forEach((line) => {
+        canvas.appendChild(U.el('p', { class: 'prev__canvas-line', text: line.trim() }));
+      });
+      dom.prevBody.appendChild(canvas);
+      return;
+    }
+
+    // pdf, docx, md — section flow
+    const sections = splitSections(body);
+    dom.prevMeta.textContent = `${countWords(body)} in body`
+      + (title ? ` + ${countWords(title)} in title` : '');
+    const page = U.el('div', { class: 'prev__page' });
+    page.appendChild(U.el('h4', { class: 'prev__page-title', text: title || 'Untitled' }));
+    if (dom.author.value.trim() && !U.$('[data-opt="author"]', dom.opts).hidden) {
+      page.appendChild(U.el('p', {
+        class: 'prev__page-by', text: dom.author.value.trim(),
+      }));
+    }
+    sections.forEach((section) => {
+      if (section.heading) {
+        page.appendChild(U.el('h5', { class: 'prev__page-h', text: section.heading }));
+      }
+      const bullets = [];
+      const paragraphs = [];
+      section.lines.forEach((line) => {
+        if (line.startsWith('-')) bullets.push(line.replace(/^[-*•\s]+/, ''));
+        else paragraphs.push(line);
+      });
+      paragraphs.forEach((text) => {
+        page.appendChild(U.el('p', { class: 'prev__page-p', text }));
+      });
+      if (bullets.length) {
+        const ul = U.el('ul', { class: 'prev__bullets' });
+        bullets.forEach((b) => ul.appendChild(U.el('li', { text: b })));
+        page.appendChild(ul);
+      }
+    });
+    dom.prevBody.appendChild(page);
+  }
+
+  function updateCount() {
+    const words = countWords(dom.body.value);
+    dom.bodyCount.textContent = words ? `${words} ${words === 1 ? 'word' : 'words'}` : '';
+  }
+
+  /* A plain function declaration, not a const arrow: the input listeners above
+     are registered before this point in the file, and a const would still be in
+     its temporal dead zone when they are wired. */
+  let previewTimer = null;
+
+  function refreshPreview() {
+    window.clearTimeout(previewTimer);
+    previewTimer = window.setTimeout(() => {
+      updateCount();
+      renderPreview();
+    }, 120);
+  }
 
   /* ------------------------------------------------------------------ */
   /* Output rendering                                                   */
@@ -301,7 +506,18 @@
     }
     dom.body.value = EXAMPLES[format] || EXAMPLES.pdf;
     dom.body.focus();
+    refreshPreview();
     U.toast('Example structure loaded. Edit it before generating.');
+  });
+
+  dom.clear.addEventListener('click', () => {
+    dom.title.value = '';
+    dom.body.value = '';
+    showIdle();
+    renderPreview();
+    updateCount();
+    dom.title.focus();
+    U.toast('Cleared. Your previous files are still in the Library.');
   });
 
   window.OPS.shell.registerPrimary('Generate file', () => generate());
@@ -310,6 +526,8 @@
   /* Startup                                                            */
   /* ------------------------------------------------------------------ */
   applyFormat(selectedFormat());
+  updateCount();
+  renderPreview();
   showIdle();
   loadHistory();
 })();

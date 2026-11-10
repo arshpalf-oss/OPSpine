@@ -3,32 +3,14 @@
 {% block title %}Forge{% endblock %}
 
 {% block workspace %}
-  {# Workspace-owned context. Previously this lived in a global
-     right-hand panel; it belongs to this tool, so it renders here. #}
-  <div class="ws-aside" data-ws-aside>
-
-  <section class="tools__section">
-    <h2 class="tools__heading">Library</h2>
-    <dl class="tools__stats">
-      <div><dt>Files stored</dt><dd>{{ counts.documents }}</dd></div>
-      <div><dt>Location</dt><dd>data/documents</dd></div>
-    </dl>
-    <a class="tools__link" href="/library">Open Library →</a>
-  </section>
-  
-  <section class="tools__section">
-    <h2 class="tools__heading">Format notes</h2>
-    <ul class="tools__keys">
-      <li><span>PPTX</span><kbd>headings → slides</kbd></li>
-      <li><span>XLSX</span><kbd>csv rows</kbd></li>
-      <li><span>PDF</span><kbd>sections</kbd></li>
-      <li><span>PNG</span><kbd>title + body</kbd></li>
-    </ul>
-  </section>
-  </div>
-
+{#
+  Forge is a studio: a source column on the left, and on the right the document
+  as it will actually be built. The preview is not a mockup — it runs the same
+  section/row parsing the server uses, so what you see is what gets written.
+#}
 <div class="forge" data-forge>
   <div class="forge__grid">
+
     {# ---------------- configuration ---------------- #}
     <form class="cfg" id="forge-form" autocomplete="off" novalidate>
       <header class="cfg__head">
@@ -68,9 +50,12 @@
       </div>
 
       <div class="field">
-        <label for="forge-body" id="forge-body-label">Content</label>
+        <div class="field__head">
+          <label for="forge-body" id="forge-body-label">Content</label>
+          <span class="field__count" id="forge-body-count" aria-live="polite"></span>
+        </div>
         <textarea class="textarea forge__body" id="forge-body" rows="12"
-                  maxlength="60000"></textarea>
+                  maxlength="60000" spellcheck="true"></textarea>
         <p class="hint" id="forge-body-hint"></p>
       </div>
 
@@ -117,7 +102,8 @@
         <button class="btn btn--primary" type="submit" id="forge-generate">
           Generate file
         </button>
-        <button class="btn" type="button" id="forge-sample">Load example structure</button>
+        <button class="btn" type="button" id="forge-sample">Load example</button>
+        <button class="btn btn--quiet" type="button" id="forge-clear">Clear</button>
       </div>
       <p class="cfg__note" id="forge-note">
         Files are stored in <code>data/documents</code> and listed in the Library.
@@ -127,6 +113,15 @@
     {# ---------------- output ---------------- #}
     <section class="out" aria-labelledby="forge-out-h">
       <h2 id="forge-out-h" class="visually-hidden">Output</h2>
+
+      {# Live preview: the structure the generator will actually produce. #}
+      <div class="prev" id="forge-preview" aria-live="polite">
+        <header class="prev__head">
+          <span class="prev__label" id="forge-prev-label">Preview</span>
+          <span class="prev__meta" id="forge-prev-meta"></span>
+        </header>
+        <div class="prev__body" id="forge-prev-body"></div>
+      </div>
 
       <div class="out__stage" id="forge-stage">
         <div class="out__idle" id="forge-idle">
@@ -148,13 +143,33 @@
       <div class="out__history">
         <div class="section-title">
           <h2>Recent output</h2>
-          <a class="section-title__meta" href="/library" style="color:inherit">Library →</a>
+          <a class="section-title__meta" href="/library">Library →</a>
         </div>
         <ul class="out__list" id="forge-history"></ul>
       </div>
+
+      {# Workspace-owned reference. Not navigation — it belongs to Forge. #}
+      <aside class="ws-aside" data-ws-aside aria-label="Forge reference">
+        <section class="tools__section">
+          <h2 class="tools__heading">Library</h2>
+          <dl class="tools__stats">
+            <div><dt>Files stored</dt><dd>{{ counts.documents }}</dd></div>
+            <div><dt>Location</dt><dd>data/documents</dd></div>
+          </dl>
+          <a class="tools__link" href="/library">Open Library →</a>
+        </section>
+
+        <section class="tools__section">
+          <h2 class="tools__heading">Format notes</h2>
+          <ul class="tools__keys">
+            <li><span>PPTX</span><kbd>heading → slide</kbd></li>
+            <li><span>XLSX</span><kbd>csv rows</kbd></li>
+            <li><span>PDF</span><kbd>sections</kbd></li>
+            <li><span>PNG</span><kbd>title + body</kbd></li>
+          </ul>
+        </section>
+      </aside>
     </section>
   </div>
 </div>
 {% endblock %}
-
-

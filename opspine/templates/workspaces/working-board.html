@@ -3,37 +3,6 @@
 {% block title %}Working Board{% endblock %}
 
 {% block workspace %}
-  {# Workspace-owned context. Previously this lived in a global
-     right-hand panel; it belongs to this tool, so it renders here. #}
-  <div class="ws-aside" data-ws-aside>
-
-  <section class="tools__section">
-    <h2 class="tools__heading">Board state</h2>
-    <dl class="tools__stats" id="wboard-stats">
-      <div><dt>Total</dt><dd>0</dd></div>
-      <div><dt>To do</dt><dd>0</dd></div>
-      <div><dt>In progress</dt><dd>0</dd></div>
-      <div><dt>Done</dt><dd>0</dd></div>
-    </dl>
-  </section>
-  
-  <section class="tools__section">
-    <h2 class="tools__heading">How it works</h2>
-    <p class="tools__para">
-      Every task has a title, description, status, priority and optional due date.
-      Clicking a card opens the detail panel. Deleting asks for confirmation.
-    </p>
-  </section>
-  
-  <section class="tools__section">
-    <h2 class="tools__heading">Shortcuts</h2>
-    <ul class="tools__keys">
-      <li><kbd>N</kbd><span>New task</span></li>
-      <li><kbd>Ctrl ↵</kbd><span>Save the open task</span></li>
-      <li><kbd>Esc</kbd><span>Close the detail panel</span></li>
-    </ul>
-  </section>
-  </div>
 
 <div class="wboard" data-wboard>
   <header class="wboard__head">
@@ -159,6 +128,38 @@
     </aside>
   </div>
 </div>
+
+  {# Workspace-owned context. Previously this lived in a global
+     right-hand panel; it belongs to this tool, so it renders here. #}
+  <div class="ws-aside" data-ws-aside>
+
+  <section class="tools__section">
+    <h2 class="tools__heading">Board state</h2>
+    <dl class="tools__stats" id="wboard-stats">
+      <div><dt>Total</dt><dd>0</dd></div>
+      <div><dt>To do</dt><dd>0</dd></div>
+      <div><dt>In progress</dt><dd>0</dd></div>
+      <div><dt>Done</dt><dd>0</dd></div>
+    </dl>
+  </section>
+  
+  <section class="tools__section">
+    <h2 class="tools__heading">How it works</h2>
+    <p class="tools__para">
+      Every task has a title, description, status, priority and optional due date.
+      Clicking a card opens the detail panel. Deleting asks for confirmation.
+    </p>
+  </section>
+  
+  <section class="tools__section">
+    <h2 class="tools__heading">Shortcuts</h2>
+    <ul class="tools__keys">
+      <li><kbd>N</kbd><span>New task</span></li>
+      <li><kbd>Ctrl ↵</kbd><span>Save the open task</span></li>
+      <li><kbd>Esc</kbd><span>Close the detail panel</span></li>
+    </ul>
+  </section>
+  </div>
 {% endblock %}
 
 

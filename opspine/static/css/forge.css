@@ -294,7 +294,7 @@ body[data-workspace="forge"] .topbar {
   border: 1px solid color-mix(in srgb, var(--ink-950) 9%, transparent);
   background:
     radial-gradient(90% 70% at 50% 0%, rgba(255, 45, 111, 0.075), transparent 62%),
-    rgba(11, 12, 18, 0.82);
+    rgb(11, 12, 18);
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -575,5 +575,268 @@ body[data-workspace="forge"] .topbar {
 
   .cfg__actions .btn {
     flex: 1 1 auto;
+  }
+}
+
+/* ==========================================================================
+   Live preview
+   ==========================================================================
+   The right column shows the document as the generator will build it: the
+   same section and row parsing runs here, so the preview cannot drift from
+   the file. Everything is opaque — no tinted glass over the studio grid.
+   ========================================================================== */
+.prev {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  border-radius: var(--radius-lg);
+  border: 1px solid color-mix(in srgb, var(--ink-950) 9%, transparent);
+  background: rgb(9, 10, 14);
+  overflow: hidden;
+}
+
+.prev__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 11px 16px;
+  border-bottom: 1px solid color-mix(in srgb, var(--ink-950) 8%, transparent);
+  background: rgb(13, 14, 19);
+}
+
+.prev__label {
+  font-family: var(--font-mono);
+  font-size: 0.625rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #ff6f97;
+}
+
+.prev__meta {
+  font-family: var(--font-mono);
+  font-size: 0.625rem;
+  letter-spacing: 0.06em;
+  color: rgba(238, 240, 248, 0.5);
+}
+
+.prev__body {
+  padding: 18px;
+  max-height: 460px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.prev__empty {
+  margin: 0;
+  padding: 26px 8px;
+  text-align: center;
+  font-size: 0.8125rem;
+  line-height: 1.6;
+  color: rgba(238, 240, 248, 0.45);
+}
+
+.prev__warn {
+  margin: 8px 0 0;
+  font-family: var(--font-mono);
+  font-size: 0.625rem;
+  letter-spacing: 0.05em;
+  color: #ffb27a;
+}
+
+/* ---- slides (PPTX) ---- */
+.prev__slides {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.prev__slide {
+  position: relative;
+  padding: 16px 18px 16px 40px;
+  border-radius: var(--radius-sm);
+  border: 1px solid color-mix(in srgb, var(--ink-950) 10%, transparent);
+  background: rgb(18, 20, 27);
+}
+
+.prev__slide--cover {
+  border-color: rgba(255, 45, 111, 0.5);
+  background: rgb(26, 14, 20);
+}
+
+.prev__slide-no {
+  position: absolute;
+  left: 12px;
+  top: 15px;
+  font-family: var(--font-mono);
+  font-size: 0.5625rem;
+  letter-spacing: 0.08em;
+  color: rgba(238, 240, 248, 0.38);
+  white-space: nowrap;
+}
+
+.prev__slide-title {
+  margin: 0;
+  font-size: 0.875rem;
+  font-weight: 650;
+  letter-spacing: -0.01em;
+  color: #f2f4f8;
+}
+
+.prev__slide-sub {
+  margin: 4px 0 0;
+  font-size: 0.75rem;
+  color: rgba(238, 240, 248, 0.55);
+}
+
+.prev__bullets {
+  margin: 8px 0 0;
+  padding-left: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.prev__bullets li {
+  font-size: 0.75rem;
+  line-height: 1.5;
+  color: rgba(238, 240, 248, 0.72);
+}
+
+/* ---- table (XLSX) ---- */
+.prev__table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.6875rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.prev__table th,
+.prev__table td {
+  padding: 6px 9px;
+  text-align: left;
+  border: 1px solid color-mix(in srgb, var(--ink-950) 9%, transparent);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 180px;
+}
+
+.prev__table th {
+  background: rgb(22, 24, 32);
+  font-weight: 650;
+  color: #f2f4f8;
+}
+
+.prev__table td {
+  color: rgba(238, 240, 248, 0.72);
+}
+
+/* ---- image (PNG) ---- */
+.prev__canvas {
+  width: 100%;
+  border-radius: var(--radius-sm);
+  border: 2px solid;
+  background: rgb(14, 15, 21);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 6px;
+}
+
+.prev__canvas-title {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: #f6f7fb;
+}
+
+.prev__canvas-line {
+  margin: 0;
+  font-size: 0.75rem;
+  color: rgba(238, 240, 248, 0.62);
+}
+
+/* ---- page flow (PDF / DOCX / MD) ---- */
+.prev__page {
+  padding: 24px 26px;
+  border-radius: var(--radius-sm);
+  background: rgb(19, 21, 28);
+  border: 1px solid color-mix(in srgb, var(--ink-950) 9%, transparent);
+}
+
+.prev__page-title {
+  margin: 0 0 4px;
+  font-size: 1.0625rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: #f6f7fb;
+}
+
+.prev__page-by {
+  margin: 0 0 14px;
+  font-family: var(--font-mono);
+  font-size: 0.625rem;
+  letter-spacing: 0.06em;
+  color: rgba(238, 240, 248, 0.45);
+}
+
+.prev__page-h {
+  margin: 16px 0 6px;
+  font-size: 0.8125rem;
+  font-weight: 650;
+  letter-spacing: -0.01em;
+  color: #ff6f97;
+}
+
+.prev__page-p {
+  margin: 0 0 8px;
+  font-size: 0.75rem;
+  line-height: 1.65;
+  color: rgba(238, 240, 248, 0.75);
+}
+
+/* ---- field counter ---- */
+.field__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.field__count {
+  font-family: var(--font-mono);
+  font-size: 0.625rem;
+  letter-spacing: 0.06em;
+  color: rgba(238, 240, 248, 0.4);
+}
+
+/* ---- quiet button ---- */
+.btn--quiet {
+  background: transparent;
+  border-color: color-mix(in srgb, var(--ink-950) 12%, transparent);
+  color: rgba(238, 240, 248, 0.6);
+}
+
+.btn--quiet:hover {
+  background: color-mix(in srgb, var(--ink-950) 6%, transparent);
+  color: #f2f4f8;
+}
+
+/* Forge's reference column sits at the end of the output stack. */
+.out .ws-aside {
+  background: rgb(12, 13, 18);
+  border-color: color-mix(in srgb, var(--ink-950) 9%, transparent);
+}
+
+@media (max-width: 1080px) {
+  .forge__grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .prev__body {
+    max-height: 320px;
   }
 }
