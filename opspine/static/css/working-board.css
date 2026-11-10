@@ -17,7 +17,7 @@ body[data-workspace="working-board"] .workspace {
 }
 
 body[data-workspace="working-board"] .topbar {
-  background: rgba(10, 8, 5, 0.86);
+  background: rgb(9, 7, 4);
   border-bottom-color: rgba(255, 138, 61, 0.14);
 }
 

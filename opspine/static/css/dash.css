@@ -18,7 +18,7 @@ body[data-workspace="dash"] .workspace {
 }
 
 body[data-workspace="dash"] .topbar {
-  background: rgba(6, 10, 18, 0.9);
+  background: rgb(6, 9, 16);
   border-bottom-color: rgba(94, 234, 212, 0.12);
 }
 
@@ -209,7 +209,7 @@ body[data-workspace="dash"] .topbar {
   gap: 1px;
   padding: 9px 14px;
   border-bottom: 1px solid var(--d-line);
-  background: rgba(13, 22, 38, 0.7);
+  background: rgb(10, 17, 29);
   flex-wrap: wrap;
 }
 
@@ -257,7 +257,7 @@ body[data-workspace="dash"] .topbar {
 
 .cmdtable__head {
   border-bottom: 1px solid var(--d-line);
-  background: rgba(17, 30, 51, 0.6);
+  background: rgb(16, 28, 48);
   font-size: 9.5px;
   letter-spacing: 0.12em;
   text-transform: uppercase;
