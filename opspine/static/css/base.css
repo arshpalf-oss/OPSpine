@@ -102,9 +102,12 @@
   --good: #4ade80;
 
   --bg: var(--ink-050);
-  --surface: rgba(21, 26, 39, 0.72);
+  /* Opaque, deliberately. A translucent surface pulled over a gradient
+     background cannot resolve to one colour, so it reads as haze. Every
+     workspace that gradient-tints its body was showing that fog. */
+  --surface: var(--ink-150);
   --surface-solid: var(--ink-150);
-  --surface-raised: rgba(35, 42, 59, 0.66);
+  --surface-raised: var(--ink-200);
   --surface-ink: #f4f5f8;
   --on-ink: #0b0d12;
 }
@@ -414,7 +417,7 @@ kbd {
   padding: 10px 12px;
   border-radius: var(--radius-sm);
   border: 1px solid var(--line);
-  background: rgba(6, 9, 16, 0.6);
+  background: rgb(4, 5, 10);
   color: var(--ink-950);
   font-size: 13.5px;
   transition: border-color var(--dur-fast), background var(--dur-fast);
@@ -590,3 +593,20 @@ html[data-motion="still"] *::after {
   animation-duration: 0.01ms !important;
   transition-duration: 0.01ms !important;
 }
+
+/* --------------------------------------------------------------------------
+   Opaque panel surfaces for the workspaces that still carry their own colour
+   scheme. These are deliberately solid: a translucent panel over a tinted or
+   gradient body cannot settle on one colour, which is what made these screens
+   read as hazy. Values are chosen to sit a clear step above each body colour
+   so panels separate without a blur.
+   -------------------------------------------------------------------------- */
+body[data-workspace="scout"]         { --ws-panel: #12263f; --ws-panel-alt: #0c1a2d; }
+body[data-workspace="forge"]         { --ws-panel: #0e1116; --ws-panel-alt: #090c11; }
+body[data-workspace="quill"]         { --ws-panel: #ffffff; --ws-panel-alt: #f4f7fd; }
+body[data-workspace="kronos"]        { --ws-panel: #ffffff; --ws-panel-alt: #f7f2ff; }
+body[data-workspace="dash"]          { --ws-panel: #0d1420; --ws-panel-alt: #080d16; }
+body[data-workspace="whiteboard"]    { --ws-panel: #171029; --ws-panel-alt: #100b1e; }
+body[data-workspace="working-board"] { --ws-panel: #17120c; --ws-panel-alt: #100c08; }
+body[data-workspace="library"]       { --ws-panel: var(--surface-solid); --ws-panel-alt: var(--surface); }
+body[data-workspace="settings"]      { --ws-panel: var(--surface-solid); --ws-panel-alt: var(--surface); }

@@ -650,6 +650,47 @@ class TestPages(BaseCase):
                 self.assertIn('id="app-shell"', html)
                 self.assertIn('class="sidebar', html)
 
+    def test_every_workspace_has_exactly_one_navigation_bar(self):
+        """One nav rail, one surface. A second bar was the reported bug."""
+        for key in ("scout", "forge", "quill", "kronos", "whiteboard",
+                    "dash", "working-board", "library", "settings"):
+            with self.subTest(key=key):
+                html = self.client.get(f"/{key}").get_data(as_text=True)
+                self.assertEqual(html.count('<nav'), 1, "expected one <nav>")
+                self.assertEqual(html.count('class="sidebar sidebar--left"'), 1)
+                self.assertEqual(html.count('id="sidebar"'), 1)
+
+    def test_no_global_tools_panel_anywhere(self):
+        """The right-hand tools panel is gone; its content lives per workspace."""
+        for key in ("scout", "forge", "quill", "kronos", "whiteboard",
+                    "dash", "working-board", "library", "settings"):
+            with self.subTest(key=key):
+                html = self.client.get(f"/{key}").get_data(as_text=True)
+                self.assertNotIn('id="tools-panel"', html)
+                self.assertNotIn('id="tools-rail"', html)
+
+    def test_workspace_context_moved_into_the_workspace(self):
+        """Nothing that was reachable became unreachable."""
+        for key in ("scout", "forge", "quill", "kronos", "whiteboard",
+                    "dash", "working-board", "library", "settings"):
+            with self.subTest(key=key):
+                html = self.client.get(f"/{key}").get_data(as_text=True)
+                self.assertIn("ws-aside", html)
+                self.assertIn("tools__heading", html)
+
+    def test_no_backdrop_filter_in_any_sheet(self):
+        """Blur over a parent with no background smears the page grey."""
+        for sheet in sorted((REPO_ROOT / "opspine/static/css").glob("*.css")):
+            with self.subTest(sheet=sheet.name):
+                self.assertNotIn("backdrop-filter", sheet.read_text())
+
+    def test_abyss_collapsed_nav_keeps_main_column_in_place(self):
+        """Collapsing history must not slide the thread into the 0px track."""
+        css = (REPO_ROOT / "opspine/static/css/abyss.css").read_text()
+        self.assertIn('grid-template-areas: "nav main tools"', css)
+        self.assertIn("grid-area: main", css)
+        self.assertIn("grid-area: nav", css)
+
     def test_abyss_is_its_own_chat_chrome(self):
         """Abyss owns its layout: two sidebars, no global workspace chrome."""
         html = self.client.get("/abyss").get_data(as_text=True)

@@ -19,7 +19,7 @@ body[data-workspace="forge"] .stage {
 }
 
 body[data-workspace="forge"] .topbar {
-  background: rgba(5, 6, 10, 0.82);
+  background: rgb(4, 5, 8);
   border-bottom-color: color-mix(in srgb, var(--ink-950) 7%, transparent);
 }
 
@@ -158,7 +158,7 @@ body[data-workspace="forge"] .topbar {
 .cfg .input,
 .cfg .textarea,
 .cfg .select {
-  background: rgba(0, 0, 0, 0.55);
+  background: rgb(4, 5, 8);
   border-color: color-mix(in srgb, var(--ink-950) 13%, transparent);
   color: #f6f6fa;
 }
@@ -422,7 +422,7 @@ body[data-workspace="forge"] .topbar {
 .made__preview {
   border-radius: var(--radius);
   border: 1px solid color-mix(in srgb, var(--ink-950) 9%, transparent);
-  background: rgba(0, 0, 0, 0.4);
+  background: #12151c;
   padding: 14px;
   overflow: auto;
   max-height: 260px;
@@ -466,7 +466,7 @@ body[data-workspace="forge"] .topbar {
 .out__history {
   border-radius: var(--radius-lg);
   border: 1px solid color-mix(in srgb, var(--ink-950) 9%, transparent);
-  background: rgba(11, 12, 18, 0.7);
+  background: #12151c;
   padding: 16px;
 }
 
