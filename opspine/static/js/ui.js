@@ -107,7 +107,18 @@
   /* ---------- toasts ---------- */
   const toastHost = () => document.getElementById('toasts');
 
+  /* U.toast(message, kind, timeout) or U.toast({ message, kind, timeout,
+     action: { label, onClick } }). An action turns the toast into an undo
+     prompt, which keeps a destructive-looking change reversible. */
   U.toast = function (message, kind = 'info', timeout = 4200) {
+    let action = null;
+    if (message && typeof message === 'object') {
+      const options = message;
+      message = options.message;
+      kind = options.kind || 'info';
+      timeout = options.timeout || (options.action ? 8000 : 4200);
+      action = options.action || null;
+    }
     const host = toastHost();
     if (!host) return;
     const node = U.el('div', { class: `toast toast--${kind}`, role: 'status' }, [
@@ -118,12 +129,25 @@
     while (host.children.length >= 3) {
       host.removeChild(host.firstElementChild);
     }
-    host.appendChild(node);
     const remove = () => {
       node.style.transition = 'opacity 160ms ease';
       node.style.opacity = '0';
       setTimeout(() => node.remove(), 180);
     };
+    if (action && typeof action.onClick === 'function') {
+      const button = U.el('button', {
+        class: 'toast__action',
+        type: 'button',
+        text: action.label || 'Undo',
+      });
+      button.addEventListener('click', (event) => {
+        event.stopPropagation();
+        action.onClick();
+        remove();
+      });
+      node.appendChild(button);
+    }
+    host.appendChild(node);
     setTimeout(remove, timeout);
     node.addEventListener('click', remove);
   };

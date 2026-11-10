@@ -1056,3 +1056,28 @@ html:not([data-theme="dark"]) .theme-icon--moon {
 #prompt .input {
   width: 100%;
 }
+
+/* Toasts can carry one action, normally Undo. */
+.toast__action {
+  margin-left: 4px;
+  padding: 3px 9px;
+  border-radius: 999px;
+  border: 1px solid var(--line-strong);
+  background: transparent;
+  color: var(--ink-900);
+  font-size: 11px;
+  font-weight: 650;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+.toast__action:hover {
+  background: var(--ink-100);
+  border-color: var(--ink-500);
+}
+
+.toast__action:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--bg), 0 0 0 4px var(--accent);
+}
