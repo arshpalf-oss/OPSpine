@@ -3,36 +3,6 @@
 {% block title %}Library{% endblock %}
 
 {% block workspace %}
-  {# Workspace-owned context. Previously this lived in a global
-     right-hand panel; it belongs to this tool, so it renders here. #}
-  <div class="ws-aside" data-ws-aside>
-
-  <section class="tools__section">
-    <h2 class="tools__heading">Storage</h2>
-    <dl class="tools__stats" id="library-stats">
-      <div><dt>Files</dt><dd>0</dd></div>
-      <div><dt>Drafts</dt><dd>0</dd></div>
-      <div><dt>Research</dt><dd>0</dd></div>
-      <div><dt>Chats</dt><dd>0</dd></div>
-    </dl>
-  </section>
-  
-  <section class="tools__section">
-    <h2 class="tools__heading">Where files live</h2>
-    <p class="tools__para">
-      Generated documents are stored in <code>data/documents</code> inside the
-      OPSpine folder. Metadata is in <code>data/opspine.db</code>.
-    </p>
-  </section>
-  
-  <section class="tools__section">
-    <h2 class="tools__heading">Missing files</h2>
-    <p class="tools__para">
-      If a file is deleted outside OPSpine, the record stays but is marked
-      “missing” so you are never shown a download that cannot work.
-    </p>
-  </section>
-  </div>
 
 <div class="library" data-library>
   <header class="library__head">
@@ -73,6 +43,39 @@
   <p class="library__notice" id="library-notice" hidden></p>
 
   <section class="library__panel" id="library-panel" aria-live="polite"></section>
+
+
+
+  {# Workspace-owned context. Previously this lived in a global
+     right-hand panel; it belongs to this tool, so it renders here. #}
+  <div class="ws-aside" data-ws-aside>
+
+  <section class="tools__section">
+    <h2 class="tools__heading">Storage</h2>
+    <dl class="tools__stats" id="library-stats">
+      <div><dt>Files</dt><dd>0</dd></div>
+      <div><dt>Drafts</dt><dd>0</dd></div>
+      <div><dt>Research</dt><dd>0</dd></div>
+      <div><dt>Chats</dt><dd>0</dd></div>
+    </dl>
+  </section>
+  
+  <section class="tools__section">
+    <h2 class="tools__heading">Where files live</h2>
+    <p class="tools__para">
+      Generated documents are stored in <code>data/documents</code> inside the
+      OPSpine folder. Metadata is in <code>data/opspine.db</code>.
+    </p>
+  </section>
+  
+  <section class="tools__section">
+    <h2 class="tools__heading">Missing files</h2>
+    <p class="tools__para">
+      If a file is deleted outside OPSpine, the record stays but is marked
+      “missing” so you are never shown a download that cannot work.
+    </p>
+  </section>
+  </div>
 </div>
 {% endblock %}
 

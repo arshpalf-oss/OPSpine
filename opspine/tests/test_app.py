@@ -669,6 +669,60 @@ class TestPages(BaseCase):
                 self.assertNotIn('id="tools-panel"', html)
                 self.assertNotIn('id="tools-rail"', html)
 
+    def test_forge_preview_parsing_matches_the_generator(self):
+        """The live preview must not drift from what the server actually builds.
+
+        It re-implements split_sections/split_rows in JS, so this pins the two
+        together: if one side changes, this fails.
+        """
+        from opspine.services import documents
+
+        self.assertEqual(
+            documents.split_sections("Overview:\nText.\n\nKey points:\n- one\n- two"),
+            [
+                {"heading": "Overview", "lines": ["Text."]},
+                {"heading": "Key points", "lines": ["- one", "- two"]},
+            ],
+        )
+        self.assertEqual(
+            documents.split_sections("# First\nbody\n# Second\nmore"),
+            [{"heading": "First", "lines": ["body"]},
+             {"heading": "Second", "lines": ["more"]}],
+        )
+        self.assertEqual(
+            documents.split_sections("just one line\nand another"),
+            [{"heading": "", "lines": ["just one line", "and another"]}],
+        )
+        self.assertEqual(documents.split_sections(""), [{"heading": "", "lines": []}])
+        self.assertEqual(documents.split_rows("a,b,c\n1,2,3"),
+                         [["a", "b", "c"], ["1", "2", "3"]])
+        self.assertEqual(documents.split_rows("a|b|c\n1|2|3"),
+                         [["a", "b", "c"], ["1", "2", "3"]])
+        self.assertEqual(documents.split_rows("a\tb\tc\n1\t2\t3"),
+                         [["a", "b", "c"], ["1", "2", "3"]])
+
+    def test_workspace_reference_is_nested_inside_its_tool(self):
+        """The reference column belongs to the tool, not to the shell.
+
+        It used to render as a bare band above the workspace because it sat
+        outside the tool's root element.
+        """
+        roots = {
+            "scout": "scout", "quill": "quill", "kronos": "kronos",
+            "whiteboard": "wb", "dash": "dashconsole",
+            "working-board": "wboard", "library": "library",
+            "settings": "settings", "forge": "forge",
+        }
+        for key, root in roots.items():
+            with self.subTest(key=key):
+                html = self.client.get(f"/{key}").get_data(as_text=True)
+                aside_at = html.find('class="ws-aside"')
+                root_at = html.find(f'class="{root}"')
+                self.assertGreater(aside_at, 0, "reference column missing")
+                self.assertGreater(root_at, 0, f"root .{root} missing")
+                self.assertGreater(aside_at, root_at,
+                                   "reference column must come after the root opens")
+
     def test_workspace_context_moved_into_the_workspace(self):
         """Nothing that was reachable became unreachable."""
         for key in ("scout", "forge", "quill", "kronos", "whiteboard",
