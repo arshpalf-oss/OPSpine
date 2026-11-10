@@ -11,7 +11,8 @@
   const api = window.OPS.api;
 
   const boot = JSON.parse(document.getElementById('opspine-boot').textContent);
-  const shell = document.getElementById('app-shell');
+  // The launcher has no app chrome; every chrome helper must no-op there.
+  const shell = document.getElementById('app-shell') || document.getElementById('launcher');
   const isMac = /Mac|iPhone|iPad/.test(navigator.platform || navigator.userAgent);
   const modLabel = isMac ? 'Cmd' : 'Ctrl';
 
@@ -34,6 +35,7 @@
   }
 
   function setSidebarCollapsed(collapsed, persist = true) {
+    if (!document.getElementById('app-shell')) return;
     shell.dataset.sidebarCollapsed = collapsed ? 'true' : 'false';
     const toggle = document.querySelector('.topbar__menu');
     if (toggle) toggle.setAttribute('aria-expanded', String(!collapsed));
@@ -46,6 +48,7 @@
   }
 
   function setToolsCollapsed(collapsed, persist = true) {
+    if (!document.getElementById('app-shell')) return;
     shell.dataset.toolsCollapsed = collapsed ? 'true' : 'false';
     const toggle = document.querySelector('.topbar__tools-toggle');
     if (toggle) toggle.setAttribute('aria-expanded', String(!collapsed));
@@ -136,11 +139,13 @@
   }
 
   function toggleSidebar() {
+    if (!document.getElementById('app-shell')) return;
     const collapsed = shell.dataset.sidebarCollapsed === 'true';
     setSidebarCollapsed(!collapsed);
   }
 
   function toggleTools() {
+    if (!document.getElementById('app-shell')) return;
     const collapsed = shell.dataset.toolsCollapsed === 'true';
     setToolsCollapsed(!collapsed);
   }
@@ -531,6 +536,10 @@
         event.preventDefault();
         toggleTools();
         break;
+      case 'toggle-theme':
+        event.preventDefault();
+        toggleTheme();
+        break;
       case 'open-palette':
         event.preventDefault();
         openPalette();
@@ -581,15 +590,37 @@
   /* Close phone drawers after navigating. */
   U.$$('.nav__item').forEach((link) => {
     link.addEventListener('click', () => {
-      if (isPhone()) shell.dataset.sidebarCollapsed = 'true';
+      if (isPhone() && document.getElementById('app-shell')) {
+      shell.dataset.sidebarCollapsed = 'true';
+    }
     });
   });
+
+  /* ------------------------------------------------------------------ */
+  /* Theme                                                              */
+  /* ------------------------------------------------------------------ */
+  function currentTheme() {
+    return document.documentElement.dataset.theme || 'light';
+  }
+
+  function setTheme(theme, persist = true) {
+    const next = theme === 'dark' ? 'dark' : 'light';
+    document.documentElement.dataset.theme = next;
+    document.dispatchEvent(new CustomEvent('opspine:theme', { detail: { theme: next } }));
+    if (persist) saveChrome({ theme: next });
+  }
+
+  function toggleTheme() {
+    setTheme(currentTheme() === 'dark' ? 'light' : 'dark');
+  }
 
   /* ------------------------------------------------------------------ */
   /* Startup                                                            */
   /* ------------------------------------------------------------------ */
   function init() {
-    if (isPhone()) shell.dataset.sidebarCollapsed = 'true';
+    if (isPhone() && document.getElementById('app-shell')) {
+      shell.dataset.sidebarCollapsed = 'true';
+    }
     const restore = document.getElementById('sidebar-restore');
     if (restore) restore.hidden = true;
 
@@ -604,6 +635,15 @@
     });
 
     buildToolsRail();
+
+    /* Keyboard theme switch, alongside the toolbar button. */
+    document.addEventListener('keydown', (event) => {
+      if (!(event.ctrlKey || event.metaKey) || event.shiftKey || event.altKey) return;
+      if (event.key !== 't' && event.key !== 'T') return;
+      event.preventDefault();
+      toggleTheme();
+    });
+
     window.OPS.shell.ready = true;
     document.dispatchEvent(new CustomEvent('opspine:ready'));
   }
@@ -620,6 +660,9 @@
     setToolsCollapsed,
     applyChrome,
     buildToolsRail,
+    setTheme,
+    toggleTheme,
+    currentTheme,
     isMac,
     modLabel,
     ready: false,

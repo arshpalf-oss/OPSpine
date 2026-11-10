@@ -215,7 +215,7 @@ body[data-workspace="whiteboard"] .topbar {
   min-height: 64px;
   padding: 10px 12px;
   border-radius: var(--radius);
-  border: 1px solid rgba(255, 255, 255, 0.24);
+  border: 1px solid color-mix(in srgb, var(--ink-950) 24%, transparent);
   background: linear-gradient(160deg, rgba(30, 20, 52, 0.96), rgba(20, 13, 36, 0.96));
   border-left: 3px solid var(--node-colour, #c4a1ff);
   color: #eee9fb;
@@ -268,7 +268,7 @@ body[data-workspace="whiteboard"] .topbar {
   gap: 6px;
   margin-top: 6px;
   padding-top: 5px;
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  border-top: 1px solid color-mix(in srgb, var(--ink-950) 8%, transparent);
 }
 
 .node__dot {

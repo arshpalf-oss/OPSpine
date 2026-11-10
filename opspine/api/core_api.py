@@ -51,6 +51,18 @@ def save_settings():
         updates["motion"] = validation.choice(
             data, "motion", settings.MOTION_CHOICES, default="liquid"
         )
+    if "theme" in data:
+        updates["theme"] = validation.choice(
+            data, "theme", settings.THEME_CHOICES, default="light"
+        )
+    if "launch_mode" in data:
+        updates["launch_mode"] = validation.choice(
+            data, "launch_mode", settings.LAUNCH_CHOICES, default="launcher"
+        )
+    if "abyss_nav" in data:
+        updates["abyss_nav"] = validation.choice(
+            data, "abyss_nav", settings.NAV_CHOICES, default="expanded"
+        )
     if "sidebar_collapsed" in data:
         updates["sidebar_collapsed"] = validation.integer(
             data, "sidebar_collapsed", default=0, minimum=0, maximum=1

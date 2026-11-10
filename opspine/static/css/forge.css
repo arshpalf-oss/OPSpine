@@ -20,7 +20,7 @@ body[data-workspace="forge"] .stage {
 
 body[data-workspace="forge"] .topbar {
   background: rgba(5, 6, 10, 0.82);
-  border-bottom-color: rgba(255, 255, 255, 0.07);
+  border-bottom-color: color-mix(in srgb, var(--ink-950) 7%, transparent);
 }
 
 .forge {
@@ -44,7 +44,7 @@ body[data-workspace="forge"] .topbar {
   gap: 16px;
   padding: 22px;
   border-radius: var(--radius-lg);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid color-mix(in srgb, var(--ink-950) 10%, transparent);
   background: linear-gradient(170deg, rgba(20, 21, 28, 0.94), rgba(10, 11, 16, 0.96));
   box-shadow: 0 30px 70px -40px rgba(255, 45, 111, 0.5);
 }
@@ -114,14 +114,14 @@ body[data-workspace="forge"] .topbar {
   gap: 1px;
   padding: 9px 11px;
   border-radius: var(--radius-sm);
-  border: 1px solid rgba(255, 255, 255, 0.11);
-  background: rgba(255, 255, 255, 0.028);
+  border: 1px solid color-mix(in srgb, var(--ink-950) 11%, transparent);
+  background: color-mix(in srgb, var(--ink-950) 3%, transparent);
   transition: border-color var(--dur-fast), background var(--dur-fast);
 }
 
 .format:hover .format__box {
-  border-color: rgba(255, 255, 255, 0.22);
-  background: rgba(255, 255, 255, 0.055);
+  border-color: color-mix(in srgb, var(--ink-950) 22%, transparent);
+  background: color-mix(in srgb, var(--ink-950) 6%, transparent);
 }
 
 .format input:checked + .format__box {
@@ -159,14 +159,14 @@ body[data-workspace="forge"] .topbar {
 .cfg .textarea,
 .cfg .select {
   background: rgba(0, 0, 0, 0.55);
-  border-color: rgba(255, 255, 255, 0.13);
+  border-color: color-mix(in srgb, var(--ink-950) 13%, transparent);
   color: #f6f6fa;
 }
 
 .cfg .input:hover,
 .cfg .textarea:hover,
 .cfg .select:hover {
-  border-color: rgba(255, 255, 255, 0.24);
+  border-color: color-mix(in srgb, var(--ink-950) 24%, transparent);
 }
 
 .cfg .input:focus-visible,
@@ -198,7 +198,7 @@ body[data-workspace="forge"] .topbar {
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 11px;
   padding-top: 4px;
-  border-top: 1px solid rgba(255, 255, 255, 0.07);
+  border-top: 1px solid color-mix(in srgb, var(--ink-950) 7%, transparent);
 }
 
 .opts .field {
@@ -245,13 +245,13 @@ body[data-workspace="forge"] .topbar {
 }
 
 .cfg__actions .btn {
-  border-color: rgba(255, 255, 255, 0.14);
-  background: rgba(255, 255, 255, 0.05);
+  border-color: color-mix(in srgb, var(--ink-950) 14%, transparent);
+  background: color-mix(in srgb, var(--ink-950) 5%, transparent);
   color: #f2f2f7;
 }
 
 .cfg__actions .btn:hover {
-  background: rgba(255, 255, 255, 0.1);
+  background: color-mix(in srgb, var(--ink-950) 10%, transparent);
 }
 
 .cfg__actions .btn--primary {
@@ -291,7 +291,7 @@ body[data-workspace="forge"] .topbar {
 .out__stage {
   min-height: 420px;
   border-radius: var(--radius-lg);
-  border: 1px solid rgba(255, 255, 255, 0.09);
+  border: 1px solid color-mix(in srgb, var(--ink-950) 9%, transparent);
   background:
     radial-gradient(90% 70% at 50% 0%, rgba(255, 45, 111, 0.075), transparent 62%),
     rgba(11, 12, 18, 0.82);
@@ -416,12 +416,12 @@ body[data-workspace="forge"] .topbar {
   gap: 8px;
   flex-wrap: wrap;
   padding-top: 14px;
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  border-top: 1px solid color-mix(in srgb, var(--ink-950) 8%, transparent);
 }
 
 .made__preview {
   border-radius: var(--radius);
-  border: 1px solid rgba(255, 255, 255, 0.09);
+  border: 1px solid color-mix(in srgb, var(--ink-950) 9%, transparent);
   background: rgba(0, 0, 0, 0.4);
   padding: 14px;
   overflow: auto;
@@ -465,7 +465,7 @@ body[data-workspace="forge"] .topbar {
 /* History */
 .out__history {
   border-radius: var(--radius-lg);
-  border: 1px solid rgba(255, 255, 255, 0.09);
+  border: 1px solid color-mix(in srgb, var(--ink-950) 9%, transparent);
   background: rgba(11, 12, 18, 0.7);
   padding: 16px;
 }
@@ -490,8 +490,8 @@ body[data-workspace="forge"] .topbar {
 }
 
 .out__row:hover {
-  background: rgba(255, 255, 255, 0.04);
-  border-color: rgba(255, 255, 255, 0.07);
+  background: color-mix(in srgb, var(--ink-950) 4%, transparent);
+  border-color: color-mix(in srgb, var(--ink-950) 7%, transparent);
 }
 
 .out__ftype {

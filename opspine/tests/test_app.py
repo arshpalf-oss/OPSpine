@@ -133,6 +133,46 @@ class TestSettings(BaseCase):
         response = self.client.post("/api/settings", json={"motion": "wobbly"})
         self.assertEqual(response.status_code, 400)
 
+    def test_theme_round_trips_and_validates(self):
+        for theme in ("dark", "light"):
+            self.client.post("/api/settings", json={"theme": theme})
+            self.assertEqual(settings.get("theme"), theme)
+        response = self.client.post("/api/settings", json={"theme": "neon"})
+        self.assertEqual(response.status_code, 400)
+
+    def test_unconverted_workspace_stays_dark(self):
+        """The switch must never render a room that isn't converted yet."""
+        self.client.post("/api/settings", json={"theme": "light"})
+        html = self.client.get("/abyss").get_data(as_text=True)
+        self.assertIn('data-theme-ready="false"', html)
+        self.assertIn('data-theme="dark"', html)
+
+    def test_launcher_is_theme_ready(self):
+        self.client.post("/api/settings", json={"theme": "light"})
+        html = self.client.get("/dashboard").get_data(as_text=True)
+        self.assertIn('data-theme-ready="true"', html)
+        self.assertIn('data-theme="light"', html)
+
+    def test_theme_is_reflected_in_the_html_element(self):
+        self.client.post("/api/settings", json={"theme": "dark"})
+        html = self.client.get("/dashboard").get_data(as_text=True)
+        self.assertIn('data-theme="dark"', html)
+        self.client.post("/api/settings", json={"theme": "light"})
+        html = self.client.get("/dashboard").get_data(as_text=True)
+        self.assertIn('data-theme="light"', html)
+
+    def test_launch_mode_and_nav_validate(self):
+        for field, good, bad in (
+            ("launch_mode", "resume", "sometimes"),
+            ("abyss_nav", "collapsed", "sideways"),
+        ):
+            self.assertEqual(
+                self.client.post("/api/settings", json={field: good}).status_code, 200
+            )
+            self.assertEqual(
+                self.client.post("/api/settings", json={field: bad}).status_code, 400
+            )
+
     def test_motion_round_trips(self):
         for motion in ("calm", "cinematic", "still", "liquid"):
             self.client.post("/api/settings", json={"motion": motion})
@@ -579,10 +619,49 @@ class TestPages(BaseCase):
                 response = self.client.get(path, follow_redirects=True)
                 self.assertEqual(response.status_code, 200, path)
 
-    def test_root_redirects_to_dashboard(self):
+    def test_root_serves_the_launcher(self):
         response = self.client.get("/")
-        self.assertEqual(response.status_code, 302)
-        self.assertIn("/dashboard", response.headers["Location"])
+        self.assertEqual(response.status_code, 200)
+        html = response.get_data(as_text=True)
+        self.assertIn('class="launcher"', html)
+        # The launcher is chrome-less: no app shell, no sidebar.
+        self.assertNotIn('id="app-shell"', html)
+        self.assertNotIn('class="sidebar', html)
+
+    def test_dashboard_is_the_launcher(self):
+        response = self.client.get("/dashboard")
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('class="launcher"', response.get_data(as_text=True))
+
+    def test_workspaces_keep_the_app_shell(self):
+        for key in ("abyss", "kronos", "forge", "settings"):
+            with self.subTest(key=key):
+                html = self.client.get(f"/{key}").get_data(as_text=True)
+                self.assertIn('id="app-shell"', html)
+                self.assertIn('class="sidebar', html)
+
+    def test_launcher_lists_every_workspace_but_itself(self):
+        html = self.client.get("/dashboard").get_data(as_text=True)
+        names = ["Abyss", "Scout", "Forge", "Quill", "Kronos",
+                 "Whiteboard", "Dash", "Working Board", "Library", "Settings"]
+        for name in names:
+            self.assertIn(f'>{name}<', html, name)
+
+    def test_resume_mode_lands_on_the_pinned_workspace(self):
+        settings.set_value("launch_mode", "resume")
+        settings.set_value("last_workspace", "/kronos")
+        try:
+            response = self.client.get("/")
+            self.assertEqual(response.status_code, 302)
+            self.assertIn("/kronos", response.headers["Location"])
+            # /dashboard still shows the launcher in resume mode.
+            self.assertEqual(self.client.get("/dashboard").status_code, 200)
+        finally:
+            settings.set_value("launch_mode", "launcher")
+
+    def test_visiting_a_workspace_remembers_it(self):
+        self.client.get("/quill")
+        self.assertEqual(settings.get("last_workspace"), "/quill")
 
     def test_unknown_path_returns_clean_404(self):
         response = self.client.get("/does-not-exist")

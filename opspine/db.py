@@ -181,6 +181,9 @@ MIGRATIONS: List[tuple] = [
 DEFAULT_SETTINGS: Dict[str, str] = {
     "local_only": "1",
     "motion": "liquid",
+    "theme": "light",
+    "launch_mode": "launcher",
+    "abyss_nav": "expanded",
     "sidebar_collapsed": "0",
     "tools_collapsed": "0",
     "display_name": "",

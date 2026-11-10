@@ -87,7 +87,7 @@ body[data-workspace="dashboard"] .workspace {
   font-size: 12.5px;
   padding: 2px 6px;
   border-radius: 5px;
-  background: rgba(255, 255, 255, 0.06);
+  background: color-mix(in srgb, var(--ink-950) 6%, transparent);
   border: 1px solid var(--line-soft);
   color: var(--ink-800);
 }
@@ -105,7 +105,7 @@ body[data-workspace="dashboard"] .workspace {
   padding: 12px 14px;
   border-radius: var(--radius);
   border: 1px solid var(--line);
-  background: rgba(255, 255, 255, 0.035);
+  background: color-mix(in srgb, var(--ink-950) 4%, transparent);
   color: var(--ink-600);
   font-size: 13px;
   text-align: left;
@@ -115,7 +115,7 @@ body[data-workspace="dashboard"] .workspace {
 
 .dash__search-btn:hover {
   border-color: var(--line-strong);
-  background: rgba(255, 255, 255, 0.06);
+  background: color-mix(in srgb, var(--ink-950) 6%, transparent);
   color: var(--ink-800);
 }
 
@@ -150,8 +150,8 @@ body[data-workspace="dashboard"] .workspace {
   border: 1px solid var(--line-soft);
   background: linear-gradient(
     160deg,
-    rgba(255, 255, 255, 0.042),
-    rgba(255, 255, 255, 0.012)
+    color-mix(in srgb, var(--ink-950) 4%, transparent),
+    color-mix(in srgb, var(--ink-950) 1%, transparent)
   );
   color: var(--ink-800);
   text-decoration: none;
@@ -271,7 +271,7 @@ body[data-workspace="dashboard"] .workspace {
   align-items: center;
   gap: 14px;
   padding: 11px 16px;
-  background: rgba(255, 255, 255, 0.02);
+  background: color-mix(in srgb, var(--ink-950) 2%, transparent);
   border-bottom: 1px solid var(--line-soft);
   font-size: 12.5px;
 }
@@ -319,7 +319,7 @@ body[data-workspace="dashboard"] .workspace {
   padding: 28px;
   border-radius: var(--radius-lg);
   border: 1px dashed var(--line);
-  background: rgba(255, 255, 255, 0.016);
+  background: color-mix(in srgb, var(--ink-950) 2%, transparent);
 }
 
 .empty-first__art {
@@ -333,7 +333,7 @@ body[data-workspace="dashboard"] .workspace {
   height: 26px;
   border-radius: 8px;
   border: 1px solid var(--line);
-  background: rgba(255, 255, 255, 0.04);
+  background: color-mix(in srgb, var(--ink-950) 4%, transparent);
 }
 
 .empty-first__art span:nth-child(1) {
@@ -375,14 +375,14 @@ body[data-workspace="dashboard"] .workspace {
   padding: 11px 13px;
   border-radius: var(--radius-sm);
   border: 1px solid var(--line-soft);
-  background: rgba(255, 255, 255, 0.025);
+  background: color-mix(in srgb, var(--ink-950) 2%, transparent);
   text-align: left;
   transition: border-color var(--dur-fast), background var(--dur-fast);
 }
 
 .motion__option:hover {
   border-color: var(--line-strong);
-  background: rgba(255, 255, 255, 0.05);
+  background: color-mix(in srgb, var(--ink-950) 5%, transparent);
 }
 
 .motion__option.is-active {
@@ -462,7 +462,7 @@ body[data-workspace="dashboard"] .workspace {
 }
 
 .quicklist a:hover {
-  background: rgba(255, 255, 255, 0.05);
+  background: color-mix(in srgb, var(--ink-950) 5%, transparent);
   text-decoration: none;
 }
 

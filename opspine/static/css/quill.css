@@ -17,7 +17,7 @@ body[data-workspace="quill"] .workspace {
 }
 
 body[data-workspace="quill"] .topbar {
-  background: rgba(255, 255, 255, 0.82);
+  background: color-mix(in srgb, var(--ink-950) 82%, transparent);
   border-bottom-color: rgba(20, 40, 90, 0.1);
 }
 
@@ -70,7 +70,7 @@ body[data-workspace="quill"] :focus-visible {
   min-height: 0;
   border-radius: var(--radius-lg);
   border: 1px solid rgba(20, 40, 90, 0.1);
-  background: rgba(255, 255, 255, 0.72);
+  background: color-mix(in srgb, var(--ink-950) 72%, transparent);
   backdrop-filter: blur(12px);
   overflow: hidden;
 }

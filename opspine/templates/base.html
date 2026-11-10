@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+{# A workspace that has not been converted to the light palette pins itself to
+   dark, so the theme switch never renders an unconverted room unreadable. #}
+{% set theme_ok = workspace.theme_ready is defined and workspace.theme_ready %}
+{% set page_theme = settings.theme if theme_ok else 'dark' %}
+<html lang="en" data-motion="{{ settings.motion }}" data-theme="{{ page_theme }}"
+      data-theme-ready="{{ 'true' if theme_ok else 'false' }}">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  {# The launcher and every workspace can invert independently of the stored
+     theme; color-scheme tells the browser about form controls and scrollbars. #}
+  <meta name="color-scheme" content="light dark">
+  <title>{% block title %}{{ workspace.name }}{% endblock %} · OPSpine</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='9' fill='%230f0f0f'/><path d='M16 6l9 10-9 10-9-10z' fill='none' stroke='%23ffffff' stroke-width='2.4'/></svg>">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  {% block styles %}{% endblock %}
+</head>
+{% from 'partials/icons.html' import icon as ws_icon %}
+<body data-workspace="{{ workspace.key }}" data-chrome="{{ workspace.chrome | default('app') }}"
+      data-accent="{{ workspace.accent }}">
+
+<a class="skip-link" href="#workspace-main">Skip to main content</a>
+
+{% block shell %}{% endblock %}
+
+{# -------------------------------------------------------------------- #}
+{# Command palette — shared by every page                              #}
+{# -------------------------------------------------------------------- #}
+<div class="overlay" id="palette" hidden role="dialog" aria-modal="true"
+     aria-labelledby="palette-title">
+  <div class="overlay__scrim" data-action="close-palette"></div>
+  <div class="palette" role="document">
+    <h2 class="visually-hidden" id="palette-title">Command palette</h2>
+    <div class="palette__field">
+      <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor"
+           stroke-width="1.8" stroke-linecap="round" aria-hidden="true">
+        <circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+      <input type="text" id="palette-input"
+             placeholder="Search workspaces, drafts, files, events…"
+             autocomplete="off" role="combobox" aria-expanded="true"
+             aria-controls="palette-results" aria-autocomplete="list">
+      <kbd>Esc</kbd>
+    </div>
+    <div class="palette__results" id="palette-results" role="listbox"
+         aria-label="Results"></div>
+    <div class="palette__foot">
+      <span><kbd>↑</kbd><kbd>↓</kbd> navigate</span>
+      <span><kbd>↵</kbd> open</span>
+      <span>Ctrl Cmd K to toggle</span>
+    </div>
+  </div>
+</div>
+
+{# -------------------------------------------------------------------- #}
+{# Shortcut help                                                        #}
+{# -------------------------------------------------------------------- #}
+<div class="overlay" id="help" hidden role="dialog" aria-modal="true"
+     aria-labelledby="help-title">
+  <div class="overlay__scrim" data-action="close-help"></div>
+  <div class="sheet" role="document">
+    <header class="sheet__head">
+      <h2 id="help-title">Keyboard shortcuts</h2>
+      <button class="icon-btn" data-action="close-help" aria-label="Close">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+             stroke-width="1.8" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </button>
+    </header>
+    <div class="sheet__body">
+      <div class="keys">
+        <h3>Workspaces</h3>
+        <ul>
+          {% for item in workspaces %}
+            {% if item.shortcut %}
+              <li><kbd>Ctrl {{ item.shortcut }}</kbd><span>{{ item.name }}</span></li>
+            {% endif %}
+          {% endfor %}
+        </ul>
+      </div>
+      <div class="keys">
+        <h3>Global</h3>
+        <ul>
+          <li><kbd>Ctrl K</kbd><span>Command palette</span></li>
+          <li><kbd>Ctrl ↵</kbd><span>Primary action</span></li>
+          <li><kbd>Ctrl T</kbd><span>Switch light / dark</span></li>
+          <li><kbd>Ctrl \</kbd><span>Collapse navigation</span></li>
+          <li><kbd>?</kbd><span>This panel</span></li>
+          <li><kbd>Esc</kbd><span>Close overlay or menu</span></li>
+        </ul>
+      </div>
+    </div>
+    <footer class="sheet__foot">
+      Shortcuts use Ctrl on Windows and Linux, Cmd on macOS.
+    </footer>
+  </div>
+</div>
+
+{# -------------------------------------------------------------------- #}
+{# Confirm dialog (shared)                                              #}
+{# -------------------------------------------------------------------- #}
+<div class="overlay" id="confirm" hidden role="dialog" aria-modal="true"
+     aria-labelledby="confirm-title" aria-describedby="confirm-message">
+  <div class="overlay__scrim" data-action="close-confirm"></div>
+  <div class="confirm" role="document">
+    <h2 id="confirm-title" class="confirm__title">Are you sure?</h2>
+    <p id="confirm-message" class="confirm__message"></p>
+    <div class="confirm__actions">
+      <button class="btn btn--ghost" data-action="close-confirm">Cancel</button>
+      <button class="btn btn--danger" id="confirm-accept">Delete</button>
+    </div>
+  </div>
+</div>
+
+<div class="toasts" id="toasts" role="status" aria-live="polite"></div>
+
+<script id="opspine-boot" type="application/json">
+{
+  "workspace": {{ workspace | tojson }},
+  "settings": {{ settings | tojson }},
+  "providers": {{ provider_status | tojson }},
+  "counts": {{ counts | tojson }},
+  "workspaces": {{ workspaces | tojson }}
+}
+</script>
+
+<script src="{{ url_for('static', filename='js/api.js') }}"></script>
+<script src="{{ url_for('static', filename='js/ui.js') }}"></script>
+<script src="{{ url_for('static', filename='js/shell.js') }}"></script>
+{% block scripts %}{% endblock %}
+</body>
+</html>

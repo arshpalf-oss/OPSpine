@@ -16,11 +16,11 @@ body[data-workspace="abyss"] .stage::before {
   position: absolute;
   inset: 0;
   background-image:
-    radial-gradient(1.2px 1.2px at 12% 22%, rgba(255, 255, 255, 0.5), transparent),
-    radial-gradient(1px 1px at 78% 14%, rgba(255, 255, 255, 0.4), transparent),
+    radial-gradient(1.2px 1.2px at 12% 22%, color-mix(in srgb, var(--ink-950) 50%, transparent), transparent),
+    radial-gradient(1px 1px at 78% 14%, color-mix(in srgb, var(--ink-950) 40%, transparent), transparent),
     radial-gradient(1.4px 1.4px at 34% 68%, rgba(180, 200, 255, 0.4), transparent),
-    radial-gradient(1px 1px at 64% 84%, rgba(255, 255, 255, 0.32), transparent),
-    radial-gradient(1px 1px at 88% 56%, rgba(255, 255, 255, 0.3), transparent);
+    radial-gradient(1px 1px at 64% 84%, color-mix(in srgb, var(--ink-950) 32%, transparent), transparent),
+    radial-gradient(1px 1px at 88% 56%, color-mix(in srgb, var(--ink-950) 30%, transparent), transparent);
   opacity: 0.55;
   pointer-events: none;
   z-index: 0;
@@ -127,11 +127,11 @@ body[data-workspace="abyss"] .stage > * {
 }
 
 .conv:hover {
-  background: rgba(255, 255, 255, 0.045);
+  background: color-mix(in srgb, var(--ink-950) 4%, transparent);
 }
 
 .conv.is-active {
-  background: rgba(255, 255, 255, 0.075);
+  background: color-mix(in srgb, var(--ink-950) 8%, transparent);
   border-color: var(--line);
 }
 
@@ -183,7 +183,7 @@ body[data-workspace="abyss"] .stage > * {
 
 .conv__btn:hover {
   color: var(--ink-950);
-  background: rgba(255, 255, 255, 0.1);
+  background: color-mix(in srgb, var(--ink-950) 10%, transparent);
 }
 
 .convs__empty {
@@ -289,7 +289,7 @@ body[data-workspace="abyss"] .stage > * {
   padding: 12px 15px;
   border-radius: var(--radius) var(--radius) var(--radius) 4px;
   border: 1px solid var(--line-soft);
-  background: rgba(255, 255, 255, 0.045);
+  background: color-mix(in srgb, var(--ink-950) 4%, transparent);
   max-width: min(100%, 60ch);
 }
 
@@ -367,7 +367,7 @@ body[data-workspace="abyss"] .stage > * {
   padding: 7px 12px;
   border-radius: var(--radius-pill);
   border: 1px solid var(--line);
-  background: rgba(255, 255, 255, 0.035);
+  background: color-mix(in srgb, var(--ink-950) 4%, transparent);
   font-size: 12px;
   color: var(--ink-700);
   transition: border-color var(--dur-fast), color var(--dur-fast),

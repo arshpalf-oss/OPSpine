@@ -45,7 +45,7 @@
 .panel {
   border-radius: var(--radius-lg);
   border: 1px solid var(--line-soft);
-  background: rgba(255, 255, 255, 0.022);
+  background: color-mix(in srgb, var(--ink-950) 2%, transparent);
   padding: 16px 18px 18px;
   display: flex;
   flex-direction: column;
@@ -83,7 +83,7 @@
   padding: 3px 9px;
   border-radius: var(--radius-pill);
   border: 1px solid var(--line);
-  background: rgba(255, 255, 255, 0.05);
+  background: color-mix(in srgb, var(--ink-950) 5%, transparent);
   color: var(--ink-700);
   white-space: nowrap;
 }
@@ -113,7 +113,7 @@
   padding: 4px 10px;
   border-radius: var(--radius-pill);
   border: 1px solid var(--line-soft);
-  background: rgba(255, 255, 255, 0.035);
+  background: color-mix(in srgb, var(--ink-950) 4%, transparent);
   font-size: 10.5px;
   color: var(--ink-700);
   font-weight: 550;
@@ -141,14 +141,14 @@
   padding: 12px 14px;
   border-radius: var(--radius);
   border: 1px solid var(--line-soft);
-  background: rgba(255, 255, 255, 0.03);
+  background: color-mix(in srgb, var(--ink-950) 3%, transparent);
   cursor: pointer;
   transition: border-color var(--dur-fast), background var(--dur-fast);
 }
 
 .switchrow:hover {
   border-color: var(--line);
-  background: rgba(255, 255, 255, 0.05);
+  background: color-mix(in srgb, var(--ink-950) 5%, transparent);
 }
 
 .switchrow:focus-within {
@@ -233,7 +233,7 @@ select.field__input {
   padding: 11px 13px;
   border-radius: var(--radius);
   border: 1px solid var(--line-soft);
-  background: rgba(255, 255, 255, 0.018);
+  background: color-mix(in srgb, var(--ink-950) 2%, transparent);
 }
 
 .keyrow__label {
@@ -296,7 +296,7 @@ select.field__input {
   padding: 11px 12px;
   border-radius: var(--radius);
   border: 1px solid var(--line-soft);
-  background: rgba(255, 255, 255, 0.022);
+  background: color-mix(in srgb, var(--ink-950) 2%, transparent);
   text-align: left;
   transition: border-color var(--dur-fast), background var(--dur-fast),
     transform var(--dur-fast);
@@ -304,7 +304,7 @@ select.field__input {
 
 .motioncard:hover {
   border-color: var(--line);
-  background: rgba(255, 255, 255, 0.045);
+  background: color-mix(in srgb, var(--ink-950) 4%, transparent);
   transform: translateY(-1px);
 }
 
@@ -437,7 +437,7 @@ select.field__input {
   justify-content: space-between;
   gap: 14px;
   padding: 8px 12px;
-  background: rgba(255, 255, 255, 0.02);
+  background: color-mix(in srgb, var(--ink-950) 2%, transparent);
 }
 
 .datapaths dt {
