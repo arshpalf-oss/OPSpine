@@ -29,6 +29,14 @@
     importConfirm: document.getElementById('set-import-confirm'),
     resetBtn: document.getElementById('set-reset'),
     pathDb: document.getElementById('set-path-db'),
+    themeGroup: document.getElementById('set-theme-group'),
+    themeBadge: document.getElementById('set-theme-badge'),
+    launchToggle: document.getElementById('set-launch-toggle'),
+    resetForm: document.getElementById('set-reset-form'),
+    resetInput: document.getElementById('set-reset-input'),
+    resetCancel: document.getElementById('set-reset-cancel'),
+    resetConfirm: document.getElementById('set-reset-confirm'),
+    resetError: document.getElementById('set-reset-error'),
   };
 
   const state = { settings: null, providers: null, pending: null };
@@ -126,9 +134,37 @@
     });
   }
 
+  function renderTheme() {
+    const current = shell.currentTheme();
+    const ready = shell.themeReady();
+    U.$$('.segmented__btn', dom.themeGroup).forEach((button) => {
+      button.setAttribute(
+        'aria-checked', String(button.dataset.themeChoice === current)
+      );
+      /* Rooms that have not been converted to the light palette refuse the
+         switch server-side. Say so here instead of letting the click fail. */
+      const locked = button.dataset.themeChoice === 'light' && !ready;
+      button.setAttribute('aria-disabled', String(locked));
+      button.disabled = locked;
+      button.title = locked
+        ? 'This workspace is still dark-only. Switch in Abyss or the Dashboard.'
+        : '';
+    });
+    if (dom.themeBadge) {
+      dom.themeBadge.textContent = ready ? current : `${current} (this room is dark-only)`;
+    }
+  }
+
+  function renderLaunch() {
+    const mode = state.settings.launch_mode || 'launcher';
+    dom.launchToggle.checked = mode === 'launcher';
+  }
+
   function renderAll() {
     dom.providerAi.value = state.settings.provider_ai || 'none';
     dom.providerSearch.value = state.settings.provider_search || 'none';
+    renderTheme();
+    renderLaunch();
     renderLocalOnly();
     renderStatus();
     renderSecrets();
@@ -186,6 +222,42 @@
     );
     if (!ok) dom.localToggle.checked = !next;
     dom.localToggle.disabled = false;
+  });
+
+  /* The theme switch in this panel is the same setting as the toolbar
+     button, so it goes through the shell rather than writing its own value. */
+  dom.themeGroup.addEventListener('click', (event) => {
+    const button = event.target.closest('.segmented__btn');
+    if (!button) return;
+    const wanted = button.dataset.themeChoice;
+    if (shell.currentTheme() !== wanted) shell.toggleTheme();
+    renderTheme();
+  });
+
+  dom.themeGroup.addEventListener('keydown', (event) => {
+    const buttons = U.$$('.segmented__btn', dom.themeGroup);
+    const index = buttons.indexOf(document.activeElement);
+    if (index === -1) return;
+    if (!['ArrowRight', 'ArrowLeft', 'ArrowUp', 'ArrowDown'].includes(event.key)) return;
+    event.preventDefault();
+    const step = event.key === 'ArrowRight' || event.key === 'ArrowDown' ? 1 : -1;
+    const next = buttons[(index + step + buttons.length) % buttons.length];
+    next.focus();
+    next.click();
+  });
+
+  /* Keep the panel honest if the theme is changed from the toolbar. */
+  document.addEventListener('opspine:theme', renderTheme);
+
+  dom.launchToggle.addEventListener('change', async () => {
+    const next = dom.launchToggle.checked ? 'launcher' : 'resume';
+    const ok = await save(
+      { launch_mode: next },
+      next === 'launcher'
+        ? 'OPSpine will start at the Dashboard.'
+        : 'OPSpine will resume the last workspace you used.'
+    );
+    if (!ok) renderLaunch();
   });
 
   dom.providerAi.addEventListener('change', () => {
@@ -345,26 +417,55 @@
   });
 
   /* Danger zone ---------------------------------------------------- */
-  dom.resetBtn.addEventListener('click', async () => {
-    const ok = await U.confirm({
-      title: 'Delete all local data?',
-      message: 'This removes every conversation, draft, event, task, board, research session, file record and generated file. It cannot be undone.',
-      confirmLabel: 'Delete everything',
-      danger: true,
-    });
-    if (!ok) return;
-    const typed = window.prompt('Type DELETE to confirm permanent removal of all data.');
-    if (typed !== 'DELETE') {
-      if (typed !== null) U.error('Confirmation text did not match. Nothing was deleted.');
-      return;
+  function closeResetForm() {
+    dom.resetForm.hidden = true;
+    dom.resetInput.value = '';
+    dom.resetConfirm.disabled = true;
+    dom.resetError.hidden = true;
+  }
+
+  dom.resetBtn.addEventListener('click', () => {
+    dom.resetForm.hidden = false;
+    dom.resetInput.value = '';
+    dom.resetConfirm.disabled = true;
+    dom.resetError.hidden = true;
+    dom.resetInput.focus();
+  });
+
+  dom.resetCancel.addEventListener('click', closeResetForm);
+
+  dom.resetInput.addEventListener('input', () => {
+    const matches = dom.resetInput.value.trim().toUpperCase() === 'DELETE';
+    dom.resetConfirm.disabled = !matches;
+  });
+
+  dom.resetInput.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') {
+      event.stopPropagation();
+      closeResetForm();
+    } else if (event.key === 'Enter' && !dom.resetConfirm.disabled) {
+      event.preventDefault();
+      dom.resetConfirm.click();
     }
+  });
+
+  dom.resetConfirm.addEventListener('click', async () => {
+    if (dom.resetConfirm.disabled) return;
+    dom.resetConfirm.disabled = true;
+    dom.resetConfirm.textContent = 'Deleting…';
     try {
       const data = await api.post('/api/danger/reset', { confirm: 'DELETE' });
       U.success(data.message || 'All local data deleted.');
+      closeResetForm();
       await load();
       shell.refreshActivity();
     } catch (err) {
+      dom.resetError.textContent = err.message;
+      dom.resetError.hidden = false;
       U.error(err.message);
+    } finally {
+      dom.resetConfirm.textContent = 'Delete everything';
+      dom.resetConfirm.disabled = dom.resetInput.value.trim().toUpperCase() !== 'DELETE';
     }
   });
 

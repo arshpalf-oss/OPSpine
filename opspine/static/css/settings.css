@@ -159,6 +159,23 @@
   box-shadow: var(--focus);
 }
 
+/* The visible track sits next to a visually hidden checkbox, so it needs its
+   own pointer target; without this the switch only responds to the keyboard. */
+.switch__track {
+  flex: none;
+  cursor: pointer;
+}
+
+.switchrow input:checked + .switch__track {
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
+.switchrow input:checked + .switch__track .switch__thumb {
+  transform: translateX(16px);
+  background: #ffffff;
+}
+
 .switchrow__copy {
   display: flex;
   flex-direction: column;
@@ -512,4 +529,93 @@ select.field__input {
   .motiongrid {
     grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
   }
+}
+
+
+/* ---------------- appearance: theme + launch ---------------- */
+.panel__badge[hidden] {
+  display: none;
+}
+
+.segmented {
+  display: inline-flex;
+  padding: 3px;
+  gap: 3px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: color-mix(in srgb, var(--ink-950) 4%, transparent);
+}
+
+.segmented__btn {
+  padding: 6px 16px;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--ink-700);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background var(--dur-fast), color var(--dur-fast);
+}
+
+.segmented__btn:hover {
+  color: var(--ink-950);
+}
+
+.segmented__btn[aria-checked='true'] {
+  background: var(--ink-950);
+  border-color: var(--ink-950);
+  color: var(--ink-000);
+}
+
+:root[data-theme='dark'] .segmented__btn[aria-checked='true'] {
+  background: var(--ink-900);
+  border-color: var(--ink-900);
+  color: #05060a;
+}
+
+/* ---------------- danger confirmation ---------------- */
+.dangerconfirm {
+  margin-top: 12px;
+  padding: 14px;
+  border-radius: var(--radius);
+  border: 1px solid color-mix(in srgb, #c2410c 40%, transparent);
+  background: color-mix(in srgb, #c2410c 6%, transparent);
+}
+
+.dangerconfirm[hidden] {
+  display: none;
+}
+
+.dangerconfirm__copy {
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--ink-800);
+  margin-bottom: 10px;
+}
+
+.dangerconfirm__row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.dangerconfirm__row .field__input {
+  flex: 1 1 200px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.dangerconfirm__row .btn {
+  flex: none;
+}
+
+.dangerconfirm__error {
+  margin-top: 8px;
+  font-size: 11.5px;
+  color: #c2410c;
+}
+
+.dangerconfirm__error[hidden] {
+  display: none;
 }
