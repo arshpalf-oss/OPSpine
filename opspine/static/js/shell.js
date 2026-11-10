@@ -577,12 +577,12 @@
       wasPhone = nowPhone;
       const restore = document.getElementById('sidebar-restore');
       if (restore) restore.hidden = true;
-      if (nowPhone && shell.dataset.sidebarCollapsed === 'false') {
+      if (nowPhone && shell && shell.dataset.sidebarCollapsed === 'false') {
         shell.dataset.sidebarCollapsed = 'true';
       }
     }
     const restore = document.getElementById('sidebar-restore');
-    if (restore && !isPhone()) {
+    if (restore && !isPhone() && shell) {
       restore.hidden = shell.dataset.sidebarCollapsed !== 'true';
     }
   }, 160));
@@ -590,9 +590,9 @@
   /* Close phone drawers after navigating. */
   U.$$('.nav__item').forEach((link) => {
     link.addEventListener('click', () => {
-      if (isPhone() && document.getElementById('app-shell')) {
-      shell.dataset.sidebarCollapsed = 'true';
-    }
+      if (isPhone() && shell) {
+        shell.dataset.sidebarCollapsed = 'true';
+      }
     });
   });
 
@@ -603,14 +603,34 @@
     return document.documentElement.dataset.theme || 'light';
   }
 
+  /* A workspace that has not been converted to the light palette pins itself
+     to dark server-side. The toggle must respect that pin, otherwise clicking
+     it repaints the page light and the room's light-on-dark text disappears. */
+  function themeReady() {
+    return document.documentElement.dataset.themeReady === 'true';
+  }
+
   function setTheme(theme, persist = true) {
     const next = theme === 'dark' ? 'dark' : 'light';
+    if (!themeReady() && next === 'light') {
+      U.toast(
+        'This workspace is still dark-only. It gains the light theme with its '
+        + 'next redesign — your saved theme is unchanged.',
+        'info',
+        5000
+      );
+      return;
+    }
     document.documentElement.dataset.theme = next;
     document.dispatchEvent(new CustomEvent('opspine:theme', { detail: { theme: next } }));
     if (persist) saveChrome({ theme: next });
   }
 
   function toggleTheme() {
+    if (!themeReady()) {
+      setTheme('light'); // explains why nothing changed
+      return;
+    }
     setTheme(currentTheme() === 'dark' ? 'light' : 'dark');
   }
 
@@ -618,7 +638,7 @@
   /* Startup                                                            */
   /* ------------------------------------------------------------------ */
   function init() {
-    if (isPhone() && document.getElementById('app-shell')) {
+    if (isPhone() && shell) {
       shell.dataset.sidebarCollapsed = 'true';
     }
     const restore = document.getElementById('sidebar-restore');
@@ -663,6 +683,7 @@
     setTheme,
     toggleTheme,
     currentTheme,
+    themeReady,
     isMac,
     modLabel,
     ready: false,

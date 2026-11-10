@@ -156,7 +156,6 @@ body[data-workspace="scout"] .topbar__kbd {
   border-radius: var(--radius-lg);
   border: 1px solid color-mix(in srgb, var(--ink-950) 34%, transparent);
   background: color-mix(in srgb, var(--ink-950) 18%, transparent);
-  backdrop-filter: blur(18px) saturate(1.15);
   box-shadow: 0 24px 60px -28px rgba(18, 34, 60, 0.72);
   overflow: hidden;
 }
@@ -241,7 +240,6 @@ body[data-workspace="scout"] .topbar__kbd {
   border-radius: var(--radius-lg);
   border: 1px solid color-mix(in srgb, var(--ink-950) 30%, transparent);
   background: color-mix(in srgb, var(--ink-950) 16%, transparent);
-  backdrop-filter: blur(16px) saturate(1.1);
   box-shadow: 0 20px 50px -30px rgba(16, 32, 56, 0.7);
   overflow: hidden;
 }
@@ -547,7 +545,6 @@ body[data-workspace="scout"] .topbar__kbd {
   border-radius: var(--radius);
   border: 1px solid color-mix(in srgb, var(--ink-950) 34%, transparent);
   background: color-mix(in srgb, var(--ink-950) 20%, transparent);
-  backdrop-filter: blur(8px);
 }
 
 .note__kind {

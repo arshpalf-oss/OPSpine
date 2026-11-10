@@ -31,7 +31,6 @@ body[data-chrome="launcher"] {
   padding: 0 var(--l-pad);
   height: 68px;
   background: color-mix(in srgb, var(--ink-100) 88%, transparent);
-  backdrop-filter: blur(14px);
   border-bottom: 1px solid var(--line-soft);
 }
 

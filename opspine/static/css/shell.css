@@ -309,7 +309,6 @@
   padding: 0 16px;
   border-bottom: 1px solid var(--line-soft);
   background: color-mix(in srgb, var(--bg) 78%, transparent);
-  backdrop-filter: blur(14px);
 }
 
 .topbar__menu {
@@ -628,7 +627,6 @@ html[data-motion="still"] .workspace {
   position: absolute;
   inset: 0;
   background: color-mix(in srgb, var(--bg) 70%, transparent);
-  backdrop-filter: blur(3px);
 }
 
 .palette,
@@ -638,7 +636,7 @@ html[data-motion="still"] .workspace {
   width: min(100%, 620px);
   border-radius: var(--radius-lg);
   border: 1px solid var(--line-strong);
-  background: rgba(14, 18, 30, 0.97);
+  background: var(--ink-050);
   box-shadow: var(--shadow-lg);
   overflow: hidden;
   animation: rise var(--dur) var(--ease);
@@ -1128,4 +1126,18 @@ label.switch {
 
 .switch__text {
   white-space: nowrap;
+}
+
+/* ---------------------------------------------------------------------- */
+/* Theme toggle glyphs                                                    */
+/* Both sun and moon are in the button so the swap needs no re-render;    */
+/* exactly one is visible at a time.                                      */
+/* ---------------------------------------------------------------------- */
+.theme-icon {
+  display: none;
+}
+
+html[data-theme="dark"] .theme-icon--sun,
+html:not([data-theme="dark"]) .theme-icon--moon {
+  display: block;
 }
