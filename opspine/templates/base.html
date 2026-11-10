@@ -111,6 +111,25 @@
   </div>
 </div>
 
+{# -------------------------------------------------------------------- #}
+{# Text prompt (shared). window.prompt is blocked in embedded and some   #}
+{# kiosk contexts, and it cannot be styled or made accessible.          #}
+{# -------------------------------------------------------------------- #}
+<div class="overlay" id="prompt" hidden role="dialog" aria-modal="true"
+     aria-labelledby="prompt-title" aria-describedby="prompt-hint">
+  <div class="overlay__scrim" data-action="close-prompt"></div>
+  <form class="confirm" id="prompt-form" role="document">
+    <h2 id="prompt-title" class="confirm__title">Name</h2>
+    <p id="prompt-hint" class="confirm__message"></p>
+    <label class="visually-hidden" id="prompt-label" for="prompt-input">Value</label>
+    <input class="input" id="prompt-input" type="text" maxlength="160" autocomplete="off">
+    <div class="confirm__actions">
+      <button class="btn btn--ghost" type="button" data-action="close-prompt">Cancel</button>
+      <button class="btn btn--primary" id="prompt-accept" type="submit">Save</button>
+    </div>
+  </form>
+</div>
+
 <div class="toasts" id="toasts" role="status" aria-live="polite"></div>
 
 <script id="opspine-boot" type="application/json">

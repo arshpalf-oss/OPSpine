@@ -167,6 +167,52 @@
     }
   };
 
+  /* ---------- text prompt ---------- */
+  let promptResolver = null;
+
+  /* Resolves with the trimmed text, or null when cancelled. Falls back to
+     window.prompt only when the shared dialog is not on the page. */
+  U.prompt = function (options = {}) {
+    const overlay = document.getElementById('prompt');
+    const input = document.getElementById('prompt-input');
+    if (!overlay || !input) {
+      const answer = window.prompt(options.title || 'Enter a value', options.value || '');
+      return Promise.resolve(answer === null ? null : answer.trim());
+    }
+    document.getElementById('prompt-title').textContent = options.title || 'Enter a value';
+    const hint = document.getElementById('prompt-hint');
+    hint.textContent = options.message || '';
+    hint.hidden = !options.message;
+    document.getElementById('prompt-label').textContent = options.label || options.title || 'Value';
+    input.value = options.value || '';
+    input.maxLength = options.maxLength || 160;
+    input.placeholder = options.placeholder || '';
+    const accept = document.getElementById('prompt-accept');
+    accept.textContent = options.confirmLabel || 'Save';
+    accept.classList.toggle('btn--danger', Boolean(options.danger));
+
+    overlay.hidden = false;
+    overlay.dataset.open = 'true';
+    input.focus();
+    input.select();
+
+    return new Promise((resolve) => {
+      promptResolver = resolve;
+    });
+  };
+
+  U.closePrompt = function (value) {
+    const overlay = document.getElementById('prompt');
+    if (!overlay || overlay.hidden) return;
+    overlay.hidden = true;
+    delete overlay.dataset.open;
+    if (promptResolver) {
+      const resolve = promptResolver;
+      promptResolver = null;
+      resolve(value === null || value === undefined ? null : String(value).trim());
+    }
+  };
+
   /* ---------- focus trap ---------- */
   const FOCUSABLE =
     'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]),' +

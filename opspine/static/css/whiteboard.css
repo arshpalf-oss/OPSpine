@@ -478,3 +478,59 @@ body[data-workspace="whiteboard"] .topbar {
     font-size: 12px;
   }
 }
+
+/* ---------------- board chrome additions ---------------- */
+/* Rename and zoom-to-fit sit with the controls they belong to, and the
+   stage carries a visible save state so unsaved work is never invisible. */
+.wb__save-state {
+  position: absolute;
+  top: 12px;
+  right: 14px;
+  z-index: 4;
+  padding: 4px 9px;
+  border-radius: 999px;
+  border: 1px solid rgba(196, 161, 255, 0.28);
+  background: #1a1330;
+  color: #cfd3e6;
+  font-size: 10.5px;
+  font-weight: 650;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  pointer-events: none;
+}
+
+.wb__save-state.is-dirty {
+  border-color: rgba(255, 209, 102, 0.55);
+  background: #3a2a10;
+  color: #ffe6ad;
+}
+
+@media (max-width: 720px) {
+  .wb__save-state {
+    top: auto;
+    bottom: 12px;
+    right: 12px;
+  }
+}
+
+/* Links are objects you can act on: click the line to remove it. */
+.wb__links .link-line {
+  cursor: pointer;
+  pointer-events: stroke;
+  transition: stroke 120ms ease, stroke-width 120ms ease;
+}
+
+.wb__links .link-line:hover {
+  stroke: #ff9ecd;
+  stroke-width: 2.6;
+}
+
+.wb__links .link-hit {
+  cursor: pointer;
+  pointer-events: stroke;
+}
+
+#wb-undo:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}

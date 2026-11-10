@@ -1031,3 +1031,28 @@ html:not([data-theme="dark"]) .theme-icon--moon {
 .ws-aside .tools__heading {
   margin-bottom: 8px;
 }
+
+/* --------------------------------------------------------------------------
+   Text prompt — shares the confirm shell, adds a field.
+   -------------------------------------------------------------------------- */
+#prompt .confirm {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+#prompt .confirm__message {
+  margin-bottom: 0;
+}
+
+#prompt .confirm__message[hidden] {
+  display: none;
+}
+
+#prompt .confirm__actions {
+  margin-top: 6px;
+}
+
+#prompt .input {
+  width: 100%;
+}

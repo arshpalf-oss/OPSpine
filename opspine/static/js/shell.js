@@ -361,6 +361,12 @@
 
     /* Escape closes whatever is open. */
     if (event.key === 'Escape') {
+      const prompt = document.getElementById('prompt');
+      if (prompt && !prompt.hidden) {
+        U.closePrompt(null);
+        event.preventDefault();
+        return;
+      }
       if (!document.getElementById('confirm').hidden) {
         U.closeConfirm(false);
         event.preventDefault();
@@ -381,7 +387,9 @@
     /* Focus trap inside the top overlay. */
     if (event.key === 'Tab' && openNow) {
       const overlay = U.$$('.overlay').find((node) => !node.hidden);
-      if (overlay) U.trapFocus(overlay.querySelector('.palette, .sheet, .confirm'), event);
+      if (overlay) {
+        U.trapFocus(overlay.querySelector('.palette, .sheet, .confirm'), event);
+      }
       return;
     }
 
@@ -472,6 +480,9 @@
       case 'close-confirm':
         U.closeConfirm(false);
         break;
+      case 'close-prompt':
+        U.closePrompt(null);
+        break;
       default:
         break;
     }
@@ -480,6 +491,14 @@
   document.getElementById('confirm-accept').addEventListener('click', () => {
     U.closeConfirm(true);
   });
+
+  const promptForm = document.getElementById('prompt-form');
+  if (promptForm) {
+    promptForm.addEventListener('submit', (event) => {
+      event.preventDefault();
+      U.closePrompt(document.getElementById('prompt-input').value);
+    });
+  }
 
   /* ------------------------------------------------------------------ */
   /* Responsive reset                                                   */
